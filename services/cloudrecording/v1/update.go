@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
 
-	"github.com/AgoraIO/agora-rest-client-go/core"
+	"github.com/AgoraIO-Community/agora-rest-client-go/core"
 )
 
 type Update struct {

@@ -1,8 +1,8 @@
 package cloudrecording
 
 import (
-	"github.com/AgoraIO/agora-rest-client-go/core"
-	v1 "github.com/AgoraIO/agora-rest-client-go/services/cloudrecording/v1"
+	"github.com/AgoraIO-Community/agora-rest-client-go/core"
+	v1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1"
 )
 
 const projectName = "cloud_recording"

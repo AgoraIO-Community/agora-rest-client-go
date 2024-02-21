@@ -19,7 +19,7 @@
 ## 安装
 使用以下命令从 GitHub 安装依赖：
 ```shell
-go get -u github.com/AgoraIO/agora-rest-client-go
+go get -u github.com/AgoraIO-Community/agora-rest-client-go
 ```
 ## 使用示例
 以调用云录制服务为例：
@@ -30,9 +30,9 @@ import (
 	"context"
 	"log"
 
-	"github.com/AgoraIO/agora-rest-client-go/core"
-	"github.com/AgoraIO/agora-rest-client-go/services/cloudrecording"
-	v1 "github.com/AgoraIO/agora-rest-client-go/services/cloudrecording/v1"
+	"github.com/AgoraIO-Community/agora-rest-client-go/core"
+	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording"
+	v1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1"
 )
 
 const (

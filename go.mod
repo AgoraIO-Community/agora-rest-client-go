@@ -1,4 +1,4 @@
-module github.com/AgoraIO/agora-rest-client-go
+module github.com/AgoraIO-Community/agora-rest-client-go
 
 go 1.18
 

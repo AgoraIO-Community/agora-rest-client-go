@@ -5,9 +5,9 @@ import (
 	"log"
 	"time"
 
-	"github.com/AgoraIO/agora-rest-client-go/core"
-	"github.com/AgoraIO/agora-rest-client-go/services/cloudrecording"
-	v1 "github.com/AgoraIO/agora-rest-client-go/services/cloudrecording/v1"
+	"github.com/AgoraIO-Community/agora-rest-client-go/core"
+	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording"
+	v1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1"
 )
 
 const (

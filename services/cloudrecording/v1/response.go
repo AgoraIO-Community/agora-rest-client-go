@@ -3,7 +3,7 @@ package v1
 import (
 	"net/http"
 
-	client "github.com/AgoraIO/agora-rest-client-go/core"
+	client "github.com/AgoraIO-Community/agora-rest-client-go/core"
 )
 
 type ErrResponse struct {
