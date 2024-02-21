@@ -3,7 +3,6 @@ package core
 import (
 	"context"
 	"fmt"
-	"slices"
 	"sync"
 	"time"
 )
@@ -157,7 +156,7 @@ func (d *DomainPool) NextRegion() {
 }
 
 func (d *DomainPool) selectDomain(domain string) {
-	if slices.Contains(d.domainSuffixes, domain) {
+	if Contains(d.domainSuffixes, domain) {
 		d.currentDomain = domain
 		d.lastUpdate = time.Now()
 	}
