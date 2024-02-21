@@ -465,3 +465,28 @@ func IndividualRecording() {
 	}
 	time.Sleep(2 * time.Second)
 }
+
+func WebRecording() {
+	log.SetFlags(log.LstdFlags | log.Lshortfile)
+	ctx := context.Background()
+	c := core.NewClient(&core.Config{
+		AppID:      appId,
+		Credential: core.NewBasicAuthCredential(username, password),
+		RegionCode: region,
+		Logger:     core.NewDefaultLogger(core.LogDebug),
+	})
+
+	cloudRecordingAPI := cloudrecording.NewAPI(c)
+
+	resp, err := cloudRecordingAPI.V1().Acquire().DoWebRecording(ctx, cname, uid, &v1.AcquirerWebRecodingClientRequest{
+		ResourceExpiredHour: 24,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	if resp.IsSuccess() {
+		log.Printf("acquire success:%+v", resp.SuccessRes)
+	} else {
+		log.Fatalf("acquire failed:%+v", resp)
+	}
+}

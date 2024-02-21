@@ -33,6 +33,11 @@ type UpdateClientRequest struct {
 	RtmpPublishConfig  *UpdateRtmpPublishConfig  `json:"rtmpPublishConfig,omitempty"`
 }
 
+type UpdateWebRecordingClientRequest struct {
+	WebRecordingConfig *UpdateWebRecordingConfig `json:"webRecordingConfig,omitempty"`
+	RtmpPublishConfig  *UpdateRtmpPublishConfig  `json:"rtmpPublishConfig,omitempty"`
+}
+
 type UpdateStreamSubscribe struct {
 	AudioUidList *UpdateAudioUIDList `json:"audioUidList,omitempty"`
 	VideoUidList *UpdateVideoUIDList `json:"videoUidList,omitempty"`
@@ -113,4 +118,15 @@ func (s *Update) Do(ctx context.Context, resourceID string, sid string, mode str
 	}
 	resp.BaseResponse = responseData
 	return &resp, nil
+}
+
+func (s *Update) DoWebRecording(ctx context.Context, resourceID string, sid string, cname string, uid string, clientRequest *UpdateWebRecordingClientRequest) (*UpdateResp, error) {
+	return s.Do(ctx, resourceID, sid, WebMode, &UpdateReqBody{
+		Cname: cname,
+		Uid:   uid,
+		ClientRequest: &UpdateClientRequest{
+			WebRecordingConfig: clientRequest.WebRecordingConfig,
+			RtmpPublishConfig:  clientRequest.RtmpPublishConfig,
+		},
+	})
 }

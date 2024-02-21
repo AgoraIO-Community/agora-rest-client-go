@@ -44,6 +44,13 @@ type StartClientRequest struct {
 	ExtensionServiceConfig *ExtensionServiceConfig `json:"extensionServiceConfig,omitempty"`
 }
 
+type StartWebRecordingClientRequest struct {
+	Token                  string                  `json:"token,omitempty"`
+	RecordingFileConfig    *RecordingFileConfig    `json:"recordingFileConfig,omitempty"`
+	StorageConfig          *StorageConfig          `json:"storageConfig,omitempty"`
+	ExtensionServiceConfig *ExtensionServiceConfig `json:"extensionServiceConfig,omitempty"`
+}
+
 const (
 	DefaultCombinationPolicy              = "default"
 	PostPhoneTranscodingCombinationPolicy = "postphone_transcoding"
@@ -275,4 +282,18 @@ func (a *Starter) Do(ctx context.Context, resourceID string, mode string, payloa
 	}
 	resp.BaseResponse = responseData
 	return &resp, nil
+}
+
+func (a *Starter) DoWebRecording(ctx context.Context, resourceID string, cname string, uid string, clientRequest *StartWebRecordingClientRequest) (*StarterResp, error) {
+	mode := WebMode
+	return a.Do(ctx, resourceID, mode, &StartReqBody{
+		Cname: cname,
+		Uid:   uid,
+		ClientRequest: &StartClientRequest{
+			Token:                  clientRequest.Token,
+			RecordingFileConfig:    clientRequest.RecordingFileConfig,
+			StorageConfig:          clientRequest.StorageConfig,
+			ExtensionServiceConfig: clientRequest.ExtensionServiceConfig,
+		},
+	})
 }
