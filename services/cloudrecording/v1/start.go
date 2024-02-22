@@ -45,7 +45,7 @@ type StartClientRequest struct {
 }
 
 type StartWebRecordingClientRequest struct {
-	Token                  string                  `json:"token,omitempty"`
+	AppsCollection         *AppsCollection         `json:"appsCollection,omitempty"`
 	RecordingFileConfig    *RecordingFileConfig    `json:"recordingFileConfig,omitempty"`
 	StorageConfig          *StorageConfig          `json:"storageConfig,omitempty"`
 	ExtensionServiceConfig *ExtensionServiceConfig `json:"extensionServiceConfig,omitempty"`
@@ -194,12 +194,13 @@ type SnapshotConfig struct {
 	FileType        []string `json:"fileType"`
 }
 type StorageConfig struct {
-	Vendor         int      `json:"vendor"`
-	Region         int      `json:"region"`
-	Bucket         string   `json:"bucket"`
-	AccessKey      string   `json:"accessKey"`
-	SecretKey      string   `json:"secretKey"`
-	FileNamePrefix []string `json:"fileNamePrefix,omitempty"`
+	Vendor          int              `json:"vendor"`
+	Region          int              `json:"region"`
+	Bucket          string           `json:"bucket"`
+	AccessKey       string           `json:"accessKey"`
+	SecretKey       string           `json:"secretKey"`
+	FileNamePrefix  []string         `json:"fileNamePrefix,omitempty"`
+	ExtensionParams *ExtensionParams `json:"extensionParams,omitempty"`
 }
 
 type ExtensionParams struct {
@@ -208,8 +209,7 @@ type ExtensionParams struct {
 }
 
 type ExtensionServiceConfig struct {
-	ErrorHandlePolicy string             `json:"errorHandlePolicy"`
-	APIVersion        string             `json:"apiVersion"`
+	ErrorHandlePolicy string             `json:"errorHandlePolicy,omitempty"`
 	ExtensionServices []ExtensionService `json:"extensionServices"`
 }
 
@@ -224,18 +224,18 @@ type Outputs struct {
 }
 
 type ServiceParam struct {
-	Outputs          []Outputs `json:"outputs"`
+	Outputs          []Outputs `json:"outputs,omitempty"`
 	URL              string    `json:"url"`
-	VideoBitRate     int       `json:"VideoBitrate"`
-	VideoFPS         int       `json:"videoFps"`
+	VideoBitRate     int       `json:"VideoBitrate,omitempty"`
+	VideoFPS         int       `json:"videoFps,omitempty"`
 	AudioProfile     int       `json:"audioProfile"`
-	Mobile           bool      `json:"mobile"`
+	Mobile           bool      `json:"mobile,omitempty"`
 	VideoWidth       int       `json:"videoWidth"`
 	VideoHeight      int       `json:"videoHeight"`
 	MaxRecordingHour int       `json:"maxRecordingHour"`
-	MaxVideoDuration int       `json:"MaxVideoDuration"`
-	Onhold           bool      `json:"onhold"`
-	ReadyTimeout     int       `json:"readyTimeout"`
+	MaxVideoDuration int       `json:"maxVideoDuration,omitempty"`
+	Onhold           bool      `json:"onhold,omitempty"`
+	ReadyTimeout     int       `json:"readyTimeout,omitempty"`
 }
 
 type StarterResp struct {
@@ -244,7 +244,7 @@ type StarterResp struct {
 }
 
 type StartSuccessResp struct {
-	CName      string `json:"cname"`
+	Cname      string `json:"cname"`
 	UID        string `json:"uid"`
 	ResourceId string `json:"resourceId"`
 	SID        string `json:"sid"`
@@ -290,7 +290,6 @@ func (a *Starter) DoWebRecording(ctx context.Context, resourceID string, cname s
 		Cname: cname,
 		Uid:   uid,
 		ClientRequest: &StartClientRequest{
-			Token:                  clientRequest.Token,
 			RecordingFileConfig:    clientRequest.RecordingFileConfig,
 			StorageConfig:          clientRequest.StorageConfig,
 			ExtensionServiceConfig: clientRequest.ExtensionServiceConfig,

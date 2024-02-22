@@ -31,13 +31,13 @@ type AcquirerClientRequest struct {
 	Scene               int      `json:"scene"`
 	ResourceExpiredHour int      `json:"resourceExpiredHour"`
 	ExcludeResourceIds  []string `json:"excludeResourceIds,omitempty"`
-	RegionAffinity      int      `json:"regionAffinity"`
+	RegionAffinity      int      `json:"regionAffinity,omitempty"`
 }
 
 type AcquirerWebRecodingClientRequest struct {
 	ResourceExpiredHour int      `json:"resourceExpiredHour"`
 	ExcludeResourceIds  []string `json:"excludeResourceIds,omitempty"`
-	RegionAffinity      int      `json:"regionAffinity"`
+	RegionAffinity      int      `json:"regionAffinity,omitempty"`
 }
 
 type AcquirerResp struct {
