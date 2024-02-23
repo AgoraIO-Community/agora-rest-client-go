@@ -62,17 +62,6 @@ type StopSuccessResp struct {
 	webRecordingServerResponse          *StopWebRecordingServerResponse
 }
 
-type StopWebRecordingResp struct {
-	Response
-	SuccessResp StopWebRecordingSuccessResp
-}
-
-type StopWebRecordingSuccessResp struct {
-	ResourceId     string
-	SID            string
-	ServerResponse StopWebRecordingServerResponse
-}
-
 type StopIndividualRecordingServerResponse struct {
 	FileListMode string `json:"fileListMode"`
 	FileList     []struct {
@@ -269,26 +258,4 @@ func (s *Stop) Do(ctx context.Context, resourceID string, sid string, mode strin
 	resp.BaseResponse = responseData
 
 	return &resp, nil
-}
-
-func (s *Stop) DoWebRecording(ctx context.Context, resourceID string, sid string, payload *StopReqBody) (*StopWebRecordingResp, error) {
-	mode := WebMode
-	resp, err := s.Do(ctx, resourceID, sid, mode, payload)
-	if err != nil {
-		return nil, err
-	}
-
-	var webResp StopWebRecordingResp
-
-	webResp.Response = resp.Response
-	if resp.IsSuccess() {
-		successResp := resp.SuccessResp
-		webResp.SuccessResp = StopWebRecordingSuccessResp{
-			ResourceId:     successResp.ResourceId,
-			SID:            successResp.SID,
-			ServerResponse: *successResp.GetWebRecordingServerResponse(),
-		}
-	}
-
-	return &webResp, nil
 }

@@ -50,17 +50,6 @@ type QueryResp struct {
 	SuccessResp QuerySuccessResp
 }
 
-type QueryWebRecordingResp struct {
-	Response
-	SuccessResp QueryWebRecordingSuccessResp
-}
-
-type QueryWebRecordingSuccessResp struct {
-	ResourceId     string
-	SID            string
-	ServerResponse QueryWebRecordingServerResponse
-}
-
 type QueryIndividualRecordingServerResponse struct {
 	Status       int    `json:"status"`
 	FileListMode string `json:"fileListMode"`
@@ -244,28 +233,4 @@ func (q *Query) Do(ctx context.Context, resourceID string, sid string, mode stri
 	resp.BaseResponse = responseData
 
 	return &resp, nil
-}
-
-func (q *Query) DoWebRecording(ctx context.Context, resourceID string, sid string) (*QueryWebRecordingResp, error) {
-	mode := WebMode
-	resp, err := q.Do(ctx, resourceID, sid, mode)
-	if err != nil {
-		return nil, err
-	}
-
-	if resp.SuccessResp.GetServerResponseMode() != QueryWebRecordingServerResponseMode {
-		return nil, errors.New("unexpected server response mode")
-	}
-
-	var webResp QueryWebRecordingResp
-
-	webResp.Response = resp.Response
-	successResp := resp.SuccessResp
-	webResp.SuccessResp = QueryWebRecordingSuccessResp{
-		ResourceId:     successResp.ResourceId,
-		SID:            successResp.SID,
-		ServerResponse: *successResp.GetWebRecording2CDNServerResponse(),
-	}
-
-	return &webResp, nil
 }

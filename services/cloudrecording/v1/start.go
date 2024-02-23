@@ -44,13 +44,6 @@ type StartClientRequest struct {
 	ExtensionServiceConfig *ExtensionServiceConfig `json:"extensionServiceConfig,omitempty"`
 }
 
-type StartWebRecordingClientRequest struct {
-	AppsCollection         *AppsCollection         `json:"appsCollection,omitempty"`
-	RecordingFileConfig    *RecordingFileConfig    `json:"recordingFileConfig,omitempty"`
-	StorageConfig          *StorageConfig          `json:"storageConfig,omitempty"`
-	ExtensionServiceConfig *ExtensionServiceConfig `json:"extensionServiceConfig,omitempty"`
-}
-
 const (
 	DefaultCombinationPolicy              = "default"
 	PostPhoneTranscodingCombinationPolicy = "postphone_transcoding"

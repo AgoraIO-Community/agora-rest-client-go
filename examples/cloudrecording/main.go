@@ -509,10 +509,10 @@ func WebRecording() {
 		Logger:     core.NewDefaultLogger(core.LogDebug),
 	})
 
-	cloudRecordingAPI := cloudrecording.NewAPI(c)
+	webRecordingV1 := cloudrecording.NewAPI(c).V1().WebRecording()
 
 	// acquire
-	resp, err := cloudRecordingAPI.V1().Acquire().DoWebRecording(ctx, cname, uid, &v1.AcquirerWebRecodingClientRequest{
+	resp, err := webRecordingV1.Acquire().Do(ctx, cname, uid, &v1.AcquirerWebRecodingClientRequest{
 		ResourceExpiredHour: 24,
 	})
 	if err != nil {
@@ -527,7 +527,7 @@ func WebRecording() {
 	resourceId := resp.SuccessRes.ResourceId
 
 	// start
-	starterResp, err := cloudRecordingAPI.V1().Start().DoWebRecording(ctx, resourceId, cname, uid, &v1.StartWebRecordingClientRequest{
+	starterResp, err := webRecordingV1.Start().Do(ctx, resourceId, cname, uid, &v1.StartWebRecordingClientRequest{
 		AppsCollection: &v1.AppsCollection{
 			CombinationPolicy: "default",
 		},
@@ -569,7 +569,7 @@ func WebRecording() {
 
 	defer func() {
 		// stop
-		stopResp, err := cloudRecordingAPI.V1().Stop().DoWebRecording(ctx, resourceId, sid, &v1.StopReqBody{
+		stopResp, err := webRecordingV1.Stop().Do(ctx, resourceId, sid, &v1.StopReqBody{
 			Cname: cname,
 			Uid:   uid,
 			ClientRequest: &v1.StopClientRequest{
@@ -588,7 +588,7 @@ func WebRecording() {
 	}()
 
 	// query
-	queryResp, err := cloudRecordingAPI.V1().Query().DoWebRecording(ctx, resourceId, sid)
+	queryResp, err := webRecordingV1.Query().Do(ctx, resourceId, sid)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -602,7 +602,7 @@ func WebRecording() {
 	time.Sleep(3 * time.Second)
 
 	// update
-	updateResp, err := cloudRecordingAPI.V1().Update().DoWebRecording(ctx, resourceId, sid, cname, uid, &v1.UpdateWebRecordingClientRequest{
+	updateResp, err := webRecordingV1.Update().Do(ctx, resourceId, sid, cname, uid, &v1.UpdateWebRecordingClientRequest{
 		WebRecordingConfig: &v1.UpdateWebRecordingConfig{
 			Onhold: false,
 		},

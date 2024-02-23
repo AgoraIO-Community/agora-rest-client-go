@@ -34,12 +34,6 @@ type AcquirerClientRequest struct {
 	RegionAffinity      int      `json:"regionAffinity,omitempty"`
 }
 
-type AcquirerWebRecodingClientRequest struct {
-	ResourceExpiredHour int      `json:"resourceExpiredHour"`
-	ExcludeResourceIds  []string `json:"excludeResourceIds,omitempty"`
-	RegionAffinity      int      `json:"regionAffinity,omitempty"`
-}
-
 type AcquirerResp struct {
 	Response
 	SuccessRes AcquirerSuccessResp
@@ -82,17 +76,4 @@ func (a *Acquire) Do(ctx context.Context, payload *AcquirerReqBody) (*AcquirerRe
 
 	resp.BaseResponse = responseData
 	return &resp, nil
-}
-
-func (a *Acquire) DoWebRecording(ctx context.Context, cname string, uid string, clientRequest *AcquirerWebRecodingClientRequest) (*AcquirerResp, error) {
-	return a.Do(ctx, &AcquirerReqBody{
-		Cname: cname,
-		Uid:   uid,
-		ClientRequest: &AcquirerClientRequest{
-			Scene:               1,
-			ResourceExpiredHour: clientRequest.ResourceExpiredHour,
-			ExcludeResourceIds:  clientRequest.ExcludeResourceIds,
-			RegionAffinity:      clientRequest.RegionAffinity,
-		},
-	})
 }
