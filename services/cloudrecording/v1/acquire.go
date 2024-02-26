@@ -7,7 +7,7 @@ import (
 
 	"github.com/tidwall/gjson"
 
-	"github.com/AgoraIO/agora-rest-client-go/core"
+	"github.com/AgoraIO-Community/agora-rest-client-go/core"
 )
 
 type Acquire struct {
@@ -31,7 +31,7 @@ type AcquirerClientRequest struct {
 	Scene               int      `json:"scene"`
 	ResourceExpiredHour int      `json:"resourceExpiredHour"`
 	ExcludeResourceIds  []string `json:"excludeResourceIds,omitempty"`
-	RegionAffinity      int      `json:"regionAffinity"`
+	RegionAffinity      int      `json:"regionAffinity,omitempty"`
 }
 
 type AcquirerResp struct {

@@ -1,8 +1,9 @@
 package cloudrecording
 
 import (
-	"github.com/AgoraIO/agora-rest-client-go/core"
-	v1 "github.com/AgoraIO/agora-rest-client-go/services/cloudrecording/v1"
+	"github.com/AgoraIO-Community/agora-rest-client-go/core"
+	v1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1"
+	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1/webrecording"
 )
 
 const projectName = "cloud_recording"
@@ -19,6 +20,6 @@ func (a *API) buildPrefixPath() string {
 	return "/apps/" + a.client.GetAppID() + "/" + projectName
 }
 
-func (a *API) V1() *v1.Collection {
-	return v1.NewCollection(a.buildPrefixPath(), a.client)
+func (a *API) V1() *v1.BaseCollection {
+	return v1.NewCollection(a.buildPrefixPath(), a.client, webrecording.NewWebRecording())
 }

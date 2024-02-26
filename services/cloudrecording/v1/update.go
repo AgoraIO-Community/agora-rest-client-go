@@ -7,7 +7,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
 
-	"github.com/AgoraIO/agora-rest-client-go/core"
+	"github.com/AgoraIO-Community/agora-rest-client-go/core"
 )
 
 type Update struct {
@@ -68,6 +68,8 @@ type UpdateResp struct {
 type UpdateSuccessResp struct {
 	ResourceId string `json:"resourceId"`
 	SID        string `json:"sid"`
+	UID        string `json:"uid"`
+	Cname      string `json:"cname"`
 }
 
 type UpdateServerResponse struct {
@@ -112,5 +114,6 @@ func (s *Update) Do(ctx context.Context, resourceID string, sid string, mode str
 		resp.ErrResponse = errResponse
 	}
 	resp.BaseResponse = responseData
+
 	return &resp, nil
 }

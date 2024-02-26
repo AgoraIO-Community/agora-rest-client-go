@@ -8,7 +8,7 @@ import (
 
 	"github.com/tidwall/gjson"
 
-	"github.com/AgoraIO/agora-rest-client-go/core"
+	"github.com/AgoraIO-Community/agora-rest-client-go/core"
 )
 
 type Stop struct {
@@ -39,6 +39,8 @@ type StopReqBody struct {
 	ClientRequest *StopClientRequest `json:"clientRequest"`
 }
 
+// StopClientRequest is the request body of stop.
+// 当 async_stop 为 true 时，表示异步停止录制。默认值为 false，异步情况下可能会获取不到对应的serverResponse内容
 type StopClientRequest struct {
 	AsyncStop bool `json:"async_stop"`
 }
@@ -100,28 +102,54 @@ type StopWebRecordingServerResponse struct {
 	ExtensionServiceState []struct {
 		Payload struct {
 			UploadingStatus string `json:"uploadingStatus"`
+			FileList        []struct {
+				FileName       string `json:"fileName"`
+				TrackType      string `json:"trackType"`
+				Uid            string `json:"uid"`
+				MixedAllUser   bool   `json:"mixedAllUser"`
+				IsPlayable     bool   `json:"isPlayable"`
+				SliceStartTime int64  `json:"sliceStartTime"`
+			} `json:"fileList"`
+			Onhold bool   `json:"onhold"`
+			State  string `json:"state"`
 		} `json:"payload"`
 		ServiceName string `json:"serviceName"`
+		ExitReason  string `json:"exit_reason"`
 	} `json:"extensionServiceState"`
 }
 
 func (s *StopSuccessResp) GetIndividualRecordingServerResponse() *StopIndividualRecordingServerResponse {
+	if s.individualRecordingServerResponse == nil {
+		return nil
+	}
 	return s.individualRecordingServerResponse
 }
 
 func (s *StopSuccessResp) GetIndividualVideoScreenshotServerResponse() *StopIndividualVideoScreenshotServerResponse {
+	if s.individualVideoScreenshotResponse == nil {
+		return nil
+	}
 	return s.individualVideoScreenshotResponse
 }
 
 func (s *StopSuccessResp) GetMixRecordingHLSServerResponse() *StopMixRecordingHLSServerResponse {
+	if s.mixRecordingHLSServerResponse == nil {
+		return nil
+	}
 	return s.mixRecordingHLSServerResponse
 }
 
 func (s *StopSuccessResp) GetMixRecordingHLSAndMP4ServerResponse() *StopMixRecordingHLSAndMP4ServerResponse {
+	if s.mixRecordingHLSAndMP4ServerResponse == nil {
+		return nil
+	}
 	return s.mixRecordingHLSAndMP4ServerResponse
 }
 
 func (s *StopSuccessResp) GetWebRecordingServerResponse() *StopWebRecordingServerResponse {
+	if s.webRecordingServerResponse == nil {
+		return nil
+	}
 	return s.webRecordingServerResponse
 }
 func (s *StopSuccessResp) GetServerResponseMode() StopRespServerResponseMode {
@@ -182,9 +210,12 @@ func (s *StopSuccessResp) setServerResponse(rawBody []byte, mode string) error {
 		serverResponseMode = StopWebRecordingServerResponseMode
 		serverResponse := gjson.GetBytes(rawBody, "serverResponse")
 		var resp StopWebRecordingServerResponse
-		if err := json.Unmarshal([]byte(serverResponse.String()), &resp); err != nil {
-			return err
+		if serverResponse.Exists() {
+			if err := json.Unmarshal([]byte(serverResponse.String()), &resp); err != nil {
+				return err
+			}
 		}
+		s.webRecordingServerResponse = &resp
 	default:
 		return errors.New("unknown mode")
 	}
