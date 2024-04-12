@@ -10,6 +10,13 @@ on:
     branches: [ "main" ]
 
 jobs:
+  govulncheck:
+    runs-on: ubuntu-latest
+    name: govulncheck
+    steps:
+      - id: govulncheck
+        uses: golang/govulncheck-action@v1
+
   golangci:
     name: lint
     runs-on: ubuntu-latest
