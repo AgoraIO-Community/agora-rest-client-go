@@ -99,11 +99,10 @@ type DomainPool struct {
 	currentRegionPrefixes []string
 	locker                sync.Mutex
 
-	resolver          DomainResolver
-	lastUpdate        time.Time
-	majorDomainHasErr bool
-	logger            Logger
-	module            string
+	resolver   DomainResolver
+	lastUpdate time.Time
+	logger     Logger
+	module     string
 }
 
 func NewDomainPool(domainArea RegionArea, logger Logger) *DomainPool {
