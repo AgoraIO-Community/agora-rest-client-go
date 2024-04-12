@@ -47,7 +47,7 @@ var (
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
-	err := godotenv.Load("/Users/admin/go/src/agora-rest-client-go/examples/cloudrecording/.env")
+	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal(err)
 	}
