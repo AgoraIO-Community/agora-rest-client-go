@@ -1,4 +1,5 @@
 # Agora REST Client for Go
+[![Go](https://github.com/AgoraIO-Community/agora-rest-client-go/actions/workflows/go.yml/badge.svg)](https://github.com/seymourtang/agora-rest-client-go/actions/workflows/go.yml)
 
 `agora-rest-client-go`是用Go语言编写的一个开源项目，专门为 Agora REST API设计。它包含了 Agora 官方提供的REST API接口的包装和内部实现，可以帮助开发者更加方便的集成服务端Agora REST API。
 ## 特性
