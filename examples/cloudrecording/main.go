@@ -30,20 +30,18 @@ var (
 	region core.RegionArea = core.CN
 )
 
-var (
-	// 选择你的存储配置 第三方云存储地区说明详情见 https://doc.shengwang.cn/api-ref/cloud-recording/restful/region-vendor
-	// 配置存储需要的参数
-	storageConfig = &v1.StorageConfig{
-		Vendor:    0,
-		Region:    0,
-		Bucket:    "",
-		AccessKey: "",
-		SecretKey: "",
-		FileNamePrefix: []string{
-			"",
-		},
-	}
-)
+// 选择你的存储配置 第三方云存储地区说明详情见 https://doc.shengwang.cn/api-ref/cloud-recording/restful/region-vendor
+// 配置存储需要的参数
+var storageConfig = &v1.StorageConfig{
+	Vendor:    0,
+	Region:    0,
+	Bucket:    "",
+	AccessKey: "",
+	SecretKey: "",
+	FileNamePrefix: []string{
+		"",
+	},
+}
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
@@ -220,7 +218,6 @@ func MixRecording() {
 			stopServerResponse = stopSuccess.GetWebRecordingServerResponse()
 		}
 		log.Printf("stopServerResponse:%+v", stopServerResponse)
-
 	}()
 
 	queryResp, err := cloudRecordingAPI.V1().Query().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, mode)
@@ -317,7 +314,6 @@ func MixRecording() {
 			},
 		},
 	})
-
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -328,7 +324,6 @@ func MixRecording() {
 		return
 	}
 	time.Sleep(2 * time.Second)
-
 }
 
 // IndividualRecording hls
@@ -487,7 +482,6 @@ func IndividualRecording() {
 			},
 		},
 	})
-
 	if err != nil {
 		log.Fatalln(err)
 	}

@@ -73,7 +73,8 @@ func (c *ClientImpl) marshalBody(body interface{}) (io.Reader, error) {
 }
 
 func (c *ClientImpl) DoREST(ctx context.Context, path string,
-	method string, requestBody interface{}) (*BaseResponse, error) {
+	method string, requestBody interface{},
+) (*BaseResponse, error) {
 	timeoutCtx, cancelFunc := context.WithTimeout(ctx, c.timeout)
 	defer func() {
 		_ = cancelFunc
@@ -127,8 +128,8 @@ func (c *ClientImpl) DoREST(ctx context.Context, path string,
 }
 
 func (c *ClientImpl) doREST(ctx context.Context, path string,
-	method string, requestBody interface{}) (*BaseResponse, error) {
-
+	method string, requestBody interface{},
+) (*BaseResponse, error) {
 	var (
 		err  error
 		resp *http.Response
@@ -200,7 +201,8 @@ func (c *ClientImpl) GetAppID() string {
 }
 
 func (c *ClientImpl) createRequest(ctx context.Context, path string,
-	method string, requestBody interface{}) (*http.Request, error) {
+	method string, requestBody interface{},
+) (*http.Request, error) {
 	url := c.domainPool.GetCurrentUrl() + path
 
 	c.logger.Debugf(ctx, "create request url:%s", url)

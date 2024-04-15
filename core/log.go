@@ -103,7 +103,6 @@ func (d *sampleLogger) Error(ctx context.Context, module string, v ...interface{
 	if d.level <= LogErr {
 		_ = d.ERROR.Output(2, fmt.Sprintln(v...))
 	}
-
 }
 
 func (d *sampleLogger) Errorf(ctx context.Context, module string, format string, v ...interface{}) {

@@ -152,6 +152,7 @@ func (s *StopSuccessResp) GetWebRecordingServerResponse() *StopWebRecordingServe
 	}
 	return s.webRecordingServerResponse
 }
+
 func (s *StopSuccessResp) GetServerResponseMode() StopRespServerResponseMode {
 	return s.serverResponseMode
 }
