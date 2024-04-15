@@ -328,16 +328,3 @@ func (s *Starter) doRESTWithRetry(ctx context.Context, path string, method strin
 
 	return resp, err
 }
-
-func (s *Starter) DoWebRecording(ctx context.Context, resourceID string, cname string, uid string, clientRequest *StartWebRecordingClientRequest) (*StarterResp, error) {
-	mode := WebMode
-	return s.Do(ctx, resourceID, mode, &StartReqBody{
-		Cname: cname,
-		Uid:   uid,
-		ClientRequest: &StartClientRequest{
-			RecordingFileConfig:    clientRequest.RecordingFileConfig,
-			StorageConfig:          clientRequest.StorageConfig,
-			ExtensionServiceConfig: clientRequest.ExtensionServiceConfig,
-		},
-	})
-}

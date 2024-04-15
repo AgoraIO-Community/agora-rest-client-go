@@ -165,6 +165,7 @@ func MixRecording() {
 			RecordingFileConfig: &v1.RecordingFileConfig{
 				AvFileType: []string{
 					"hls",
+					"mp4",
 				},
 			},
 			StorageConfig: storageConfig,
