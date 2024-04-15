@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"time"
@@ -12,13 +11,14 @@ import (
 
 type Client interface {
 	GetAppID() string
+	GetLogger() Logger
 	DoREST(ctx context.Context, path string, method string, requestBody interface{}) (*BaseResponse, error)
 }
 
 type Config struct {
-	AppID      string
-	Timeout    time.Duration
-	Credential Credential
+	AppID       string
+	HttpTimeout time.Duration
+	Credential  Credential
 
 	RegionCode RegionArea
 	Logger     Logger
@@ -35,16 +35,20 @@ type ClientImpl struct {
 	domainPool *DomainPool
 }
 
+func (c *ClientImpl) GetLogger() Logger {
+	return c.logger
+}
+
 var _ Client = (*ClientImpl)(nil)
 
-const defaultTimeout = 10 * time.Second
+const defaultHttpTimeout = 10 * time.Second
 
 func NewClient(config *Config) *ClientImpl {
-	if config.Timeout == 0 {
-		config.Timeout = defaultTimeout
+	if config.HttpTimeout == 0 {
+		config.HttpTimeout = defaultHttpTimeout
 	}
 	cc := &http.Client{
-		Timeout: config.Timeout,
+		Timeout: config.HttpTimeout,
 	}
 	if config.Logger == nil {
 		config.Logger = defaultLogger
@@ -53,7 +57,7 @@ func NewClient(config *Config) *ClientImpl {
 		appID:      config.AppID,
 		credential: config.Credential,
 		httpClient: cc,
-		timeout:    config.Timeout,
+		timeout:    config.HttpTimeout,
 		logger:     config.Logger,
 		module:     "http client",
 		domainPool: NewDomainPool(config.RegionCode, config.Logger),
@@ -72,62 +76,9 @@ func (c *ClientImpl) marshalBody(body interface{}) (io.Reader, error) {
 	return bytes.NewReader(jsonBody), nil
 }
 
+const doRESTTimeout = 10 * time.Second
+
 func (c *ClientImpl) DoREST(ctx context.Context, path string,
-	method string, requestBody interface{},
-) (*BaseResponse, error) {
-	timeoutCtx, cancelFunc := context.WithTimeout(ctx, c.timeout)
-	defer func() {
-		_ = cancelFunc
-	}()
-
-	var (
-		resp  *BaseResponse
-		err   error
-		retry int
-	)
-
-	err = RetryDo(func(retryCount int) error {
-		var doErr error
-
-		resp, doErr = c.doREST(timeoutCtx, path, method, requestBody)
-		if doErr != nil {
-			return NewRetryErr(false, doErr)
-		}
-
-		statusCode := resp.HttpStatusCode
-		switch {
-		case statusCode >= 200 && statusCode <= 300:
-			return nil
-		case statusCode >= 400 && statusCode < 410:
-			c.logger.Debugf(ctx, c.module, "http status code is %d, no retry,http response:%s", statusCode, resp.RawBody)
-			return &RetryErr{
-				false,
-				NewInternalErr(fmt.Sprintf("http status code is %d, no retry,http response:%s", statusCode, resp.RawBody)),
-			}
-		default:
-			c.logger.Debugf(ctx, c.module, "http status code is %d, retry,http response:%s", statusCode, resp.RawBody)
-			return fmt.Errorf("http status code is %d, retry", resp.RawBody)
-		}
-	}, func() bool {
-		select {
-		case <-ctx.Done():
-			return true
-		default:
-		}
-		return retry >= 3
-	}, func(i int) time.Duration {
-		return time.Second * time.Duration(i+1)
-	}, func(err error) {
-		c.logger.Debugf(ctx, c.module, "http request err:%s", err)
-		retry++
-	})
-	if resp != nil {
-		c.logger.Debugf(ctx, c.module, "http response:%s", resp.RawBody)
-	}
-	return resp, err
-}
-
-func (c *ClientImpl) doREST(ctx context.Context, path string,
 	method string, requestBody interface{},
 ) (*BaseResponse, error) {
 	var (
@@ -135,13 +86,15 @@ func (c *ClientImpl) doREST(ctx context.Context, path string,
 		resp *http.Response
 		req  *http.Request
 	)
+	timeoutCtx, cancel := context.WithTimeout(ctx, doRESTTimeout)
+	defer cancel()
 
-	if err = c.domainPool.SelectBestDomain(ctx); err != nil {
+	if err = c.domainPool.SelectBestDomain(timeoutCtx); err != nil {
 		return nil, err
 	}
 
 	doHttpRequest := func() error {
-		req, err = c.createRequest(ctx, path, method, requestBody)
+		req, err = c.createRequest(timeoutCtx, path, method, requestBody)
 		if err != nil {
 			return err
 		}
@@ -150,12 +103,12 @@ func (c *ClientImpl) doREST(ctx context.Context, path string,
 	}
 	err = RetryDo(
 		func(retryCount int) error {
-			c.logger.Debugf(ctx, c.module, "http retry attempt:%d", retryCount)
+			c.logger.Debugf(timeoutCtx, c.module, "http retry attempt:%d", retryCount)
 			return doHttpRequest()
 		},
 		func() bool {
 			select {
-			case <-ctx.Done():
+			case <-timeoutCtx.Done():
 				return true
 			default:
 			}
@@ -168,7 +121,7 @@ func (c *ClientImpl) doREST(ctx context.Context, path string,
 			return 500 * time.Millisecond
 		},
 		func(err error) {
-			c.logger.Debugf(ctx, c.module, "http request err:%s", err)
+			c.logger.Debugf(timeoutCtx, c.module, "http request err:%s", err)
 			c.domainPool.NextRegion()
 		},
 	)
@@ -183,6 +136,7 @@ func (c *ClientImpl) doREST(ctx context.Context, path string,
 	if err != nil {
 		return nil, err
 	}
+	c.logger.Debugf(ctx, c.module, "http response:%s", body)
 
 	return &BaseResponse{
 		RawBody:        body,

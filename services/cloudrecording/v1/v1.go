@@ -29,6 +29,8 @@ func (c *BaseCollection) Acquire() *Acquire {
 
 func (c *BaseCollection) Start() *Starter {
 	return &Starter{
+		module:     "cloudRecording:start",
+		logger:     c.client.GetLogger(),
 		client:     c.client,
 		prefixPath: c.prefixPath,
 	}

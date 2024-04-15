@@ -3,7 +3,9 @@ package v1
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/tidwall/gjson"
 
@@ -11,6 +13,8 @@ import (
 )
 
 type Starter struct {
+	module     string
+	logger     core.Logger
 	client     core.Client
 	prefixPath string // /v1/apps/{appid}/cloud_recording
 }
@@ -23,8 +27,8 @@ const (
 
 // BuildPath returns the request path.
 // /v1/apps/{appid}/cloud_recording/resourceid/{resourceid}/mode/{mode}/start
-func (a *Starter) BuildPath(resourceID string, mode string) string {
-	return a.prefixPath + "/resourceid/" + resourceID + "/mode/" + mode + "/start"
+func (s *Starter) BuildPath(resourceID string, mode string) string {
+	return s.prefixPath + "/resourceid/" + resourceID + "/mode/" + mode + "/start"
 }
 
 type StartReqBody struct {
@@ -243,10 +247,10 @@ type StartSuccessResp struct {
 	SID        string `json:"sid"`
 }
 
-func (a *Starter) Do(ctx context.Context, resourceID string, mode string, payload *StartReqBody) (*StarterResp, error) {
-	path := a.BuildPath(resourceID, mode)
+func (s *Starter) Do(ctx context.Context, resourceID string, mode string, payload *StartReqBody) (*StarterResp, error) {
+	path := s.BuildPath(resourceID, mode)
 
-	responseData, err := a.client.DoREST(ctx, path, http.MethodPost, payload)
+	responseData, err := s.doRESTWithRetry(ctx, path, http.MethodPost, payload)
 	if err != nil {
 		var internalErr *core.InternalErr
 		if !errors.As(err, &internalErr) {
@@ -277,9 +281,57 @@ func (a *Starter) Do(ctx context.Context, resourceID string, mode string, payloa
 	return &resp, nil
 }
 
-func (a *Starter) DoWebRecording(ctx context.Context, resourceID string, cname string, uid string, clientRequest *StartWebRecordingClientRequest) (*StarterResp, error) {
+const retryCount = 3
+
+func (s *Starter) doRESTWithRetry(ctx context.Context, path string, method string, requestBody interface{}) (*core.BaseResponse, error) {
+	var (
+		resp  *core.BaseResponse
+		err   error
+		retry int
+	)
+
+	err = core.RetryDo(func(retryCount int) error {
+		var doErr error
+
+		resp, doErr = s.client.DoREST(ctx, path, method, requestBody)
+		if doErr != nil {
+			return core.NewRetryErr(false, doErr)
+		}
+
+		statusCode := resp.HttpStatusCode
+		switch {
+		case statusCode == 200 || statusCode == 201:
+			return nil
+		case statusCode >= 400 && statusCode < 410:
+			s.logger.Debugf(ctx, s.module, "http status code is %d, no retry,http response:%s", statusCode, resp.RawBody)
+			return core.NewRetryErr(
+				false,
+				core.NewInternalErr(fmt.Sprintf("http status code is %d, no retry,http response:%s", statusCode, resp.RawBody)),
+			)
+		default:
+			s.logger.Debugf(ctx, s.module, "http status code is %d, retry,http response:%s", statusCode, resp.RawBody)
+			return fmt.Errorf("http status code is %d, retry", resp.RawBody)
+		}
+	}, func() bool {
+		select {
+		case <-ctx.Done():
+			return true
+		default:
+		}
+		return retry >= retryCount
+	}, func(i int) time.Duration {
+		return time.Second * time.Duration(i+1)
+	}, func(err error) {
+		s.logger.Debugf(ctx, s.module, "http request err:%s", err)
+		retry++
+	})
+
+	return resp, err
+}
+
+func (s *Starter) DoWebRecording(ctx context.Context, resourceID string, cname string, uid string, clientRequest *StartWebRecordingClientRequest) (*StarterResp, error) {
 	mode := WebMode
-	return a.Do(ctx, resourceID, mode, &StartReqBody{
+	return s.Do(ctx, resourceID, mode, &StartReqBody{
 		Cname: cname,
 		Uid:   uid,
 		ClientRequest: &StartClientRequest{
