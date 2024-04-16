@@ -1,4 +1,4 @@
-package webrecording
+package individualrecording
 
 import (
 	"context"
@@ -10,14 +10,18 @@ type Acquire struct {
 	Base *baseV1.Acquire
 }
 
-var _ baseV1.AcquireWebRecording = (*Acquire)(nil)
+var _ baseV1.AcquireIndividualRecording = (*Acquire)(nil)
 
-func (a *Acquire) Do(ctx context.Context, cname string, uid string, clientRequest *baseV1.AcquirerWebRecodingClientRequest) (*baseV1.AcquirerResp, error) {
+func (a *Acquire) Do(ctx context.Context, cname string, uid string, enablePostponeTranscodingMix bool, clientRequest *baseV1.AcquirerIndividualRecodingClientRequest) (*baseV1.AcquirerResp, error) {
+	scene := 0
+	if enablePostponeTranscodingMix {
+		scene = 2
+	}
 	return a.Base.Do(ctx, &baseV1.AcquirerReqBody{
 		Cname: cname,
 		Uid:   uid,
 		ClientRequest: &baseV1.AcquirerClientRequest{
-			Scene:               1,
+			Scene:               scene,
 			ResourceExpiredHour: clientRequest.ResourceExpiredHour,
 			ExcludeResourceIds:  clientRequest.ExcludeResourceIds,
 			RegionAffinity:      clientRequest.RegionAffinity,

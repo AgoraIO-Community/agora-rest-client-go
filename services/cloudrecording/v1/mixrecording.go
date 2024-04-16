@@ -79,12 +79,20 @@ type StopMixRecording interface {
 }
 
 type UpdateMixRecordingClientRequest struct {
+	StreamSubscribe *UpdateStreamSubscribe
 }
 type UpdateMixRecording interface {
 	Do(ctx context.Context, resourceID string, sid string, cname string, uid string, clientRequest *UpdateMixRecordingClientRequest) (*UpdateResp, error)
 }
 
 type UpdateLayoutUpdateMixRecordingClientRequest struct {
+	MaxResolutionUID           string
+	MixedVideoLayout           int
+	BackgroundColor            string
+	BackgroundImage            string
+	DefaultUserBackgroundImage string
+	LayoutConfig               []UpdateLayoutConfig
+	BackgroundConfig           []BackgroundConfig
 }
 
 type UpdateLayoutMixRecording interface {

@@ -7,13 +7,13 @@ import (
 )
 
 type Acquire struct {
-	BaseAcquire *baseV1.Acquire
+	Base *baseV1.Acquire
 }
 
 var _ baseV1.AcquireMixRecording = (*Acquire)(nil)
 
 func (a *Acquire) Do(ctx context.Context, cname string, uid string, clientRequest *baseV1.AcquirerMixRecodingClientRequest) (*baseV1.AcquirerResp, error) {
-	return a.BaseAcquire.Do(ctx, &baseV1.AcquirerReqBody{
+	return a.Base.Do(ctx, &baseV1.AcquirerReqBody{
 		Cname: cname,
 		Uid:   uid,
 		ClientRequest: &baseV1.AcquirerClientRequest{

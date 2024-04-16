@@ -7,16 +7,25 @@ import (
 )
 
 type UpdateLayout struct {
-	BaseUpdateLayout *baseV1.UpdateLayout
+	Base *baseV1.UpdateLayout
 }
 
 var _ baseV1.UpdateLayoutMixRecording = (*UpdateLayout)(nil)
 
 func (u *UpdateLayout) Do(ctx context.Context, resourceID string, sid string, cname string, uid string,
-	clientRequest *baseV1.UpdateLayoutUpdateMixRecordingClientRequest) (*baseV1.UpdateLayoutResp, error) {
-	return u.BaseUpdateLayout.Do(ctx, resourceID, sid, baseV1.MixMode, &baseV1.UpdateLayoutReqBody{
-		Cname:         cname,
-		Uid:           uid,
-		ClientRequest: &baseV1.UpdateLayoutClientRequest{},
+	clientRequest *baseV1.UpdateLayoutUpdateMixRecordingClientRequest,
+) (*baseV1.UpdateLayoutResp, error) {
+	return u.Base.Do(ctx, resourceID, sid, baseV1.MixMode, &baseV1.UpdateLayoutReqBody{
+		Cname: cname,
+		Uid:   uid,
+		ClientRequest: &baseV1.UpdateLayoutClientRequest{
+			MaxResolutionUID:           clientRequest.MaxResolutionUID,
+			MixedVideoLayout:           clientRequest.MixedVideoLayout,
+			BackgroundColor:            clientRequest.BackgroundColor,
+			BackgroundImage:            clientRequest.BackgroundImage,
+			DefaultUserBackgroundImage: clientRequest.DefaultUserBackgroundImage,
+			LayoutConfig:               clientRequest.LayoutConfig,
+			BackgroundConfig:           clientRequest.BackgroundConfig,
+		},
 	})
 }

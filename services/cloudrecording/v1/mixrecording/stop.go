@@ -7,13 +7,13 @@ import (
 )
 
 type Stop struct {
-	BaseStop *baseV1.Stop
+	Base *baseV1.Stop
 }
 
 var _ baseV1.StopMixRecording = (*Stop)(nil)
 
 func (s *Stop) DoHLS(ctx context.Context, resourceID string, sid string, payload *baseV1.StopReqBody) (*baseV1.StopMixRecordingHLSSuccessResponse, error) {
-	resp, err := s.BaseStop.Do(ctx, resourceID, sid, baseV1.MixMode, payload)
+	resp, err := s.Base.Do(ctx, resourceID, sid, baseV1.MixMode, payload)
 	if err != nil {
 		return nil, err
 	}
@@ -31,11 +31,10 @@ func (s *Stop) DoHLS(ctx context.Context, resourceID string, sid string, payload
 	}
 
 	return &mixResp, nil
-
 }
 
 func (s *Stop) DoHLSAndMP4(ctx context.Context, resourceID string, sid string, payload *baseV1.StopReqBody) (*baseV1.StopMixRecordingHLSAndMP4SuccessResponse, error) {
-	resp, err := s.BaseStop.Do(ctx, resourceID, sid, baseV1.MixMode, payload)
+	resp, err := s.Base.Do(ctx, resourceID, sid, baseV1.MixMode, payload)
 	if err != nil {
 		return nil, err
 	}

@@ -7,13 +7,13 @@ import (
 )
 
 type Query struct {
-	BaseQuery *baseV1.Query
+	Base *baseV1.Query
 }
 
 var _ baseV1.QueryMixRecording = (*Query)(nil)
 
 func (q Query) DoHLS(ctx context.Context, resourceID string, sid string) (*baseV1.QueryMixRecordingHLSResp, error) {
-	resp, err := q.BaseQuery.Do(ctx, resourceID, sid, baseV1.MixMode)
+	resp, err := q.Base.Do(ctx, resourceID, sid, baseV1.MixMode)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func (q Query) DoHLS(ctx context.Context, resourceID string, sid string) (*baseV
 }
 
 func (q Query) DoHLSAndMP4(ctx context.Context, resourceID string, sid string) (*baseV1.QueryMixRecordingHLSAndMP4Resp, error) {
-	resp, err := q.BaseQuery.Do(ctx, resourceID, sid, baseV1.MixMode)
+	resp, err := q.Base.Do(ctx, resourceID, sid, baseV1.MixMode)
 	if err != nil {
 		return nil, err
 	}
