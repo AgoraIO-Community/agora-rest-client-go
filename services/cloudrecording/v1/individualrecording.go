@@ -5,26 +5,72 @@ import (
 )
 
 type AcquirerIndividualRecodingClientRequest struct {
-	ResourceExpiredHour int      `json:"resourceExpiredHour"`
-	ExcludeResourceIds  []string `json:"excludeResourceIds,omitempty"`
-	RegionAffinity      int      `json:"regionAffinity,omitempty"`
+	// 云端录制 RESTful API 的调用时效。从成功开启云端录制并获得 sid （录制 ID）后开始计算。单位为小时。
+	ResourceExpiredHour int
+
+	// 另一路或几路录制任务的 resourceId。该字段用于排除指定的录制资源，以便新发起的录制任务可以使用新区域的资源，实现跨区域多路录制。
+	ExcludeResourceIds []string
+
+	// 指定使用某个区域的资源进行录制。支持取值如下：
+	//
+	// 0: 根据发起请求的区域就近调用资源。
+	//
+	// 1: 中国。
+	//
+	// 2: 东南亚。
+	//
+	// 3: 欧洲。
+	//
+	// 4: 北美。
+	RegionAffinity int
 }
 
 type AcquireIndividualRecording interface {
+	// Do Acquire a resource for individual recording.
+	//
+	// cname: Channel name.
+	//
+	// uid:RTC User ID.
+	//
+	// enablePostponeTranscodingMix: Whether to enable the postpone transcoding mix.
+	//
+	// clientRequest: AcquirerIndividualRecodingClientRequest
 	Do(ctx context.Context, cname string, uid string, enablePostponeTranscodingMix bool, clientRequest *AcquirerIndividualRecodingClientRequest) (*AcquirerResp, error)
 }
 
 type StartIndividualRecordingClientRequest struct {
-	Token               string
-	StorageConfig       *StorageConfig
-	RecordingConfig     *RecordingConfig
+	// Token 用于鉴权的动态密钥（Token）。如果你的项目已启用 App 证书，则务必在该字段中传入你项目的动态密钥
+	Token string
+
+	// StorageConfig 第三方云存储的配置项
+	StorageConfig *StorageConfig
+
+	// RecordingConfig 录制的音视频流配置项
+	RecordingConfig *RecordingConfig
+
+	// RecordingFileConfig 录制文件的配置项
 	RecordingFileConfig *RecordingFileConfig
-	SnapshotConfig      *SnapshotConfig
-	AppsCollection      *AppsCollection
-	TranscodeOptions    *TranscodeOptions
+
+	// SnapshotConfig 视频截图的配置项
+	SnapshotConfig *SnapshotConfig
+
+	// AppsCollection 应用配置项
+	AppsCollection *AppsCollection
+
+	// TranscodeOptions 延时转码或延时混音下，生成的录制文件的配置项
+	TranscodeOptions *TranscodeOptions
 }
 
 type StartIndividualRecording interface {
+	// Do Start individual recording.
+	//
+	// resourceID: Resource ID.
+	//
+	// cname: Channel name.
+	//
+	// uid:RTC User ID.
+	//
+	// clientRequest: StartIndividualRecordingClientRequest
 	Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *StartIndividualRecordingClientRequest) (*StarterResp, error)
 }
 
