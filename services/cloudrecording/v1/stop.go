@@ -63,58 +63,187 @@ type StopSuccessResp struct {
 }
 
 type StopIndividualRecordingServerResponse struct {
+	// FileListMode fileList 字段的数据格式：
+	// "string"：fileList 为 String 类型。合流录制模式下，如果 avFileType 设置为 ["hls"]，fileListMode 为 "string"。
+	//
+	// "json"：fileList 为 JSON Array 类型。单流或合流录制模式下 avFileType 设置为 ["hls","mp4"] 时，fileListMode 为 "json"。
 	FileListMode string `json:"fileListMode"`
-	FileList     []struct {
-		FileName       string `json:"fileName"`
-		TrackType      string `json:"trackType"`
-		Uid            string `json:"uid"`
-		MixedAllUser   bool   `json:"mixedAllUser"`
-		IsPlayable     bool   `json:"isPlayable"`
-		SliceStartTime int64  `json:"sliceStartTime"`
+
+	FileList []struct {
+		// FileName 录制产生的 M3U8 文件和 MP4 文件的文件名。
+		FileName string `json:"fileName"`
+
+		// TrackType 录制文件的类型:
+		//
+		// "audio"：纯音频文件。
+		//
+		// "video"：纯视频文件。
+		//
+		// "audio_and_video"：音视频文件。
+		TrackType string `json:"trackType"`
+
+		// Uid 用户 UID，表示录制的是哪个用户的音频流或视频流。
+		//
+		// 合流录制模式下，uid 为 "0"。
+		Uid string `json:"uid"`
+
+		// MixedAllUser 用户是否是分开录制
+		//
+		// true：所有用户合并在一个录制文件中。
+		//
+		// false：每个用户分开录制。
+		MixedAllUser bool `json:"mixedAllUser"`
+
+		// IsPlayable 是否可以在线播放。
+		//
+		// true：可以在线播放。
+		//
+		// false：无法在线播放。
+		IsPlayable bool `json:"isPlayable"`
+
+		// SliceStartTime 该文件的录制开始时间，Unix 时间戳，单位为毫秒。
+		SliceStartTime int64 `json:"sliceStartTime"`
 	} `json:"fileList"`
+
+	// UploadingStatus 当前录制上传的状态：
+	//
+	// "uploaded"：本次录制的文件已经全部上传至指定的第三方云存储。
+	//
+	// "backuped"：本次录制的文件已经全部上传完成，但是至少有一个 TS 文件上传到了声网备份云。声网服务器会自动将这部分文件继续上传至指定的第三方云存储。
+	//
+	// "unknown"：未知状态。
 	UploadingStatus string `json:"uploadingStatus"`
 }
 
 type StopIndividualVideoScreenshotServerResponse struct {
+	// UploadingStatus 当前录制上传的状态：
+	//
+	// "uploaded"：本次录制的文件已经全部上传至指定的第三方云存储。
+	//
+	// "backuped"：本次录制的文件已经全部上传完成，但是至少有一个 TS 文件上传到了声网备份云。声网服务器会自动将这部分文件继续上传至指定的第三方云存储。
+	//
+	// "unknown"：未知状态。
 	UploadingStatus string `json:"uploadingStatus"`
 }
 
 type StopMixRecordingHLSServerResponse struct {
-	FileListMode    string `json:"fileListMode"`
-	FileList        string `json:"fileList"`
+	// FileListMode fileList 字段的数据格式：
+	// "string"：fileList 为 String 类型。合流录制模式下，如果 avFileType 设置为 ["hls"]，fileListMode 为 "string"。
+	//
+	// "json"：fileList 为 JSON Array 类型。单流或合流录制模式下 avFileType 设置为 ["hls","mp4"] 时，fileListMode 为 "json"。
+	FileListMode string `json:"fileListMode"`
+
+	// FileList 录制产生的 M3U8 文件的文件名。
+	FileList string `json:"fileList"`
+
+	// UploadingStatus 当前录制上传的状态：
+	//
+	// "uploaded"：本次录制的文件已经全部上传至指定的第三方云存储。
+	//
+	// "backuped"：本次录制的文件已经全部上传完成，但是至少有一个 TS 文件上传到了声网备份云。声网服务器会自动将这部分文件继续上传至指定的第三方云存储。
+	//
+	// "unknown"：未知状态。
 	UploadingStatus string `json:"uploadingStatus"`
 }
 
 type StopMixRecordingHLSAndMP4ServerResponse struct {
+	// FileListMode fileList 字段的数据格式：
+	// "string"：fileList 为 String 类型。合流录制模式下，如果 avFileType 设置为 ["hls"]，fileListMode 为 "string"。
+	//
+	// "json"：fileList 为 JSON Array 类型。单流或合流录制模式下 avFileType 设置为 ["hls","mp4"] 时，fileListMode 为 "json"。
 	FileListMode string `json:"fileListMode"`
-	FileList     []struct {
-		FileName       string `json:"fileName"`
-		TrackType      string `json:"trackType"`
-		Uid            string `json:"uid"`
-		MixedAllUser   bool   `json:"mixedAllUser"`
-		IsPlayable     bool   `json:"isPlayable"`
-		SliceStartTime int64  `json:"sliceStartTime"`
+
+	// FileList 录制文件列表。
+	FileList []struct {
+		// FileName 录制产生的 M3U8 文件和 MP4 文件的文件名。
+		FileName string `json:"fileName"`
+
+		// TrackType 录制文件的类型:
+		//
+		// "audio"：纯音频文件。
+		//
+		// "video"：纯视频文件。
+		//
+		// "audio_and_video"：音视频文件。
+		TrackType string `json:"trackType"`
+
+		// Uid 用户 UID，表示录制的是哪个用户的音频流或视频流。
+		//
+		// 合流录制模式下，uid 为 "0"。
+		Uid string `json:"uid"`
+
+		// MixedAllUser 用户是否是分开录制
+		//
+		// true：所有用户合并在一个录制文件中。
+		//
+		// false：每个用户分开录制。
+		MixedAllUser bool `json:"mixedAllUser"`
+
+		// IsPlayable 是否可以在线播放。
+		//
+		// true：可以在线播放。
+		//
+		// false：无法在线播放。
+		IsPlayable bool `json:"isPlayable"`
+
+		// SliceStartTime 该文件的录制开始时间，Unix 时间戳，单位为毫秒。
+		SliceStartTime int64 `json:"sliceStartTime"`
 	} `json:"fileList"`
+
+	// UploadingStatus 当前录制上传的状态：
+	//
+	// "uploaded"：本次录制的文件已经全部上传至指定的第三方云存储。
+	//
+	// "backuped"：本次录制的文件已经全部上传完成，但是至少有一个 TS 文件上传到了声网备份云。声网服务器会自动将这部分文件继续上传至指定的第三方云存储。
+	//
+	// "unknown"：未知状态。
 	UploadingStatus string `json:"uploadingStatus"`
 }
 
 type StopWebRecordingServerResponse struct {
 	ExtensionServiceState []struct {
 		Payload struct {
+			// UploadingStatus 当前录制上传的状态：
+			//
+			// "uploaded"：本次录制的文件已经全部上传至指定的第三方云存储。
+			//
+			// "backuped"：本次录制的文件已经全部上传完成，但是至少有一个 TS 文件上传到了声网备份云。声网服务器会自动将这部分文件继续上传至指定的第三方云存储。
+			//
+			// "unknown"：未知状态。
 			UploadingStatus string `json:"uploadingStatus"`
-			FileList        []struct {
-				FileName       string `json:"fileName"`
-				TrackType      string `json:"trackType"`
-				Uid            string `json:"uid"`
-				MixedAllUser   bool   `json:"mixedAllUser"`
-				IsPlayable     bool   `json:"isPlayable"`
-				SliceStartTime int64  `json:"sliceStartTime"`
+
+			// FileListMode 文件列表
+			FileList []struct {
+				// FileName 录制产生的 M3U8 文件和 MP4 文件的文件名。
+				FileName string `json:"fileName"`
+
+				// SliceStartTime 该文件的录制开始时间，Unix 时间戳，单位为毫秒。
+				SliceStartTime int64 `json:"sliceStartTime"`
 			} `json:"fileList"`
-			Onhold bool   `json:"onhold"`
-			State  string `json:"state"`
+
+			// Onhold 页面录制是否处于暂停状态：
+			//
+			// true：处于暂停状态。
+			//
+			// false：处于运行状态。
+			Onhold bool `json:"onhold"`
+
+			// State 将订阅内容上传至扩展服务的状态：
+			//
+			// "init"：服务正在初始化。
+			//
+			// "inProgress"：服务启动完成，正在进行中。
+			//
+			// "exit"：服务退出。
+			State string `json:"state"`
 		} `json:"payload"`
+
+		// ServiceName 服务类型
+		// 服务类型：
+		// "upload_service"：上传服务。
+		//
+		// "web_recorder_service"：页面录制服务。
 		ServiceName string `json:"serviceName"`
-		ExitReason  string `json:"exit_reason"`
 	} `json:"extensionServiceState"`
 }
 
