@@ -7,13 +7,13 @@ import (
 )
 
 type Query struct {
-	BaseQuery *baseV1.Query
+	Base *baseV1.Query
 }
 
 var _ baseV1.QueryWebRecording = (*Query)(nil)
 
 func (q *Query) Do(ctx context.Context, resourceID string, sid string) (*baseV1.QueryWebRecordingResp, error) {
-	resp, err := q.BaseQuery.Do(ctx, resourceID, sid, baseV1.WebMode)
+	resp, err := q.Base.Do(ctx, resourceID, sid, baseV1.WebMode)
 	if err != nil {
 		return nil, err
 	}

@@ -1,4 +1,4 @@
-package webrecording
+package mixrecording
 
 import (
 	"context"
@@ -10,14 +10,14 @@ type Acquire struct {
 	Base *baseV1.Acquire
 }
 
-var _ baseV1.AcquireWebRecording = (*Acquire)(nil)
+var _ baseV1.AcquireMixRecording = (*Acquire)(nil)
 
-func (a *Acquire) Do(ctx context.Context, cname string, uid string, clientRequest *baseV1.AcquirerWebRecodingClientRequest) (*baseV1.AcquirerResp, error) {
+func (a *Acquire) Do(ctx context.Context, cname string, uid string, clientRequest *baseV1.AcquirerMixRecodingClientRequest) (*baseV1.AcquirerResp, error) {
 	return a.Base.Do(ctx, &baseV1.AcquirerReqBody{
 		Cname: cname,
 		Uid:   uid,
 		ClientRequest: &baseV1.AcquirerClientRequest{
-			Scene:               1,
+			Scene:               0,
 			ResourceExpiredHour: clientRequest.ResourceExpiredHour,
 			ExcludeResourceIds:  clientRequest.ExcludeResourceIds,
 			RegionAffinity:      clientRequest.RegionAffinity,

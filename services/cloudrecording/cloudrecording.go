@@ -3,6 +3,8 @@ package cloudrecording
 import (
 	"github.com/AgoraIO-Community/agora-rest-client-go/core"
 	v1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1"
+	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1/individualrecording"
+	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1/mixrecording"
 	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1/webrecording"
 )
 
@@ -21,5 +23,5 @@ func (a *API) buildPrefixPath() string {
 }
 
 func (a *API) V1() *v1.BaseCollection {
-	return v1.NewCollection(a.buildPrefixPath(), a.client, webrecording.NewWebRecording())
+	return v1.NewCollection(a.buildPrefixPath(), a.client, webrecording.NewWebRecording(), mixrecording.NewMixRecording(), individualrecording.NewIndividualRecording())
 }

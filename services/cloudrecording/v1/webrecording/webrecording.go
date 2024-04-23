@@ -19,15 +19,15 @@ func (w *Impl) SetBase(base *baseV1.BaseCollection) {
 }
 
 func (w *Impl) Acquire() baseV1.AcquireWebRecording {
-	return &Acquire{BaseAcquire: w.Base.Acquire()}
+	return &Acquire{Base: w.Base.Acquire()}
 }
 
 func (w *Impl) Query() baseV1.QueryWebRecording {
-	return &Query{BaseQuery: w.Base.Query()}
+	return &Query{Base: w.Base.Query()}
 }
 
 func (w *Impl) Start() baseV1.StartWebRecording {
-	return &Starter{BaseStarter: w.Base.Start()}
+	return &Starter{Base: w.Base.Start()}
 }
 
 func (w *Impl) Stop() baseV1.StopWebRecording {

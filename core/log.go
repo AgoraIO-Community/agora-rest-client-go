@@ -89,50 +89,49 @@ func NewDefaultLogger(level LogLevel) *sampleLogger {
 
 func (d *sampleLogger) Debug(ctx context.Context, module string, v ...interface{}) {
 	if d.level <= LogDebug {
-		d.DEBUG.Output(2, fmt.Sprintln(v...))
+		_ = d.DEBUG.Output(2, fmt.Sprintln(v...))
 	}
 }
 
 func (d *sampleLogger) Debugf(ctx context.Context, module string, format string, v ...interface{}) {
 	if d.level <= LogDebug {
-		d.DEBUG.Output(2, fmt.Sprintf(format, v...))
+		_ = d.DEBUG.Output(2, fmt.Sprintf(format, v...))
 	}
 }
 
 func (d *sampleLogger) Error(ctx context.Context, module string, v ...interface{}) {
 	if d.level <= LogErr {
-		d.ERROR.Output(2, fmt.Sprintln(v...))
+		_ = d.ERROR.Output(2, fmt.Sprintln(v...))
 	}
-
 }
 
 func (d *sampleLogger) Errorf(ctx context.Context, module string, format string, v ...interface{}) {
 	if d.level <= LogErr {
-		d.ERROR.Output(2, fmt.Sprintf(format, v...))
+		_ = d.ERROR.Output(2, fmt.Sprintf(format, v...))
 	}
 }
 
 func (d *sampleLogger) Info(ctx context.Context, module string, v ...interface{}) {
 	if d.level >= LogInfo {
-		d.INFO.Output(2, fmt.Sprintln(v...))
+		_ = d.INFO.Output(2, fmt.Sprintln(v...))
 	}
 }
 
 func (d *sampleLogger) Infof(ctx context.Context, module string, format string, v ...interface{}) {
 	if d.level >= LogInfo {
-		d.WARN.Output(2, fmt.Sprintln(v...))
+		_ = d.WARN.Output(2, fmt.Sprintln(v...))
 	}
 }
 
 func (d *sampleLogger) Warn(ctx context.Context, module string, v ...interface{}) {
 	if d.level <= LogWarning {
-		d.WARN.Output(2, fmt.Sprintln(v...))
+		_ = d.WARN.Output(2, fmt.Sprintln(v...))
 	}
 }
 
 func (d *sampleLogger) Warnf(ctx context.Context, module string, format string, v ...interface{}) {
 	if d.level <= LogWarning {
-		d.WARN.Output(2, fmt.Sprintf(format, v...))
+		_ = d.WARN.Output(2, fmt.Sprintf(format, v...))
 	}
 }
 

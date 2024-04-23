@@ -30,24 +30,22 @@ var (
 	region core.RegionArea = core.CN
 )
 
-var (
-	// 选择你的存储配置 第三方云存储地区说明详情见 https://doc.shengwang.cn/api-ref/cloud-recording/restful/region-vendor
-	// 配置存储需要的参数
-	storageConfig = &v1.StorageConfig{
-		Vendor:    0,
-		Region:    0,
-		Bucket:    "",
-		AccessKey: "",
-		SecretKey: "",
-		FileNamePrefix: []string{
-			"",
-		},
-	}
-)
+// 选择你的存储配置 第三方云存储地区说明详情见 https://doc.shengwang.cn/api-ref/cloud-recording/restful/region-vendor
+// 配置存储需要的参数
+var storageConfig = &v1.StorageConfig{
+	Vendor:    0,
+	Region:    0,
+	Bucket:    "",
+	AccessKey: "",
+	SecretKey: "",
+	FileNamePrefix: []string{
+		"",
+	},
+}
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
-	err := godotenv.Load("/Users/admin/go/src/agora-rest-client-go/examples/cloudrecording/.env")
+	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -110,8 +108,6 @@ func main() {
 
 // MixRecording hls&mp4
 func MixRecording() {
-	mode := "mix"
-
 	ctx := context.Background()
 	c := core.NewClient(&core.Config{
 		AppID:      appId,
@@ -120,15 +116,9 @@ func MixRecording() {
 		Logger:     core.NewDefaultLogger(core.LogDebug),
 	})
 
-	cloudRecordingAPI := cloudrecording.NewAPI(c)
-
-	resp, err := cloudRecordingAPI.V1().Acquire().Do(ctx, &v1.AcquirerReqBody{
-		Cname: cname,
-		Uid:   uid,
-		ClientRequest: &v1.AcquirerClientRequest{
-			Scene:               0,
-			ResourceExpiredHour: 24,
-		},
+	mixRecordingV1 := cloudrecording.NewAPI(c).V1().MixRecording()
+	resp, err := mixRecordingV1.Acquire().Do(ctx, cname, uid, &v1.AcquirerMixRecodingClientRequest{
+		ResourceExpiredHour: 24,
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -139,38 +129,35 @@ func MixRecording() {
 		log.Printf("start resp:%+v", resp.ErrResponse)
 	}
 
-	starterResp, err := cloudRecordingAPI.V1().Start().Do(ctx, resp.SuccessRes.ResourceId, mode, &v1.StartReqBody{
-		Cname: cname,
-		Uid:   uid,
-		ClientRequest: &v1.StartClientRequest{
-			Token: token,
-			RecordingConfig: &v1.RecordingConfig{
-				ChannelType:  1,
-				StreamTypes:  2,
-				AudioProfile: 2,
-				MaxIdleTime:  30,
-				TranscodingConfig: &v1.TranscodingConfig{
-					Width:            640,
-					Height:           260,
-					FPS:              15,
-					BitRate:          500,
-					MixedVideoLayout: 0,
-					BackgroundColor:  "#000000",
-				},
-				SubscribeAudioUIDs: []string{
-					"#allstream#",
-				},
-				SubscribeVideoUIDs: []string{
-					"#allstream#",
-				},
+	starterResp, err := mixRecordingV1.Start().Do(ctx, resp.SuccessRes.ResourceId, cname, uid, &v1.StartMixRecordingClientRequest{
+		Token: token,
+		RecordingConfig: &v1.RecordingConfig{
+			ChannelType:  1,
+			StreamTypes:  2,
+			AudioProfile: 2,
+			MaxIdleTime:  30,
+			TranscodingConfig: &v1.TranscodingConfig{
+				Width:            640,
+				Height:           260,
+				FPS:              15,
+				BitRate:          500,
+				MixedVideoLayout: 0,
+				BackgroundColor:  "#000000",
 			},
-			RecordingFileConfig: &v1.RecordingFileConfig{
-				AvFileType: []string{
-					"hls",
-				},
+			SubscribeAudioUIDs: []string{
+				"#allstream#",
 			},
-			StorageConfig: storageConfig,
+			SubscribeVideoUIDs: []string{
+				"#allstream#",
+			},
 		},
+		RecordingFileConfig: &v1.RecordingFileConfig{
+			AvFileType: []string{
+				"hls",
+				"mp4",
+			},
+		},
+		StorageConfig: storageConfig,
 	})
 	if err != nil {
 		log.Fatalln(err)
@@ -183,11 +170,11 @@ func MixRecording() {
 
 	startSuccessResp := starterResp.SuccessResp
 	defer func() {
-		stopResp, err := cloudRecordingAPI.V1().Stop().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, mode, &v1.StopReqBody{
+		stopResp, err := mixRecordingV1.Stop().DoHLSAndMP4(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, &v1.StopReqBody{
 			Cname: cname,
 			Uid:   uid,
 			ClientRequest: &v1.StopClientRequest{
-				AsyncStop: true,
+				AsyncStop: false,
 			},
 		})
 		if err != nil {
@@ -198,32 +185,10 @@ func MixRecording() {
 		} else {
 			log.Fatalf("stop failed:%+v", &stopResp.ErrResponse)
 		}
-		stopSuccess := stopResp.SuccessResp
-		var stopServerResponse interface{}
-		switch stopSuccess.GetServerResponseMode() {
-		case v1.StopServerResponseUnknownMode:
-			log.Fatalln("unknown mode")
-		case v1.StopIndividualRecordingServerResponseMode:
-			log.Printf("serverResponseMode:%d", v1.StopIndividualRecordingServerResponseMode)
-			stopServerResponse = stopSuccess.GetIndividualRecordingServerResponse()
-		case v1.StopIndividualVideoScreenshotServerResponseMode:
-			log.Printf("serverResponseMode:%d", v1.StopIndividualVideoScreenshotServerResponseMode)
-			stopServerResponse = stopSuccess.GetIndividualVideoScreenshotServerResponse()
-		case v1.StopMixRecordingHlsServerResponseMode:
-			log.Printf("serverResponseMode:%d", v1.StopMixRecordingHlsServerResponseMode)
-			stopServerResponse = stopSuccess.GetMixRecordingHLSServerResponse()
-		case v1.StopMixRecordingHlsAndMp4ServerResponseMode:
-			log.Printf("serverResponseMode:%d", v1.StopMixRecordingHlsAndMp4ServerResponseMode)
-			stopServerResponse = stopSuccess.GetMixRecordingHLSAndMP4ServerResponse()
-		case v1.StopWebRecordingServerResponseMode:
-			log.Printf("serverResponseMode:%d", v1.StopWebRecordingServerResponseMode)
-			stopServerResponse = stopSuccess.GetWebRecordingServerResponse()
-		}
-		log.Printf("stopServerResponse:%+v", stopServerResponse)
-
+		log.Printf("stopServerResponse:%+v", stopResp.SuccessResp.ServerResponse)
 	}()
 
-	queryResp, err := cloudRecordingAPI.V1().Query().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, mode)
+	queryResp, err := mixRecordingV1.Query().DoHLSAndMP4(ctx, startSuccessResp.ResourceId, startSuccessResp.SID)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -234,61 +199,35 @@ func MixRecording() {
 		return
 	}
 
-	var queryServerResponse interface{}
-
-	querySuccess := queryResp.SuccessResp
-	switch querySuccess.GetServerResponseMode() {
-	case v1.QueryServerResponseUnknownMode:
-		log.Fatalln("unknown mode")
-	case v1.QueryIndividualRecordingServerResponseMode:
-		log.Printf("serverResponseMode:%d", v1.QueryIndividualRecordingServerResponseMode)
-		queryServerResponse = querySuccess.GetIndividualRecordingServerResponse()
-	case v1.QueryIndividualVideoScreenshotServerResponseMode:
-		log.Printf("serverResponseMode:%d", v1.QueryIndividualVideoScreenshotServerResponseMode)
-		queryServerResponse = querySuccess.GetIndividualVideoScreenshotServerResponse()
-	case v1.QueryMixRecordingHlsServerResponseMode:
-		log.Printf("serverResponseMode:%d", v1.QueryMixRecordingHlsServerResponseMode)
-		queryServerResponse = querySuccess.GetMixRecordingHLSServerResponse()
-	case v1.QueryMixRecordingHlsAndMp4ServerResponseMode:
-		log.Printf("serverResponseMode:%d", v1.QueryMixRecordingHlsAndMp4ServerResponseMode)
-		queryServerResponse = querySuccess.GetMixRecordingHLSAndMP4ServerResponse()
-	case v1.QueryWebRecordingServerResponseMode:
-		log.Printf("serverResponseMode:%d", v1.QueryWebRecordingServerResponseMode)
-		queryServerResponse = querySuccess.GetWebRecording2CDNServerResponse()
-	}
-
-	log.Printf("queryServerResponse:%+v", queryServerResponse)
+	log.Printf("queryServerResponse:%+v", queryResp.SuccessResp.ServerResponse)
 
 	time.Sleep(3 * time.Second)
 
-	updateLayoutResp, err := cloudRecordingAPI.V1().UpdateLayout().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, mode, &v1.UpdateLayoutReqBody{
-		Cname: cname,
-		Uid:   uid,
-		ClientRequest: &v1.UpdateLayoutClientRequest{
-			MixedVideoLayout: 3,
-			BackgroundColor:  "#FF0000",
-			LayoutConfig: []v1.UpdateLayoutConfig{
-				{
-					UID:        "22",
-					XAxis:      0.1,
-					YAxis:      0.1,
-					Width:      0.1,
-					Height:     0.1,
-					Alpha:      1,
-					RenderMode: 1,
-				},
-				{
-					UID:        "2",
-					XAxis:      0.2,
-					YAxis:      0.2,
-					Width:      0.1,
-					Height:     0.1,
-					Alpha:      1,
-					RenderMode: 1,
-				},
+	updateLayoutResp, err := mixRecordingV1.UpdateLayout().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, cname, uid, &v1.UpdateLayoutUpdateMixRecordingClientRequest{
+		MixedVideoLayout: 3,
+		BackgroundColor:  "#FF0000",
+		LayoutConfig: []v1.UpdateLayoutConfig{
+			{
+				UID:        "22",
+				XAxis:      0.1,
+				YAxis:      0.1,
+				Width:      0.1,
+				Height:     0.1,
+				Alpha:      1,
+				RenderMode: 1,
+			},
+			{
+				UID:        "2",
+				XAxis:      0.2,
+				YAxis:      0.2,
+				Width:      0.1,
+				Height:     0.1,
+				Alpha:      1,
+				RenderMode: 1,
 			},
 		},
-	})
+	},
+	)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -298,26 +237,22 @@ func MixRecording() {
 		log.Printf("updateLayout failed:%+v", updateLayoutResp.ErrResponse)
 		return
 	}
+	time.Sleep(3 * time.Second)
 
-	updateResp, err := cloudRecordingAPI.V1().Update().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, mode, &v1.UpdateReqBody{
-		Cname: cname,
-		Uid:   uid,
-		ClientRequest: &v1.UpdateClientRequest{
-			StreamSubscribe: &v1.UpdateStreamSubscribe{
-				AudioUidList: &v1.UpdateAudioUIDList{
-					SubscribeAudioUIDs: []string{
-						"#allstream#",
-					},
+	updateResp, err := mixRecordingV1.Update().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, cname, uid, &v1.UpdateMixRecordingClientRequest{
+		StreamSubscribe: &v1.UpdateStreamSubscribe{
+			AudioUidList: &v1.UpdateAudioUIDList{
+				SubscribeAudioUIDs: []string{
+					"#allstream#",
 				},
-				VideoUidList: &v1.UpdateVideoUIDList{
-					SubscribeVideoUIDs: []string{
-						"#allstream#",
-					},
+			},
+			VideoUidList: &v1.UpdateVideoUIDList{
+				SubscribeVideoUIDs: []string{
+					"#allstream#",
 				},
 			},
 		},
 	})
-
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -328,13 +263,10 @@ func MixRecording() {
 		return
 	}
 	time.Sleep(2 * time.Second)
-
 }
 
 // IndividualRecording hls
 func IndividualRecording() {
-	mode := "individual"
-
 	ctx := context.Background()
 	c := core.NewClient(&core.Config{
 		AppID:      appId,
@@ -343,15 +275,10 @@ func IndividualRecording() {
 		Logger:     core.NewDefaultLogger(core.LogDebug),
 	})
 
-	cloudRecordingAPI := cloudrecording.NewAPI(c)
+	individualRecordingV1 := cloudrecording.NewAPI(c).V1().IndividualRecording()
 
-	resp, err := cloudRecordingAPI.V1().Acquire().Do(ctx, &v1.AcquirerReqBody{
-		Cname: cname,
-		Uid:   uid,
-		ClientRequest: &v1.AcquirerClientRequest{
-			Scene:               0,
-			ResourceExpiredHour: 24,
-		},
+	resp, err := individualRecordingV1.Acquire().Do(ctx, cname, uid, false, &v1.AcquirerIndividualRecodingClientRequest{
+		ResourceExpiredHour: 24,
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -362,27 +289,23 @@ func IndividualRecording() {
 		log.Fatalf("acquire failed:%+v", resp)
 	}
 
-	starterResp, err := cloudRecordingAPI.V1().Start().Do(ctx, resp.SuccessRes.ResourceId, mode, &v1.StartReqBody{
-		Cname: cname,
-		Uid:   uid,
-		ClientRequest: &v1.StartClientRequest{
-			Token: token,
-			RecordingConfig: &v1.RecordingConfig{
-				ChannelType: 1,
-				StreamTypes: 2,
-				SubscribeAudioUIDs: []string{
-					"22",
-					"456",
-				},
-				SubscribeUidGroup: 0,
+	starterResp, err := individualRecordingV1.Start().Do(ctx, resp.SuccessRes.ResourceId, cname, uid, &v1.StartIndividualRecordingClientRequest{
+		Token: token,
+		RecordingConfig: &v1.RecordingConfig{
+			ChannelType: 1,
+			StreamTypes: 2,
+			SubscribeAudioUIDs: []string{
+				"22",
+				"456",
 			},
-			RecordingFileConfig: &v1.RecordingFileConfig{
-				AvFileType: []string{
-					"hls",
-				},
-			},
-			StorageConfig: storageConfig,
+			SubscribeUidGroup: 0,
 		},
+		RecordingFileConfig: &v1.RecordingFileConfig{
+			AvFileType: []string{
+				"hls",
+			},
+		},
+		StorageConfig: storageConfig,
 	})
 	if err != nil {
 		log.Fatal(err)
@@ -395,11 +318,11 @@ func IndividualRecording() {
 	startSuccessResp := starterResp.SuccessResp
 
 	defer func() {
-		stopResp, err := cloudRecordingAPI.V1().Stop().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, mode, &v1.StopReqBody{
+		stopResp, err := individualRecordingV1.Stop().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, &v1.StopReqBody{
 			Cname: cname,
 			Uid:   uid,
 			ClientRequest: &v1.StopClientRequest{
-				AsyncStop: true,
+				AsyncStop: false,
 			},
 		})
 		if err != nil {
@@ -410,30 +333,10 @@ func IndividualRecording() {
 		} else {
 			log.Fatalf("stopResp failed:%+v", &stopResp.ErrResponse)
 		}
-		stopSuccess := stopResp.SuccessResp
-		var stopServerResponse interface{}
-		switch stopSuccess.GetServerResponseMode() {
-		case v1.StopServerResponseUnknownMode:
-			log.Fatalln("unknown mode")
-		case v1.StopIndividualRecordingServerResponseMode:
-			log.Printf("serverResponseMode:%d", v1.StopIndividualRecordingServerResponseMode)
-			stopServerResponse = stopSuccess.GetIndividualRecordingServerResponse()
-		case v1.StopIndividualVideoScreenshotServerResponseMode:
-			log.Printf("serverResponseMode:%d", v1.StopIndividualVideoScreenshotServerResponseMode)
-			stopServerResponse = stopSuccess.GetIndividualVideoScreenshotServerResponse()
-		case v1.StopMixRecordingHlsServerResponseMode:
-			log.Printf("serverResponseMode:%d", v1.StopMixRecordingHlsServerResponseMode)
-			stopServerResponse = stopSuccess.GetMixRecordingHLSServerResponse()
-		case v1.StopMixRecordingHlsAndMp4ServerResponseMode:
-			log.Printf("serverResponseMode:%d", v1.StopMixRecordingHlsAndMp4ServerResponseMode)
-			stopServerResponse = stopSuccess.GetMixRecordingHLSAndMP4ServerResponse()
-		case v1.StopWebRecordingServerResponseMode:
-			log.Printf("serverResponseMode:%d", v1.StopWebRecordingServerResponseMode)
-			stopServerResponse = stopSuccess.GetWebRecordingServerResponse()
-		}
-		log.Printf("stopServerResponse:%+v", stopServerResponse)
+
+		log.Printf("stopServerResponse:%+v", stopResp.SuccessResp.ServerResponse)
 	}()
-	queryResp, err := cloudRecordingAPI.V1().Query().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, mode)
+	queryResp, err := individualRecordingV1.Query().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -443,51 +346,23 @@ func IndividualRecording() {
 		log.Fatalf("queryResp failed:%+v", queryResp.ErrResponse)
 	}
 
-	var queryServerResponse interface{}
-
-	querySuccess := queryResp.SuccessResp
-	switch querySuccess.GetServerResponseMode() {
-	case v1.QueryServerResponseUnknownMode:
-		log.Fatalln("unknown mode")
-	case v1.QueryIndividualRecordingServerResponseMode:
-		log.Printf("serverResponseMode:%d", v1.QueryIndividualRecordingServerResponseMode)
-		queryServerResponse = querySuccess.GetIndividualRecordingServerResponse()
-	case v1.QueryIndividualVideoScreenshotServerResponseMode:
-		log.Printf("serverResponseMode:%d", v1.QueryIndividualVideoScreenshotServerResponseMode)
-		queryServerResponse = querySuccess.GetIndividualVideoScreenshotServerResponse()
-	case v1.QueryMixRecordingHlsServerResponseMode:
-		log.Printf("serverResponseMode:%d", v1.QueryMixRecordingHlsServerResponseMode)
-		queryServerResponse = querySuccess.GetMixRecordingHLSServerResponse()
-	case v1.QueryMixRecordingHlsAndMp4ServerResponseMode:
-		log.Printf("serverResponseMode:%d", v1.QueryMixRecordingHlsAndMp4ServerResponseMode)
-		queryServerResponse = querySuccess.GetMixRecordingHLSAndMP4ServerResponse()
-	case v1.QueryWebRecordingServerResponseMode:
-		log.Printf("serverResponseMode:%d", v1.QueryWebRecordingServerResponseMode)
-		queryServerResponse = querySuccess.GetWebRecording2CDNServerResponse()
-	}
-
-	log.Printf("queryServerResponse:%+v", queryServerResponse)
+	log.Printf("queryServerResponse:%+v", queryResp.SuccessResp.ServerResponse)
 
 	time.Sleep(3 * time.Second)
-	updateResp, err := cloudRecordingAPI.V1().Update().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, mode, &v1.UpdateReqBody{
-		Cname: cname,
-		Uid:   uid,
-		ClientRequest: &v1.UpdateClientRequest{
-			StreamSubscribe: &v1.UpdateStreamSubscribe{
-				AudioUidList: &v1.UpdateAudioUIDList{
-					SubscribeAudioUIDs: []string{
-						"999",
-					},
+	updateResp, err := individualRecordingV1.Update().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, cname, uid, &v1.UpdateIndividualRecordingClientRequest{
+		StreamSubscribe: &v1.UpdateStreamSubscribe{
+			AudioUidList: &v1.UpdateAudioUIDList{
+				SubscribeAudioUIDs: []string{
+					"999",
 				},
-				VideoUidList: &v1.UpdateVideoUIDList{
-					SubscribeVideoUIDs: []string{
-						"999",
-					},
+			},
+			VideoUidList: &v1.UpdateVideoUIDList{
+				SubscribeVideoUIDs: []string{
+					"999",
 				},
 			},
 		},
 	})
-
 	if err != nil {
 		log.Fatalln(err)
 	}
