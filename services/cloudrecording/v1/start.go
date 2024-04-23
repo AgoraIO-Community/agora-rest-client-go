@@ -227,9 +227,9 @@ type RecordingConfig struct {
 	//
 	// 3：13 到 17 个 UID。
 	//
-	// 4：17 到 32 个 UID。
+	// 4：18 到 32 个 UID。
 	//
-	// 5：32 到 49 个 UID。
+	// 5：33 到 49 个 UID。
 	SubscribeUidGroup int `json:"subscribeUidGroup"`
 }
 
