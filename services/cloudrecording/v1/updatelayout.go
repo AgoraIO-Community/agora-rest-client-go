@@ -137,7 +137,7 @@ type BackgroundConfig struct {
 
 type UpdateLayoutSuccessResp struct {
 	ResourceId string `json:"resourceId"`
-	SID        string `json:"sid"`
+	Sid        string `json:"sid"`
 }
 
 type UpdateLayoutResp struct {

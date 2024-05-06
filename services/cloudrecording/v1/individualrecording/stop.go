@@ -25,7 +25,7 @@ func (s *Stop) Do(ctx context.Context, resourceID string, sid string, payload *b
 		successResp := resp.SuccessResp
 		individualResp.SuccessResp = baseV1.StopIndividualRecordingSuccessResp{
 			ResourceId:     successResp.ResourceId,
-			SID:            successResp.SID,
+			Sid:            successResp.Sid,
 			ServerResponse: *successResp.GetIndividualRecordingServerResponse(),
 		}
 	}
@@ -46,7 +46,7 @@ func (s *Stop) DoVideoScreenshot(ctx context.Context, resourceID string, sid str
 		successResp := resp.SuccessResp
 		individualResp.SuccessResp = baseV1.StopIndividualRecordingVideoScreenshotSuccessResp{
 			ResourceId:     successResp.ResourceId,
-			SID:            successResp.SID,
+			Sid:            successResp.Sid,
 			ServerResponse: *successResp.GetIndividualVideoScreenshotServerResponse(),
 		}
 	}

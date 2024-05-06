@@ -27,7 +27,7 @@ type QueryWebRecordingResp struct {
 
 type QueryWebRecordingSuccessResp struct {
 	ResourceId     string
-	SID            string
+	Sid            string
 	ServerResponse QueryWebRecordingServerResponse
 }
 type QueryWebRecording interface {
@@ -51,7 +51,7 @@ type StopWebRecordingResp struct {
 
 type StopWebRecordingSuccessResp struct {
 	ResourceId     string
-	SID            string
+	Sid            string
 	ServerResponse StopWebRecordingServerResponse
 }
 

@@ -660,8 +660,8 @@ type StartSuccessResp struct {
 	// 使用这个 Resource ID 可以开始一段云端录制。这个 Resource ID 的有效期为 5 分钟，超时需要重新请求。
 	ResourceId string `json:"resourceId"`
 
-	// SID 录制 ID。成功开始云端录制后，你会得到一个 Sid （录制 ID）。该 ID 是一次录制周期的唯一标识。
-	SID string `json:"sid"`
+	// Sid 录制 ID。成功开始云端录制后，你会得到一个 Sid （录制 ID）。该 ID 是一次录制周期的唯一标识。
+	Sid string `json:"sid"`
 }
 
 func (s *Starter) Do(ctx context.Context, resourceID string, mode string, payload *StartReqBody) (*StarterResp, error) {

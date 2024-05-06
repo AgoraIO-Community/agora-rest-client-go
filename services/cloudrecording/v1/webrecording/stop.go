@@ -26,7 +26,7 @@ func (s *Stop) Do(ctx context.Context, resourceID string, sid string, payload *b
 		successResp := resp.SuccessResp
 		webResp.SuccessResp = baseV1.StopWebRecordingSuccessResp{
 			ResourceId:     successResp.ResourceId,
-			SID:            successResp.SID,
+			Sid:            successResp.Sid,
 			ServerResponse: *successResp.GetWebRecordingServerResponse(),
 		}
 	}

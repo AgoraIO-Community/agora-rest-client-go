@@ -82,7 +82,7 @@ type StartIndividualRecording interface {
 
 type QueryIndividualRecordingSuccessResp struct {
 	ResourceId     string
-	SID            string
+	Sid            string
 	ServerResponse QueryIndividualRecordingServerResponse
 }
 
@@ -93,7 +93,7 @@ type QueryIndividualRecordingResp struct {
 
 type QueryIndividualRecordingVideoScreenshotSuccessResp struct {
 	ResourceId     string
-	SID            string
+	Sid            string
 	ServerResponse QueryIndividualVideoScreenshotServerResponse
 }
 
@@ -117,13 +117,13 @@ type UpdateIndividualRecording interface {
 
 type StopIndividualRecordingSuccessResp struct {
 	ResourceId     string
-	SID            string
+	Sid            string
 	ServerResponse StopIndividualRecordingServerResponse
 }
 
 type StopIndividualRecordingVideoScreenshotSuccessResp struct {
 	ResourceId     string
-	SID            string
+	Sid            string
 	ServerResponse StopIndividualVideoScreenshotServerResponse
 }
 

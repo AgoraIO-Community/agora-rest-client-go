@@ -168,7 +168,7 @@ func MixRecording() {
 
 	startSuccessResp := starterResp.SuccessResp
 	defer func() {
-		stopResp, err := mixRecordingV1.Stop().DoHLSAndMP4(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, &v1.StopReqBody{
+		stopResp, err := mixRecordingV1.Stop().DoHLSAndMP4(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, &v1.StopReqBody{
 			Cname: cname,
 			Uid:   uid,
 			ClientRequest: &v1.StopClientRequest{
@@ -186,7 +186,7 @@ func MixRecording() {
 		log.Printf("stopServerResponse:%+v", stopResp.SuccessResp.ServerResponse)
 	}()
 
-	queryResp, err := mixRecordingV1.Query().DoHLSAndMP4(ctx, startSuccessResp.ResourceId, startSuccessResp.SID)
+	queryResp, err := mixRecordingV1.Query().DoHLSAndMP4(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -201,7 +201,7 @@ func MixRecording() {
 
 	time.Sleep(3 * time.Second)
 
-	updateLayoutResp, err := mixRecordingV1.UpdateLayout().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, cname, uid, &v1.UpdateLayoutUpdateMixRecordingClientRequest{
+	updateLayoutResp, err := mixRecordingV1.UpdateLayout().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, cname, uid, &v1.UpdateLayoutUpdateMixRecordingClientRequest{
 		MixedVideoLayout: 3,
 		BackgroundColor:  "#FF0000",
 		LayoutConfig: []v1.UpdateLayoutConfig{
@@ -237,7 +237,7 @@ func MixRecording() {
 	}
 	time.Sleep(3 * time.Second)
 
-	updateResp, err := mixRecordingV1.Update().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, cname, uid, &v1.UpdateMixRecordingClientRequest{
+	updateResp, err := mixRecordingV1.Update().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, cname, uid, &v1.UpdateMixRecordingClientRequest{
 		StreamSubscribe: &v1.UpdateStreamSubscribe{
 			AudioUidList: &v1.UpdateAudioUIDList{
 				SubscribeAudioUIDs: []string{
@@ -314,7 +314,7 @@ func IndividualRecording() {
 	startSuccessResp := starterResp.SuccessResp
 
 	defer func() {
-		stopResp, err := individualRecordingV1.Stop().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, &v1.StopReqBody{
+		stopResp, err := individualRecordingV1.Stop().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, &v1.StopReqBody{
 			Cname: cname,
 			Uid:   uid,
 			ClientRequest: &v1.StopClientRequest{
@@ -332,7 +332,7 @@ func IndividualRecording() {
 
 		log.Printf("stopServerResponse:%+v", stopResp.SuccessResp.ServerResponse)
 	}()
-	queryResp, err := individualRecordingV1.Query().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID)
+	queryResp, err := individualRecordingV1.Query().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -345,7 +345,7 @@ func IndividualRecording() {
 	log.Printf("queryServerResponse:%+v", queryResp.SuccessResp.ServerResponse)
 
 	time.Sleep(3 * time.Second)
-	updateResp, err := individualRecordingV1.Update().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, cname, uid, &v1.UpdateIndividualRecordingClientRequest{
+	updateResp, err := individualRecordingV1.Update().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, cname, uid, &v1.UpdateIndividualRecordingClientRequest{
 		StreamSubscribe: &v1.UpdateStreamSubscribe{
 			AudioUidList: &v1.UpdateAudioUIDList{
 				SubscribeAudioUIDs: []string{
@@ -431,7 +431,7 @@ func WebRecording() {
 	}
 
 	startSuccessResp := starterResp.SuccessResp
-	sid := startSuccessResp.SID
+	sid := startSuccessResp.Sid
 
 	defer func() {
 		// stop

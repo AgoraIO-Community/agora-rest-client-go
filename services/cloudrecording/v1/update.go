@@ -126,7 +126,7 @@ type UpdateResp struct {
 
 type UpdateSuccessResp struct {
 	ResourceId string `json:"resourceId"`
-	SID        string `json:"sid"`
+	Sid        string `json:"sid"`
 	UID        string `json:"uid"`
 	Cname      string `json:"cname"`
 }

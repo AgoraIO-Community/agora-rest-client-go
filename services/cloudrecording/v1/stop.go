@@ -52,7 +52,7 @@ type StopResp struct {
 
 type StopSuccessResp struct {
 	ResourceId string `json:"resourceId"`
-	SID        string `json:"sid"`
+	Sid        string `json:"sid"`
 
 	serverResponseMode                  StopRespServerResponseMode
 	individualRecordingServerResponse   *StopIndividualRecordingServerResponse

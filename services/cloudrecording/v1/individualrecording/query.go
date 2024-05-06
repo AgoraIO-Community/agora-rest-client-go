@@ -25,7 +25,7 @@ func (q *Query) Do(ctx context.Context, resourceID string, sid string) (*baseV1.
 		successResp := resp.SuccessResp
 		individualResp.SuccessResp = baseV1.QueryIndividualRecordingSuccessResp{
 			ResourceId:     successResp.ResourceId,
-			SID:            successResp.SID,
+			Sid:            successResp.Sid,
 			ServerResponse: *successResp.GetIndividualRecordingServerResponse(),
 		}
 	}
@@ -46,7 +46,7 @@ func (q *Query) DoVideoScreenshot(ctx context.Context, resourceID string, sid st
 		successResp := resp.SuccessResp
 		individualResp.SuccessResp = baseV1.QueryIndividualRecordingVideoScreenshotSuccessResp{
 			ResourceId:     successResp.ResourceId,
-			SID:            successResp.SID,
+			Sid:            successResp.Sid,
 			ServerResponse: *successResp.GetIndividualVideoScreenshotServerResponse(),
 		}
 	}
