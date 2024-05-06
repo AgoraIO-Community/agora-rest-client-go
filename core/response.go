@@ -13,9 +13,9 @@ type BaseResponse struct {
 	HttpStatusCode int
 }
 
-// UnmarshallToTarget unmarshall body into target var
+// UnmarshalToTarget unmarshall body into target var
 // successful if err is nil
-func (r *BaseResponse) UnmarshallToTarget(target interface{}) error {
+func (r *BaseResponse) UnmarshalToTarget(target interface{}) error {
 	err := json.Unmarshal(r.RawBody, target)
 	if err != nil {
 		return err

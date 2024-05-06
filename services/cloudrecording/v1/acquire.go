@@ -64,7 +64,7 @@ func (a *Acquire) Do(ctx context.Context, payload *AcquirerReqBody) (*AcquirerRe
 
 	if responseData.HttpStatusCode == http.StatusOK {
 		var successResponse AcquirerSuccessResp
-		if err = responseData.UnmarshallToTarget(&successResponse); err != nil {
+		if err = responseData.UnmarshalToTarget(&successResponse); err != nil {
 			return nil, err
 		}
 		resp.SuccessRes = successResponse
@@ -74,7 +74,7 @@ func (a *Acquire) Do(ctx context.Context, payload *AcquirerReqBody) (*AcquirerRe
 			return nil, core.NewGatewayErr(responseData.HttpStatusCode, string(responseData.RawBody))
 		}
 		var errResponse ErrResponse
-		if err = responseData.UnmarshallToTarget(&errResponse); err != nil {
+		if err = responseData.UnmarshalToTarget(&errResponse); err != nil {
 			return nil, err
 		}
 		resp.ErrResponse = errResponse
