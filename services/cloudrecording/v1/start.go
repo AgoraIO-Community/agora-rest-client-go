@@ -60,7 +60,7 @@ type StartClientRequest struct {
 
 const (
 	DefaultCombinationPolicy              = "default"
-	PostPhoneTranscodingCombinationPolicy = "postphone_transcoding"
+	PostPhoneTranscodingCombinationPolicy = "postpone_transcoding"
 )
 
 // AppsCollection 应用配置项
