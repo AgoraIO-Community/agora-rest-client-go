@@ -27,7 +27,7 @@ func (w *Impl) Query() baseV1.QueryWebRecording {
 }
 
 func (w *Impl) Start() baseV1.StartWebRecording {
-	return &Starter{Base: w.Base.Start()}
+	return &Start{Base: w.Base.Start()}
 }
 
 func (w *Impl) Stop() baseV1.StopWebRecording {

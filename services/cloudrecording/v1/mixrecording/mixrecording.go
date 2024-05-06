@@ -27,7 +27,7 @@ func (i *Impl) Query() baseV1.QueryMixRecording {
 }
 
 func (i *Impl) Start() baseV1.StartMixRecording {
-	return &Starter{Base: i.Base.Start()}
+	return &Start{Base: i.Base.Start()}
 }
 
 func (i *Impl) Stop() baseV1.StopMixRecording {

@@ -12,7 +12,7 @@ import (
 	"github.com/AgoraIO-Community/agora-rest-client-go/core"
 )
 
-type Starter struct {
+type Start struct {
 	module     string
 	logger     core.Logger
 	client     core.Client
@@ -32,7 +32,7 @@ const (
 
 // buildPath returns the request path.
 // /v1/apps/{appid}/cloud_recording/resourceid/{resourceid}/mode/{mode}/start
-func (s *Starter) buildPath(resourceID string, mode string) string {
+func (s *Start) buildPath(resourceID string, mode string) string {
 	return s.prefixPath + "/resourceid/" + resourceID + "/mode/" + mode + "/start"
 }
 
@@ -664,7 +664,7 @@ type StartSuccessResp struct {
 	Sid string `json:"sid"`
 }
 
-func (s *Starter) Do(ctx context.Context, resourceID string, mode string, payload *StartReqBody) (*StarterResp, error) {
+func (s *Start) Do(ctx context.Context, resourceID string, mode string, payload *StartReqBody) (*StarterResp, error) {
 	path := s.buildPath(resourceID, mode)
 
 	responseData, err := s.doRESTWithRetry(ctx, path, http.MethodPost, payload)
@@ -700,7 +700,7 @@ func (s *Starter) Do(ctx context.Context, resourceID string, mode string, payloa
 
 const retryCount = 3
 
-func (s *Starter) doRESTWithRetry(ctx context.Context, path string, method string, requestBody interface{}) (*core.BaseResponse, error) {
+func (s *Start) doRESTWithRetry(ctx context.Context, path string, method string, requestBody interface{}) (*core.BaseResponse, error) {
 	var (
 		resp  *core.BaseResponse
 		err   error
