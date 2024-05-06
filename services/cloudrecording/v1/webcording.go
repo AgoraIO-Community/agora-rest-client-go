@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-type AcquirerWebRecodingClientRequest struct {
+type AcquireWebRecodingClientRequest struct {
 	ResourceExpiredHour int      `json:"resourceExpiredHour"`
 	ExcludeResourceIds  []string `json:"excludeResourceIds,omitempty"`
 	RegionAffinity      int      `json:"regionAffinity,omitempty"`
@@ -17,7 +17,7 @@ type AcquirerWebRecodingClientRequest struct {
 }
 
 type AcquireWebRecording interface {
-	Do(ctx context.Context, cname string, uid string, clientRequest *AcquirerWebRecodingClientRequest) (*AcquirerResp, error)
+	Do(ctx context.Context, cname string, uid string, clientRequest *AcquireWebRecodingClientRequest) (*AcquireResp, error)
 }
 
 type QueryWebRecordingResp struct {

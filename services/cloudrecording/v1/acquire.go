@@ -21,13 +21,13 @@ func (a *Acquire) buildPath() string {
 	return a.prefixPath + "/acquire"
 }
 
-type AcquirerReqBody struct {
-	Cname         string                 `json:"cname"`
-	Uid           string                 `json:"uid"`
-	ClientRequest *AcquirerClientRequest `json:"clientRequest"`
+type AcquireReqBody struct {
+	Cname         string                `json:"cname"`
+	Uid           string                `json:"uid"`
+	ClientRequest *AcquireClientRequest `json:"clientRequest"`
 }
 
-type AcquirerClientRequest struct {
+type AcquireClientRequest struct {
 	Scene int `json:"scene"`
 
 	// StartParameter 设置该字段后，可以提升可用性并优化负载均衡。
@@ -35,21 +35,21 @@ type AcquirerClientRequest struct {
 	// 注意：如果填写该字段，则必须确保 startParameter object 和后续 start 请求中填写的 clientRequest object 完全一致，
 	// 且取值合法，否则 start 请求会收到报错。
 	StartParameter      *StartClientRequest `json:"startParameter,omitempty"`
-	ResourceExpiredHour int                 `json:"resourceExpiredHour"`
+	ResourceExpiredHour int                 `json:"resourceExpiredHour,omitempty"`
 	ExcludeResourceIds  []string            `json:"excludeResourceIds,omitempty"`
 	RegionAffinity      int                 `json:"regionAffinity,omitempty"`
 }
 
-type AcquirerResp struct {
+type AcquireResp struct {
 	Response
-	SuccessRes AcquirerSuccessResp
+	SuccessRes AcquireSuccessResp
 }
 
-type AcquirerSuccessResp struct {
+type AcquireSuccessResp struct {
 	ResourceId string `json:"resourceId"`
 }
 
-func (a *Acquire) Do(ctx context.Context, payload *AcquirerReqBody) (*AcquirerResp, error) {
+func (a *Acquire) Do(ctx context.Context, payload *AcquireReqBody) (*AcquireResp, error) {
 	path := a.buildPath()
 
 	responseData, err := a.client.DoREST(ctx, path, http.MethodPost, payload)
@@ -60,10 +60,10 @@ func (a *Acquire) Do(ctx context.Context, payload *AcquirerReqBody) (*AcquirerRe
 		}
 	}
 
-	var resp AcquirerResp
+	var resp AcquireResp
 
 	if responseData.HttpStatusCode == http.StatusOK {
-		var successResponse AcquirerSuccessResp
+		var successResponse AcquireSuccessResp
 		if err = responseData.UnmarshalToTarget(&successResponse); err != nil {
 			return nil, err
 		}

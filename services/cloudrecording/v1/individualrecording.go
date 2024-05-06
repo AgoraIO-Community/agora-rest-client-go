@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-type AcquirerIndividualRecodingClientRequest struct {
+type AcquireIndividualRecodingClientRequest struct {
 	// 云端录制 RESTful API 的调用时效。从成功开启云端录制并获得 sid （录制 ID）后开始计算。单位为小时。
 	ResourceExpiredHour int
 
@@ -40,8 +40,8 @@ type AcquireIndividualRecording interface {
 	//
 	// enablePostponeTranscodingMix: Whether to enable the postpone transcoding mix.
 	//
-	// clientRequest: AcquirerIndividualRecodingClientRequest
-	Do(ctx context.Context, cname string, uid string, enablePostponeTranscodingMix bool, clientRequest *AcquirerIndividualRecodingClientRequest) (*AcquirerResp, error)
+	// clientRequest: AcquireIndividualRecodingClientRequest
+	Do(ctx context.Context, cname string, uid string, enablePostponeTranscodingMix bool, clientRequest *AcquireIndividualRecodingClientRequest) (*AcquireResp, error)
 }
 
 type StartIndividualRecordingClientRequest struct {

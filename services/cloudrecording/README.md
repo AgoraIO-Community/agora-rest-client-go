@@ -49,10 +49,10 @@
 
 	cloudRecordingAPI := cloudrecording.NewAPI(client)
 
-	resp, err := cloudRecordingAPI.V1().Acquire().Do(context.TODO(), &v1.AcquirerReqBody{
+	resp, err := cloudRecordingAPI.V1().Acquire().Do(context.TODO(), &v1.AcquireReqBody{
 		Cname: "12321",
 		Uid:   "43434",
-		ClientRequest: &v1.AcquirerClientRequest{
+		ClientRequest: &v1.AcquireClientRequest{
 			Scene:               0,
 			ResourceExpiredHour: 24,
 		},

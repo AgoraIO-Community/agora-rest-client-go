@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-type AcquirerMixRecodingClientRequest struct {
+type AcquireMixRecodingClientRequest struct {
 	ResourceExpiredHour int
 	ExcludeResourceIds  []string
 	RegionAffinity      int
@@ -17,7 +17,7 @@ type AcquirerMixRecodingClientRequest struct {
 }
 
 type AcquireMixRecording interface {
-	Do(ctx context.Context, cname string, uid string, clientRequest *AcquirerMixRecodingClientRequest) (*AcquirerResp, error)
+	Do(ctx context.Context, cname string, uid string, clientRequest *AcquireMixRecodingClientRequest) (*AcquireResp, error)
 }
 
 type QueryMixRecordingHLSSuccessResp struct {

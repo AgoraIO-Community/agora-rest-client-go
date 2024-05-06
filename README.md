@@ -59,10 +59,10 @@ func main() {
 	cloudRecordingAPI := cloudrecording.NewAPI(client)
 
     // 调用云端录制服务 API 的Acquire接口
-	resp, err := cloudRecordingAPI.V1().Acquire().Do(context.TODO(), &v1.AcquirerReqBody{
+	resp, err := cloudRecordingAPI.V1().Acquire().Do(context.TODO(), &v1.AcquireReqBody{
 		Cname: cname,
 		Uid:   uid,
-		ClientRequest: &v1.AcquirerClientRequest{
+		ClientRequest: &v1.AcquireClientRequest{
 			Scene:               0,
 			ResourceExpiredHour: 24,
 		},

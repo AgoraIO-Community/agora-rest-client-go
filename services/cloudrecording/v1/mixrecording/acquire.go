@@ -12,7 +12,7 @@ type Acquire struct {
 
 var _ baseV1.AcquireMixRecording = (*Acquire)(nil)
 
-func (a *Acquire) Do(ctx context.Context, cname string, uid string, clientRequest *baseV1.AcquirerMixRecodingClientRequest) (*baseV1.AcquirerResp, error) {
+func (a *Acquire) Do(ctx context.Context, cname string, uid string, clientRequest *baseV1.AcquireMixRecodingClientRequest) (*baseV1.AcquireResp, error) {
 	var startParameter *baseV1.StartClientRequest
 	if clientRequest.StartParameter != nil {
 		startParameter = &baseV1.StartClientRequest{
@@ -23,10 +23,10 @@ func (a *Acquire) Do(ctx context.Context, cname string, uid string, clientReques
 		}
 	}
 
-	return a.Base.Do(ctx, &baseV1.AcquirerReqBody{
+	return a.Base.Do(ctx, &baseV1.AcquireReqBody{
 		Cname: cname,
 		Uid:   uid,
-		ClientRequest: &baseV1.AcquirerClientRequest{
+		ClientRequest: &baseV1.AcquireClientRequest{
 			Scene:               0,
 			ResourceExpiredHour: clientRequest.ResourceExpiredHour,
 			ExcludeResourceIds:  clientRequest.ExcludeResourceIds,
