@@ -77,7 +77,7 @@ type StartIndividualRecording interface {
 	// uid:RTC User ID.
 	//
 	// clientRequest: StartIndividualRecordingClientRequest
-	Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *StartIndividualRecordingClientRequest) (*StarterResp, error)
+	Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *StartIndividualRecordingClientRequest) (*StartResp, error)
 }
 
 type QueryIndividualRecordingSuccessResp struct {

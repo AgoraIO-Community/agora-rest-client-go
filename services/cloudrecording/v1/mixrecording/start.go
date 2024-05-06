@@ -12,7 +12,7 @@ type Start struct {
 
 var _ baseV1.StartMixRecording = (*Start)(nil)
 
-func (s *Start) Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *baseV1.StartMixRecordingClientRequest) (*baseV1.StarterResp, error) {
+func (s *Start) Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *baseV1.StartMixRecordingClientRequest) (*baseV1.StartResp, error) {
 	return s.Base.Do(ctx, resourceID, baseV1.MixMode, &baseV1.StartReqBody{
 		Cname: cname,
 		Uid:   uid,

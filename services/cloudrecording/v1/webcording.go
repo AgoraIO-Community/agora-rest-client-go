@@ -41,7 +41,7 @@ type StartWebRecordingClientRequest struct {
 }
 
 type StartWebRecording interface {
-	Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *StartWebRecordingClientRequest) (*StarterResp, error)
+	Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *StartWebRecordingClientRequest) (*StartResp, error)
 }
 
 type StopWebRecordingResp struct {

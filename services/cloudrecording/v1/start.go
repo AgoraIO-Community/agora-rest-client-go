@@ -642,7 +642,7 @@ type ServiceParam struct {
 	ReadyTimeout int `json:"readyTimeout"`
 }
 
-type StarterResp struct {
+type StartResp struct {
 	Response
 	SuccessResp StartSuccessResp
 }
@@ -664,7 +664,7 @@ type StartSuccessResp struct {
 	Sid string `json:"sid"`
 }
 
-func (s *Start) Do(ctx context.Context, resourceID string, mode string, payload *StartReqBody) (*StarterResp, error) {
+func (s *Start) Do(ctx context.Context, resourceID string, mode string, payload *StartReqBody) (*StartResp, error) {
 	path := s.buildPath(resourceID, mode)
 
 	responseData, err := s.doRESTWithRetry(ctx, path, http.MethodPost, payload)
@@ -675,7 +675,7 @@ func (s *Start) Do(ctx context.Context, resourceID string, mode string, payload 
 		}
 	}
 
-	var resp StarterResp
+	var resp StartResp
 
 	if responseData.HttpStatusCode == http.StatusOK {
 		var successResp StartSuccessResp

@@ -54,7 +54,7 @@ type StartMixRecordingClientRequest struct {
 }
 
 type StartMixRecording interface {
-	Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *StartMixRecordingClientRequest) (*StarterResp, error)
+	Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *StartMixRecordingClientRequest) (*StartResp, error)
 }
 
 type StopMixRecordingHLSResp struct {
