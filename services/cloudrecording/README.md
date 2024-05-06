@@ -79,7 +79,7 @@
 
 通过调用`Start().Do`方法来实现开始云端录制
 ```go
-	starterResp, err := cloudRecordingAPI.V1().Start().Do(ctx, resp.SuccessRes.ResourceId, mode, &v1.StartReqBody{
+	startResp, err := cloudRecordingAPI.V1().Start().Do(ctx, resp.SuccessRes.ResourceId, mode, &v1.StartReqBody{
 		Cname: cname,
 		Uid:   uid,
 		ClientRequest: &v1.StartClientRequest{
@@ -127,10 +127,10 @@
 	if err != nil {
 		log.Fatalln(err)
 	}
-	if starterResp.IsSuccess() {
-		log.Printf("success:%+v", &starterResp.SuccessResp)
+	if startResp.IsSuccess() {
+		log.Printf("success:%+v", &startResp.SuccessResp)
 	} else {
-		log.Printf("failed:%+v", &starterResp.ErrResponse)
+		log.Printf("failed:%+v", &startResp.ErrResponse)
 	}
 ```
 

@@ -127,7 +127,7 @@ func MixRecording() {
 		log.Printf("start resp:%+v", resp.ErrResponse)
 	}
 
-	starterResp, err := mixRecordingV1.Start().Do(ctx, resp.SuccessRes.ResourceId, cname, uid, &v1.StartMixRecordingClientRequest{
+	startResp, err := mixRecordingV1.Start().Do(ctx, resp.SuccessRes.ResourceId, cname, uid, &v1.StartMixRecordingClientRequest{
 		Token: token,
 		RecordingConfig: &v1.RecordingConfig{
 			ChannelType:  1,
@@ -160,13 +160,13 @@ func MixRecording() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	if starterResp.IsSuccess() {
-		log.Printf("success:%+v", &starterResp.SuccessResp)
+	if startResp.IsSuccess() {
+		log.Printf("success:%+v", &startResp.SuccessResp)
 	} else {
-		log.Printf("failed:%+v", &starterResp.ErrResponse)
+		log.Printf("failed:%+v", &startResp.ErrResponse)
 	}
 
-	startSuccessResp := starterResp.SuccessResp
+	startSuccessResp := startResp.SuccessResp
 	defer func() {
 		stopResp, err := mixRecordingV1.Stop().DoHLSAndMP4(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, &v1.StopReqBody{
 			Cname: cname,
@@ -285,7 +285,7 @@ func IndividualRecording() {
 		log.Fatalf("acquire failed:%+v", resp)
 	}
 
-	starterResp, err := individualRecordingV1.Start().Do(ctx, resp.SuccessRes.ResourceId, cname, uid, &v1.StartIndividualRecordingClientRequest{
+	startResp, err := individualRecordingV1.Start().Do(ctx, resp.SuccessRes.ResourceId, cname, uid, &v1.StartIndividualRecordingClientRequest{
 		Token: token,
 		RecordingConfig: &v1.RecordingConfig{
 			ChannelType: 1,
@@ -306,12 +306,12 @@ func IndividualRecording() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if starterResp.IsSuccess() {
-		log.Printf("starterResp success:%+v", &starterResp.SuccessResp)
+	if startResp.IsSuccess() {
+		log.Printf("startResp success:%+v", &startResp.SuccessResp)
 	} else {
-		log.Fatalf("starterResp failed:%+v", &starterResp.ErrResponse)
+		log.Fatalf("startResp failed:%+v", &startResp.ErrResponse)
 	}
-	startSuccessResp := starterResp.SuccessResp
+	startSuccessResp := startResp.SuccessResp
 
 	defer func() {
 		stopResp, err := individualRecordingV1.Stop().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, &v1.StopReqBody{
@@ -371,6 +371,7 @@ func IndividualRecording() {
 	time.Sleep(2 * time.Second)
 }
 
+// WebRecording hls&mp4
 func WebRecording() {
 	ctx := context.Background()
 	c := core.NewClient(&core.Config{
@@ -396,7 +397,7 @@ func WebRecording() {
 	resourceId := resp.SuccessRes.ResourceId
 
 	// start
-	starterResp, err := webRecordingV1.Start().Do(ctx, resourceId, cname, uid, &v1.StartWebRecordingClientRequest{
+	startResp, err := webRecordingV1.Start().Do(ctx, resourceId, cname, uid, &v1.StartWebRecordingClientRequest{
 		RecordingFileConfig: &v1.RecordingFileConfig{
 			AvFileType: []string{
 				"hls",
@@ -424,13 +425,13 @@ func WebRecording() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if starterResp.IsSuccess() {
-		log.Printf("starterResp success:%+v", &starterResp.SuccessResp)
+	if startResp.IsSuccess() {
+		log.Printf("startResp success:%+v", &startResp.SuccessResp)
 	} else {
-		log.Fatalf("starterResp failed:%+v", &starterResp.ErrResponse)
+		log.Fatalf("startResp failed:%+v", &startResp.ErrResponse)
 	}
 
-	startSuccessResp := starterResp.SuccessResp
+	startSuccessResp := startResp.SuccessResp
 	sid := startSuccessResp.Sid
 
 	defer func() {

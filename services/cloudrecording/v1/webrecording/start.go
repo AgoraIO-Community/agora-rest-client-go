@@ -13,8 +13,7 @@ type Start struct {
 var _ baseV1.StartWebRecording = (*Start)(nil)
 
 func (s *Start) Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *baseV1.StartWebRecordingClientRequest) (*baseV1.StartResp, error) {
-	mode := baseV1.WebMode
-	return s.Base.Do(ctx, resourceID, mode, &baseV1.StartReqBody{
+	return s.Base.Do(ctx, resourceID, baseV1.WebMode, &baseV1.StartReqBody{
 		Cname: cname,
 		Uid:   uid,
 		ClientRequest: &baseV1.StartClientRequest{
