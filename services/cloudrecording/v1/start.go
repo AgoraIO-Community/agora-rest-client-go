@@ -30,9 +30,9 @@ const (
 	WebMode = "web"
 )
 
-// BuildPath returns the request path.
+// buildPath returns the request path.
 // /v1/apps/{appid}/cloud_recording/resourceid/{resourceid}/mode/{mode}/start
-func (s *Starter) BuildPath(resourceID string, mode string) string {
+func (s *Starter) buildPath(resourceID string, mode string) string {
 	return s.prefixPath + "/resourceid/" + resourceID + "/mode/" + mode + "/start"
 }
 
@@ -665,7 +665,7 @@ type StartSuccessResp struct {
 }
 
 func (s *Starter) Do(ctx context.Context, resourceID string, mode string, payload *StartReqBody) (*StarterResp, error) {
-	path := s.BuildPath(resourceID, mode)
+	path := s.buildPath(resourceID, mode)
 
 	responseData, err := s.doRESTWithRetry(ctx, path, http.MethodPost, payload)
 	if err != nil {
