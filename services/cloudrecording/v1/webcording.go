@@ -5,7 +5,7 @@ import (
 )
 
 type AcquireWebRecodingClientRequest struct {
-	ResourceExpiredHour int      `json:"resourceExpiredHour"`
+	ResourceExpiredHour int      `json:"resourceExpiredHour,omitempty"`
 	ExcludeResourceIds  []string `json:"excludeResourceIds,omitempty"`
 	RegionAffinity      int      `json:"regionAffinity,omitempty"`
 

@@ -54,7 +54,6 @@
 		Uid:   "43434",
 		ClientRequest: &v1.AcquireClientRequest{
 			Scene:               0,
-			ResourceExpiredHour: 24,
 		},
 	})
 	if err != nil {

@@ -5,7 +5,7 @@ import (
 )
 
 type AcquireIndividualRecodingClientRequest struct {
-	// 云端录制 RESTful API 的调用时效。从成功开启云端录制并获得 sid （录制 ID）后开始计算。单位为小时。
+	// 云端录制 RESTful API 的调用时效。从成功开启云端录制并获得 sid （录制 ID）后开始计算。单位为小时，默认值为 72 小时。
 	ResourceExpiredHour int
 
 	// 另一路或几路录制任务的 resourceId。该字段用于排除指定的录制资源，以便新发起的录制任务可以使用新区域的资源，实现跨区域多路录制。

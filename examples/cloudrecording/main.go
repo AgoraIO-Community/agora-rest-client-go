@@ -117,9 +117,7 @@ func MixRecording() {
 	})
 
 	mixRecordingV1 := cloudrecording.NewAPI(c).V1().MixRecording()
-	resp, err := mixRecordingV1.Acquire().Do(ctx, cname, uid, &v1.AcquireMixRecodingClientRequest{
-		ResourceExpiredHour: 24,
-	})
+	resp, err := mixRecordingV1.Acquire().Do(ctx, cname, uid, &v1.AcquireMixRecodingClientRequest{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -277,9 +275,7 @@ func IndividualRecording() {
 
 	individualRecordingV1 := cloudrecording.NewAPI(c).V1().IndividualRecording()
 
-	resp, err := individualRecordingV1.Acquire().Do(ctx, cname, uid, false, &v1.AcquireIndividualRecodingClientRequest{
-		ResourceExpiredHour: 24,
-	})
+	resp, err := individualRecordingV1.Acquire().Do(ctx, cname, uid, false, &v1.AcquireIndividualRecodingClientRequest{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -387,9 +383,7 @@ func WebRecording() {
 	webRecordingV1 := cloudrecording.NewAPI(c).V1().WebRecording()
 
 	// acquire
-	resp, err := webRecordingV1.Acquire().Do(ctx, cname, uid, &v1.AcquireWebRecodingClientRequest{
-		ResourceExpiredHour: 24,
-	})
+	resp, err := webRecordingV1.Acquire().Do(ctx, cname, uid, &v1.AcquireWebRecodingClientRequest{})
 	if err != nil {
 		log.Fatal(err)
 	}
