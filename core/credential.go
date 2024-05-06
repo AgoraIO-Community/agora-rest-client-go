@@ -20,6 +20,9 @@ type BasicAuthCredential struct {
 	Password string
 }
 
+// Ensure BasicAuthCredential implements Credential
+var _ Credential = (*BasicAuthCredential)(nil)
+
 func NewBasicAuthCredential(username string, password string) *BasicAuthCredential {
 	return &BasicAuthCredential{
 		Username: username,
