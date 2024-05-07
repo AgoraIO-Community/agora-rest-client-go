@@ -3,6 +3,7 @@ package mixrecording
 import (
 	"context"
 
+	"github.com/AgoraIO-Community/agora-rest-client-go/core"
 	baseV1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1"
 )
 
@@ -11,6 +12,12 @@ type Stop struct {
 }
 
 var _ baseV1.StopMixRecording = (*Stop)(nil)
+
+func (s *Stop) WithForwardRegion(prefix core.ForwardedReginPrefix) baseV1.StopMixRecording {
+	s.Base.WithForwardRegion(prefix)
+
+	return s
+}
 
 func (s *Stop) DoHLS(ctx context.Context, resourceID string, sid string, payload *baseV1.StopReqBody) (*baseV1.StopMixRecordingHLSSuccessResponse, error) {
 	resp, err := s.Base.Do(ctx, resourceID, sid, baseV1.MixMode, payload)

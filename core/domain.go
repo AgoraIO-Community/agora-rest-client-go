@@ -17,10 +17,20 @@ const GlobalDomainPrefix = "api"
 type RegionArea int
 
 const (
-	US = iota
-	EU
-	AP
-	CN
+	USRegionArea = iota
+	EURegionArea
+	APRegionArea
+	CNRegionArea
+)
+
+type ForwardedReginPrefix string
+
+const (
+	DefaultForwardedReginPrefix ForwardedReginPrefix = ""
+	CNForwardedReginPrefix      ForwardedReginPrefix = "/cn"
+	APForwardedReginPrefix      ForwardedReginPrefix = "/ap"
+	NAForwardedReginPrefix      ForwardedReginPrefix = "/na"
+	EUForwardedReginPrefix      ForwardedReginPrefix = "/eu"
 )
 
 const (
@@ -49,7 +59,7 @@ type Domain struct {
 }
 
 var RegionDomain = map[RegionArea]Domain{
-	US: {
+	USRegionArea: {
 		RegionDomainPrefixes: []string{
 			USWestRegionDomainPrefix,
 			USEastRegionDomainPrefix,
@@ -59,7 +69,7 @@ var RegionDomain = map[RegionArea]Domain{
 			ChinaMainlandMajorDomain,
 		},
 	},
-	EU: {
+	EURegionArea: {
 		RegionDomainPrefixes: []string{
 			EUWestRegionDomainPrefix,
 			EUCentralRegionDomainPrefix,
@@ -69,7 +79,7 @@ var RegionDomain = map[RegionArea]Domain{
 			ChinaMainlandMajorDomain,
 		},
 	},
-	AP: {
+	APRegionArea: {
 		RegionDomainPrefixes: []string{
 			APSoutheastRegionDomainPrefix,
 			APNortheastRegionDomainPrefix,
@@ -79,7 +89,7 @@ var RegionDomain = map[RegionArea]Domain{
 			ChinaMainlandMajorDomain,
 		},
 	},
-	CN: {
+	CNRegionArea: {
 		RegionDomainPrefixes: []string{
 			CNEastRegionDomainPrefix,
 			CNNorthRegionDomainPrefix,

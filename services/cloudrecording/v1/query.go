@@ -12,14 +12,15 @@ import (
 )
 
 type Query struct {
-	client     core.Client
-	prefixPath string // /v1/apps/{appid}/cloud_recording
+	forwardedRegionPrefix core.ForwardedReginPrefix
+	client                core.Client
+	prefixPath            string // /v1/apps/{appid}/cloud_recording
 }
 
 // buildPath returns the request path.
 // /v1/apps/{appid}/cloud_recording/resourceid/{resourceid}/sid/{sid}/mode/{mode}/query
 func (q *Query) buildPath(resourceID string, sid string, mode string) string {
-	return q.prefixPath + "/resourceid/" + resourceID + "/sid/" + sid + "/mode/" + mode + "/query"
+	return string(q.forwardedRegionPrefix) + q.prefixPath + "/resourceid/" + resourceID + "/sid/" + sid + "/mode/" + mode + "/query"
 }
 
 type QueryRespServerResponseMode int
@@ -419,6 +420,12 @@ func (q *QuerySuccessResp) setServerResponse(rawBody []byte, mode string) error 
 	}
 	q.serverResponseMode = serverResponseMode
 	return nil
+}
+
+func (q *Query) WithForwardRegion(prefix core.ForwardedReginPrefix) *Query {
+	q.forwardedRegionPrefix = prefix
+
+	return q
 }
 
 func (q *Query) Do(ctx context.Context, resourceID string, sid string, mode string) (*QueryResp, error) {

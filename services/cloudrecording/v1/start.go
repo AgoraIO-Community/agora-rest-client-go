@@ -13,10 +13,11 @@ import (
 )
 
 type Start struct {
-	module     string
-	logger     core.Logger
-	client     core.Client
-	prefixPath string // /v1/apps/{appid}/cloud_recording
+	forwardedRegionPrefix core.ForwardedReginPrefix
+	module                string
+	logger                core.Logger
+	client                core.Client
+	prefixPath            string // /v1/apps/{appid}/cloud_recording
 }
 
 const (
@@ -33,7 +34,7 @@ const (
 // buildPath returns the request path.
 // /v1/apps/{appid}/cloud_recording/resourceid/{resourceid}/mode/{mode}/start
 func (s *Start) buildPath(resourceID string, mode string) string {
-	return s.prefixPath + "/resourceid/" + resourceID + "/mode/" + mode + "/start"
+	return string(s.forwardedRegionPrefix) + s.prefixPath + "/resourceid/" + resourceID + "/mode/" + mode + "/start"
 }
 
 type StartReqBody struct {
@@ -662,6 +663,12 @@ type StartSuccessResp struct {
 
 	// Sid 录制 ID。成功开始云端录制后，你会得到一个 Sid （录制 ID）。该 ID 是一次录制周期的唯一标识。
 	Sid string `json:"sid"`
+}
+
+func (s *Start) WithForwardRegion(prefix core.ForwardedReginPrefix) *Start {
+	s.forwardedRegionPrefix = prefix
+
+	return s
 }
 
 func (s *Start) Do(ctx context.Context, resourceID string, mode string, payload *StartReqBody) (*StartResp, error) {

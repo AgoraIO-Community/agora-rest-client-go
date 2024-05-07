@@ -11,14 +11,15 @@ import (
 )
 
 type UpdateLayout struct {
-	client     core.Client
-	prefixPath string // /apps/{appid}/cloud_recording
+	forwardedRegionPrefix core.ForwardedReginPrefix
+	client                core.Client
+	prefixPath            string // /apps/{appid}/cloud_recording
 }
 
 // buildPath returns the request path.
 // /v1/apps/{appid}/cloud_recording/resourceid/{resourceid}/sid/{sid}/mode/{mode}/updateLayout
-func (s *UpdateLayout) buildPath(resourceID string, sid string, mode string) string {
-	return s.prefixPath + "/resourceid/" + resourceID + "/sid/" + sid + "/mode/" + mode + "/updateLayout"
+func (u *UpdateLayout) buildPath(resourceID string, sid string, mode string) string {
+	return string(u.forwardedRegionPrefix) + u.prefixPath + "/resourceid/" + resourceID + "/sid/" + sid + "/mode/" + mode + "/updateLayout"
 }
 
 type UpdateLayoutReqBody struct {
@@ -145,10 +146,16 @@ type UpdateLayoutResp struct {
 	SuccessResp UpdateLayoutSuccessResp
 }
 
-func (s *UpdateLayout) Do(ctx context.Context, resourceID string, sid string, mode string, payload *UpdateLayoutReqBody) (*UpdateLayoutResp, error) {
-	path := s.buildPath(resourceID, sid, mode)
+func (u *UpdateLayout) WithForwardRegion(prefix core.ForwardedReginPrefix) *UpdateLayout {
+	u.forwardedRegionPrefix = prefix
 
-	responseData, err := s.client.DoREST(ctx, path, http.MethodPost, payload)
+	return u
+}
+
+func (u *UpdateLayout) Do(ctx context.Context, resourceID string, sid string, mode string, payload *UpdateLayoutReqBody) (*UpdateLayoutResp, error) {
+	path := u.buildPath(resourceID, sid, mode)
+
+	responseData, err := u.client.DoREST(ctx, path, http.MethodPost, payload)
 	if err != nil {
 		var internalErr *core.InternalErr
 		if !errors.As(err, &internalErr) {

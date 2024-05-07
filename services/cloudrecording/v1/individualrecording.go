@@ -2,6 +2,8 @@ package v1
 
 import (
 	"context"
+
+	"github.com/AgoraIO-Community/agora-rest-client-go/core"
 )
 
 type AcquireIndividualRecodingClientRequest struct {
@@ -32,6 +34,7 @@ type AcquireIndividualRecodingClientRequest struct {
 }
 
 type AcquireIndividualRecording interface {
+	WithForwardRegion(prefix core.ForwardedReginPrefix) AcquireIndividualRecording
 	// Do Acquire a resource for individual recording.
 	//
 	// cname: Channel name.
@@ -68,6 +71,7 @@ type StartIndividualRecordingClientRequest struct {
 }
 
 type StartIndividualRecording interface {
+	WithForwardRegion(prefix core.ForwardedReginPrefix) StartIndividualRecording
 	// Do Start individual recording.
 	//
 	// resourceID: Resource ID.
@@ -103,6 +107,7 @@ type QueryIndividualRecordingVideoScreenshotResp struct {
 }
 
 type QueryIndividualRecording interface {
+	WithForwardRegion(prefix core.ForwardedReginPrefix) QueryIndividualRecording
 	Do(ctx context.Context, resourceID string, sid string) (*QueryIndividualRecordingResp, error)
 	DoVideoScreenshot(ctx context.Context, resourceID string, sid string) (*QueryIndividualRecordingVideoScreenshotResp, error)
 }
@@ -112,6 +117,7 @@ type UpdateIndividualRecordingClientRequest struct {
 }
 
 type UpdateIndividualRecording interface {
+	WithForwardRegion(prefix core.ForwardedReginPrefix) UpdateIndividualRecording
 	Do(ctx context.Context, resourceID string, sid string, cname string, uid string, clientRequest *UpdateIndividualRecordingClientRequest) (*UpdateResp, error)
 }
 
@@ -138,6 +144,7 @@ type StopIndividualRecordingVideoScreenshotResp struct {
 }
 
 type StopIndividualRecording interface {
+	WithForwardRegion(prefix core.ForwardedReginPrefix) StopIndividualRecording
 	Do(ctx context.Context, resourceID string, sid string, payload *StopReqBody) (*StopIndividualRecordingResp, error)
 	DoVideoScreenshot(ctx context.Context, resourceID string, sid string, payload *StopReqBody) (*StopIndividualRecordingVideoScreenshotResp, error)
 }
