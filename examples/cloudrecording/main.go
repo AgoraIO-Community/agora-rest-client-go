@@ -117,9 +117,7 @@ func MixRecording() {
 	})
 
 	mixRecordingV1 := cloudrecording.NewAPI(c).V1().MixRecording()
-	resp, err := mixRecordingV1.Acquire().WithForwardRegion(core.CNForwardedReginPrefix).Do(ctx, cname, uid, &v1.AcquireMixRecodingClientRequest{
-		ResourceExpiredHour: 24,
-	})
+	resp, err := mixRecordingV1.Acquire().WithForwardRegion(core.CNForwardedReginPrefix).Do(ctx, cname, uid, &v1.AcquireMixRecodingClientRequest{})
 	if err != nil {
 		log.Fatal(err)
 	}
