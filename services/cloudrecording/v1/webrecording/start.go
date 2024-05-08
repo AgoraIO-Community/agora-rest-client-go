@@ -19,7 +19,7 @@ func (s *Start) WithForwardRegion(prefix core.ForwardedReginPrefix) baseV1.Start
 	return s
 }
 
-func (s *Start) Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *baseV1.StartWebRecordingClientRequest) (*baseV1.StarterResp, error) {
+func (s *Start) Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *baseV1.StartWebRecordingClientRequest) (*baseV1.StartResp, error) {
 	return s.Base.Do(ctx, resourceID, baseV1.WebMode, &baseV1.StartReqBody{
 		Cname: cname,
 		Uid:   uid,
