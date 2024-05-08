@@ -3,6 +3,7 @@ package webrecording
 import (
 	"context"
 
+	"github.com/AgoraIO-Community/agora-rest-client-go/core"
 	baseV1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1"
 )
 
@@ -11,6 +12,12 @@ type Acquire struct {
 }
 
 var _ baseV1.AcquireWebRecording = (*Acquire)(nil)
+
+func (a *Acquire) WithForwardRegion(prefix core.ForwardedReginPrefix) baseV1.AcquireWebRecording {
+	a.Base.WithForwardRegion(prefix)
+
+	return a
+}
 
 func (a *Acquire) Do(ctx context.Context, cname string, uid string, clientRequest *baseV1.AcquireWebRecodingClientRequest) (*baseV1.AcquireResp, error) {
 	var startParameter *baseV1.StartClientRequest

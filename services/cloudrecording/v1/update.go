@@ -11,14 +11,15 @@ import (
 )
 
 type Update struct {
-	client     core.Client
-	prefixPath string // /v1/apps/{appid}/cloud_recording
+	forwardedRegionPrefix core.ForwardedReginPrefix
+	client                core.Client
+	prefixPath            string // /v1/apps/{appid}/cloud_recording
 }
 
 // buildPath returns the request path.
 // /v1/apps/{appid}/cloud_recording/resourceid/{resourceid}/sid/{sid}/mode/{mode}/update
-func (s *Update) buildPath(resourceID string, sid string, mode string) string {
-	return s.prefixPath + "/resourceid/" + resourceID + "/sid/" + sid + "/mode/" + mode + "/update"
+func (u *Update) buildPath(resourceID string, sid string, mode string) string {
+	return string(u.forwardedRegionPrefix) + u.prefixPath + "/resourceid/" + resourceID + "/sid/" + sid + "/mode/" + mode + "/update"
 }
 
 type UpdateReqBody struct {
@@ -131,10 +132,16 @@ type UpdateSuccessResp struct {
 	Cname      string `json:"cname"`
 }
 
-func (s *Update) Do(ctx context.Context, resourceID string, sid string, mode string, payload *UpdateReqBody) (*UpdateResp, error) {
-	path := s.buildPath(resourceID, sid, mode)
+func (u *Update) WithForwardRegion(prefix core.ForwardedReginPrefix) *Update {
+	u.forwardedRegionPrefix = prefix
 
-	responseData, err := s.client.DoREST(ctx, path, http.MethodPost, payload)
+	return u
+}
+
+func (u *Update) Do(ctx context.Context, resourceID string, sid string, mode string, payload *UpdateReqBody) (*UpdateResp, error) {
+	path := u.buildPath(resourceID, sid, mode)
+
+	responseData, err := u.client.DoREST(ctx, path, http.MethodPost, payload)
 	if err != nil {
 		var internalErr *core.InternalErr
 		if !errors.As(err, &internalErr) {

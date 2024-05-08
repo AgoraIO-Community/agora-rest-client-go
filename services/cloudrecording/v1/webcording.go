@@ -2,6 +2,8 @@ package v1
 
 import (
 	"context"
+
+	"github.com/AgoraIO-Community/agora-rest-client-go/core"
 )
 
 type AcquireWebRecodingClientRequest struct {
@@ -17,6 +19,7 @@ type AcquireWebRecodingClientRequest struct {
 }
 
 type AcquireWebRecording interface {
+	WithForwardRegion(prefix core.ForwardedReginPrefix) AcquireWebRecording
 	Do(ctx context.Context, cname string, uid string, clientRequest *AcquireWebRecodingClientRequest) (*AcquireResp, error)
 }
 
@@ -31,6 +34,7 @@ type QueryWebRecordingSuccessResp struct {
 	ServerResponse QueryWebRecordingServerResponse
 }
 type QueryWebRecording interface {
+	WithForwardRegion(prefix core.ForwardedReginPrefix) QueryWebRecording
 	Do(ctx context.Context, resourceID string, sid string) (*QueryWebRecordingResp, error)
 }
 
@@ -41,6 +45,7 @@ type StartWebRecordingClientRequest struct {
 }
 
 type StartWebRecording interface {
+	WithForwardRegion(prefix core.ForwardedReginPrefix) StartWebRecording
 	Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *StartWebRecordingClientRequest) (*StartResp, error)
 }
 
@@ -56,6 +61,7 @@ type StopWebRecordingSuccessResp struct {
 }
 
 type StopWebRecording interface {
+	WithForwardRegion(prefix core.ForwardedReginPrefix) StopWebRecording
 	Do(ctx context.Context, resourceID string, sid string, payload *StopReqBody) (*StopWebRecordingResp, error)
 }
 
@@ -65,6 +71,7 @@ type UpdateWebRecordingClientRequest struct {
 }
 
 type UpdateWebRecording interface {
+	WithForwardRegion(prefix core.ForwardedReginPrefix) UpdateWebRecording
 	Do(ctx context.Context, resourceID string, sid string, cname string, uid string, clientRequest *UpdateWebRecordingClientRequest) (*UpdateResp, error)
 }
 

@@ -12,14 +12,15 @@ import (
 )
 
 type Stop struct {
-	client     core.Client
-	prefixPath string // /v1/apps/{appid}/cloud_recording
+	forwardedRegionPrefix core.ForwardedReginPrefix
+	client                core.Client
+	prefixPath            string // /v1/apps/{appid}/cloud_recording
 }
 
 // buildPath returns the request path.
-// /v1/apps/{appid}/cloud_recording/resourceid/{resourceid}/sid/{sid}/mode/{mode}/stop
+// [(/cn)|(/ap)|(/na)/(/eu)]/v1/apps/{appid}/cloud_recording/resourceid/{resourceid}/sid/{sid}/mode/{mode}/stop
 func (s *Stop) buildPath(resourceID string, sid string, mode string) string {
-	return s.prefixPath + "/resourceid/" + resourceID + "/sid/" + sid + "/mode/" + mode + "/stop"
+	return string(s.forwardedRegionPrefix) + s.prefixPath + "/resourceid/" + resourceID + "/sid/" + sid + "/mode/" + mode + "/stop"
 }
 
 type StopRespServerResponseMode int
@@ -351,6 +352,12 @@ func (s *StopSuccessResp) setServerResponse(rawBody []byte, mode string) error {
 	}
 	s.serverResponseMode = serverResponseMode
 	return nil
+}
+
+func (s *Stop) WithForwardRegion(prefix core.ForwardedReginPrefix) *Stop {
+	s.forwardedRegionPrefix = prefix
+
+	return s
 }
 
 func (s *Stop) Do(ctx context.Context, resourceID string, sid string, mode string, payload *StopReqBody) (*StopResp, error) {

@@ -23,11 +23,11 @@ var (
 	cname    string
 	uid      string
 	// 选择你的区域，目前支持的区域有：
-	// US: 北美
-	// EU: 欧洲
-	// CN: 中国大陆
-	// AP: 亚太
-	region core.RegionArea = core.CN
+	// USRegionArea: 北美
+	// EURegionArea: 欧洲
+	// CNRegionArea: 中国大陆
+	// APRegionArea: 亚太
+	region core.RegionArea = core.CNRegionArea
 )
 
 // 选择你的存储配置 第三方云存储地区说明详情见 https://doc.shengwang.cn/api-ref/cloud-recording/restful/region-vendor
@@ -117,7 +117,7 @@ func MixRecording() {
 	})
 
 	mixRecordingV1 := cloudrecording.NewAPI(c).V1().MixRecording()
-	resp, err := mixRecordingV1.Acquire().Do(ctx, cname, uid, &v1.AcquireMixRecodingClientRequest{})
+	resp, err := mixRecordingV1.Acquire().WithForwardRegion(core.CNForwardedReginPrefix).Do(ctx, cname, uid, &v1.AcquireMixRecodingClientRequest{})
 	if err != nil {
 		log.Fatal(err)
 	}

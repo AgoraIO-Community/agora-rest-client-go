@@ -98,6 +98,8 @@ func (c *ClientImpl) DoREST(ctx context.Context, path string,
 		if err != nil {
 			return err
 		}
+
+		req.Header.Add("User-Agent", BuildUserAgent())
 		resp, err = c.httpClient.Do(req)
 		return err
 	}
