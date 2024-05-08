@@ -31,8 +31,7 @@ func (r *resolverImpl) Resolve(ctx context.Context, domains []string, regionPref
 	var wg sync.WaitGroup
 
 	done := make(chan struct{}, 1)
-	res := make(chan string, 1)
-	errCh := make(chan error, len(domains))
+	res := make(chan string, len(domains))
 	for _, d := range domains {
 		wg.Add(1)
 		go func(domain string, regionPrefix string) {
@@ -43,7 +42,7 @@ func (r *resolverImpl) Resolve(ctx context.Context, domains []string, regionPref
 			took := time.Since(n)
 			r.logger.Debugf(ctx, r.module, "url:%s,IP:%s,took:%s", url, addrs, took.String())
 			if err != nil {
-				errCh <- err
+				r.logger.Errorf(ctx, r.module, "resolve domain:%s failed,err:%s", url, err.Error())
 			} else {
 				res <- domain
 			}

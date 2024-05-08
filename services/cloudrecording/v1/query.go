@@ -435,7 +435,7 @@ func (q *Query) Do(ctx context.Context, resourceID string, sid string, mode stri
 
 	if responseData.HttpStatusCode == http.StatusOK {
 		var successResponse QuerySuccessResp
-		if err = responseData.UnmarshallToTarget(&successResponse); err != nil {
+		if err = responseData.UnmarshalToTarget(&successResponse); err != nil {
 			return nil, err
 		}
 		resp.SuccessResp = successResponse
@@ -448,7 +448,7 @@ func (q *Query) Do(ctx context.Context, resourceID string, sid string, mode stri
 			return nil, core.NewGatewayErr(responseData.HttpStatusCode, string(responseData.RawBody))
 		}
 		var errResponse ErrResponse
-		if err = responseData.UnmarshallToTarget(&errResponse); err != nil {
+		if err = responseData.UnmarshalToTarget(&errResponse); err != nil {
 			return nil, err
 		}
 		resp.ErrResponse = errResponse

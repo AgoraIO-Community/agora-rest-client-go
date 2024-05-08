@@ -403,9 +403,6 @@ func WebRecording() {
 
 	// start
 	starterResp, err := webRecordingV1.Start().Do(ctx, resourceId, cname, uid, &v1.StartWebRecordingClientRequest{
-		AppsCollection: &v1.AppsCollection{
-			CombinationPolicy: "default",
-		},
 		RecordingFileConfig: &v1.RecordingFileConfig{
 			AvFileType: []string{
 				"hls",

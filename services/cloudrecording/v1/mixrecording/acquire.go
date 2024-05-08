@@ -13,6 +13,16 @@ type Acquire struct {
 var _ baseV1.AcquireMixRecording = (*Acquire)(nil)
 
 func (a *Acquire) Do(ctx context.Context, cname string, uid string, clientRequest *baseV1.AcquirerMixRecodingClientRequest) (*baseV1.AcquirerResp, error) {
+	var startParameter *baseV1.StartClientRequest
+	if clientRequest.StartParameter != nil {
+		startParameter = &baseV1.StartClientRequest{
+			Token:               clientRequest.StartParameter.Token,
+			RecordingConfig:     clientRequest.StartParameter.RecordingConfig,
+			RecordingFileConfig: clientRequest.StartParameter.RecordingFileConfig,
+			StorageConfig:       clientRequest.StartParameter.StorageConfig,
+		}
+	}
+
 	return a.Base.Do(ctx, &baseV1.AcquirerReqBody{
 		Cname: cname,
 		Uid:   uid,
@@ -21,6 +31,7 @@ func (a *Acquire) Do(ctx context.Context, cname string, uid string, clientReques
 			ResourceExpiredHour: clientRequest.ResourceExpiredHour,
 			ExcludeResourceIds:  clientRequest.ExcludeResourceIds,
 			RegionAffinity:      clientRequest.RegionAffinity,
+			StartParameter:      startParameter,
 		},
 	})
 }

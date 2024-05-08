@@ -28,10 +28,16 @@ type AcquirerReqBody struct {
 }
 
 type AcquirerClientRequest struct {
-	Scene               int      `json:"scene"`
-	ResourceExpiredHour int      `json:"resourceExpiredHour"`
-	ExcludeResourceIds  []string `json:"excludeResourceIds,omitempty"`
-	RegionAffinity      int      `json:"regionAffinity,omitempty"`
+	Scene int `json:"scene"`
+
+	// StartParameter 设置该字段后，可以提升可用性并优化负载均衡。
+	//
+	// 注意：如果填写该字段，则必须确保 startParameter object 和后续 start 请求中填写的 clientRequest object 完全一致，
+	// 且取值合法，否则 start 请求会收到报错。
+	StartParameter      *StartClientRequest `json:"startParameter,omitempty"`
+	ResourceExpiredHour int                 `json:"resourceExpiredHour"`
+	ExcludeResourceIds  []string            `json:"excludeResourceIds,omitempty"`
+	RegionAffinity      int                 `json:"regionAffinity,omitempty"`
 }
 
 type AcquirerResp struct {
@@ -58,7 +64,7 @@ func (a *Acquire) Do(ctx context.Context, payload *AcquirerReqBody) (*AcquirerRe
 
 	if responseData.HttpStatusCode == http.StatusOK {
 		var successResponse AcquirerSuccessResp
-		if err = responseData.UnmarshallToTarget(&successResponse); err != nil {
+		if err = responseData.UnmarshalToTarget(&successResponse); err != nil {
 			return nil, err
 		}
 		resp.SuccessRes = successResponse
@@ -68,7 +74,7 @@ func (a *Acquire) Do(ctx context.Context, payload *AcquirerReqBody) (*AcquirerRe
 			return nil, core.NewGatewayErr(responseData.HttpStatusCode, string(responseData.RawBody))
 		}
 		var errResponse ErrResponse
-		if err = responseData.UnmarshallToTarget(&errResponse); err != nil {
+		if err = responseData.UnmarshalToTarget(&errResponse); err != nil {
 			return nil, err
 		}
 		resp.ErrResponse = errResponse

@@ -97,7 +97,7 @@ type DomainPool struct {
 	currentDomain         string
 	regionPrefixes        []string
 	currentRegionPrefixes []string
-	locker                sync.Mutex
+	locker                *sync.Mutex
 
 	resolver   DomainResolver
 	lastUpdate time.Time
@@ -111,6 +111,7 @@ func NewDomainPool(domainArea RegionArea, logger Logger) *DomainPool {
 		domainSuffixes: RegionDomain[domainArea].MajorDomainSuffixes,
 		resolver:       newResolverImpl(logger),
 		logger:         logger,
+		locker:         &sync.Mutex{},
 		module:         "domain pool",
 	}
 

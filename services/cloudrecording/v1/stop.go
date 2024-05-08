@@ -367,7 +367,7 @@ func (s *Stop) Do(ctx context.Context, resourceID string, sid string, mode strin
 	var resp StopResp
 	if responseData.HttpStatusCode == http.StatusOK {
 		var successResp StopSuccessResp
-		if err = responseData.UnmarshallToTarget(&successResp); err != nil {
+		if err = responseData.UnmarshalToTarget(&successResp); err != nil {
 			return nil, err
 		}
 		resp.SuccessResp = successResp
@@ -380,7 +380,7 @@ func (s *Stop) Do(ctx context.Context, resourceID string, sid string, mode strin
 			return nil, core.NewGatewayErr(responseData.HttpStatusCode, string(responseData.RawBody))
 		}
 		var errResponse ErrResponse
-		if err = responseData.UnmarshallToTarget(&errResponse); err != nil {
+		if err = responseData.UnmarshalToTarget(&errResponse); err != nil {
 			return nil, err
 		}
 		resp.ErrResponse = errResponse

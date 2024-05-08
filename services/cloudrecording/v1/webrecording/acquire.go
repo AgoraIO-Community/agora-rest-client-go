@@ -13,6 +13,15 @@ type Acquire struct {
 var _ baseV1.AcquireWebRecording = (*Acquire)(nil)
 
 func (a *Acquire) Do(ctx context.Context, cname string, uid string, clientRequest *baseV1.AcquirerWebRecodingClientRequest) (*baseV1.AcquirerResp, error) {
+	var startParameter *baseV1.StartClientRequest
+	if clientRequest.StartParameter != nil {
+		startParameter = &baseV1.StartClientRequest{
+			RecordingFileConfig:    clientRequest.StartParameter.RecordingFileConfig,
+			StorageConfig:          clientRequest.StartParameter.StorageConfig,
+			ExtensionServiceConfig: clientRequest.StartParameter.ExtensionServiceConfig,
+		}
+	}
+
 	return a.Base.Do(ctx, &baseV1.AcquirerReqBody{
 		Cname: cname,
 		Uid:   uid,
@@ -21,6 +30,7 @@ func (a *Acquire) Do(ctx context.Context, cname string, uid string, clientReques
 			ResourceExpiredHour: clientRequest.ResourceExpiredHour,
 			ExcludeResourceIds:  clientRequest.ExcludeResourceIds,
 			RegionAffinity:      clientRequest.RegionAffinity,
+			StartParameter:      startParameter,
 		},
 	})
 }
