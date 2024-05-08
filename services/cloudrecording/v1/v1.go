@@ -34,8 +34,8 @@ func (c *BaseCollection) Acquire() *Acquire {
 	}
 }
 
-func (c *BaseCollection) Start() *Starter {
-	return &Starter{
+func (c *BaseCollection) Start() *Start {
+	return &Start{
 		module:     "cloudRecording:start",
 		logger:     c.client.GetLogger(),
 		client:     c.client,

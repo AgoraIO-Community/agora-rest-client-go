@@ -16,9 +16,9 @@ type Stop struct {
 	prefixPath string // /v1/apps/{appid}/cloud_recording
 }
 
-// BuildPath returns the request path.
+// buildPath returns the request path.
 // /v1/apps/{appid}/cloud_recording/resourceid/{resourceid}/sid/{sid}/mode/{mode}/stop
-func (s *Stop) BuildPath(resourceID string, sid string, mode string) string {
+func (s *Stop) buildPath(resourceID string, sid string, mode string) string {
 	return s.prefixPath + "/resourceid/" + resourceID + "/sid/" + sid + "/mode/" + mode + "/stop"
 }
 
@@ -52,7 +52,7 @@ type StopResp struct {
 
 type StopSuccessResp struct {
 	ResourceId string `json:"resourceId"`
-	SID        string `json:"sid"`
+	Sid        string `json:"sid"`
 
 	serverResponseMode                  StopRespServerResponseMode
 	individualRecordingServerResponse   *StopIndividualRecordingServerResponse
@@ -354,7 +354,7 @@ func (s *StopSuccessResp) setServerResponse(rawBody []byte, mode string) error {
 }
 
 func (s *Stop) Do(ctx context.Context, resourceID string, sid string, mode string, payload *StopReqBody) (*StopResp, error) {
-	path := s.BuildPath(resourceID, sid, mode)
+	path := s.buildPath(resourceID, sid, mode)
 
 	responseData, err := s.client.DoREST(ctx, path, http.MethodPost, payload)
 	if err != nil {

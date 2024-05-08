@@ -4,8 +4,8 @@ import (
 	"context"
 )
 
-type AcquirerIndividualRecodingClientRequest struct {
-	// 云端录制 RESTful API 的调用时效。从成功开启云端录制并获得 sid （录制 ID）后开始计算。单位为小时。
+type AcquireIndividualRecodingClientRequest struct {
+	// 云端录制 RESTful API 的调用时效。从成功开启云端录制并获得 sid （录制 ID）后开始计算。单位为小时，默认值为 72 小时。
 	ResourceExpiredHour int
 
 	// 另一路或几路录制任务的 resourceId。该字段用于排除指定的录制资源，以便新发起的录制任务可以使用新区域的资源，实现跨区域多路录制。
@@ -40,8 +40,8 @@ type AcquireIndividualRecording interface {
 	//
 	// enablePostponeTranscodingMix: Whether to enable the postpone transcoding mix.
 	//
-	// clientRequest: AcquirerIndividualRecodingClientRequest
-	Do(ctx context.Context, cname string, uid string, enablePostponeTranscodingMix bool, clientRequest *AcquirerIndividualRecodingClientRequest) (*AcquirerResp, error)
+	// clientRequest: AcquireIndividualRecodingClientRequest
+	Do(ctx context.Context, cname string, uid string, enablePostponeTranscodingMix bool, clientRequest *AcquireIndividualRecodingClientRequest) (*AcquireResp, error)
 }
 
 type StartIndividualRecordingClientRequest struct {
@@ -77,12 +77,12 @@ type StartIndividualRecording interface {
 	// uid:RTC User ID.
 	//
 	// clientRequest: StartIndividualRecordingClientRequest
-	Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *StartIndividualRecordingClientRequest) (*StarterResp, error)
+	Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *StartIndividualRecordingClientRequest) (*StartResp, error)
 }
 
 type QueryIndividualRecordingSuccessResp struct {
 	ResourceId     string
-	SID            string
+	Sid            string
 	ServerResponse QueryIndividualRecordingServerResponse
 }
 
@@ -93,7 +93,7 @@ type QueryIndividualRecordingResp struct {
 
 type QueryIndividualRecordingVideoScreenshotSuccessResp struct {
 	ResourceId     string
-	SID            string
+	Sid            string
 	ServerResponse QueryIndividualVideoScreenshotServerResponse
 }
 
@@ -117,13 +117,13 @@ type UpdateIndividualRecording interface {
 
 type StopIndividualRecordingSuccessResp struct {
 	ResourceId     string
-	SID            string
+	Sid            string
 	ServerResponse StopIndividualRecordingServerResponse
 }
 
 type StopIndividualRecordingVideoScreenshotSuccessResp struct {
 	ResourceId     string
-	SID            string
+	Sid            string
 	ServerResponse StopIndividualVideoScreenshotServerResponse
 }
 

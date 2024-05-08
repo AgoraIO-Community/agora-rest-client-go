@@ -23,7 +23,7 @@ func (i *Impl) Acquire() baseV1.AcquireIndividualRecording {
 }
 
 func (i *Impl) Start() baseV1.StartIndividualRecording {
-	return &Starter{Base: i.Base.Start()}
+	return &Start{Base: i.Base.Start()}
 }
 
 func (i *Impl) Query() baseV1.QueryIndividualRecording {

@@ -4,8 +4,8 @@ import (
 	"context"
 )
 
-type AcquirerWebRecodingClientRequest struct {
-	ResourceExpiredHour int      `json:"resourceExpiredHour"`
+type AcquireWebRecodingClientRequest struct {
+	ResourceExpiredHour int      `json:"resourceExpiredHour,omitempty"`
 	ExcludeResourceIds  []string `json:"excludeResourceIds,omitempty"`
 	RegionAffinity      int      `json:"regionAffinity,omitempty"`
 
@@ -17,7 +17,7 @@ type AcquirerWebRecodingClientRequest struct {
 }
 
 type AcquireWebRecording interface {
-	Do(ctx context.Context, cname string, uid string, clientRequest *AcquirerWebRecodingClientRequest) (*AcquirerResp, error)
+	Do(ctx context.Context, cname string, uid string, clientRequest *AcquireWebRecodingClientRequest) (*AcquireResp, error)
 }
 
 type QueryWebRecordingResp struct {
@@ -27,7 +27,7 @@ type QueryWebRecordingResp struct {
 
 type QueryWebRecordingSuccessResp struct {
 	ResourceId     string
-	SID            string
+	Sid            string
 	ServerResponse QueryWebRecordingServerResponse
 }
 type QueryWebRecording interface {
@@ -41,7 +41,7 @@ type StartWebRecordingClientRequest struct {
 }
 
 type StartWebRecording interface {
-	Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *StartWebRecordingClientRequest) (*StarterResp, error)
+	Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *StartWebRecordingClientRequest) (*StartResp, error)
 }
 
 type StopWebRecordingResp struct {
@@ -51,7 +51,7 @@ type StopWebRecordingResp struct {
 
 type StopWebRecordingSuccessResp struct {
 	ResourceId     string
-	SID            string
+	Sid            string
 	ServerResponse StopWebRecordingServerResponse
 }
 

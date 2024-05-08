@@ -35,7 +35,7 @@ const (
 
 type QuerySuccessResp struct {
 	ResourceId string `json:"resourceId"`
-	SID        string `json:"sid"`
+	Sid        string `json:"sid"`
 
 	serverResponseMode                  QueryRespServerResponseMode
 	individualRecordingServerResponse   *QueryIndividualRecordingServerResponse

@@ -117,9 +117,7 @@ func MixRecording() {
 	})
 
 	mixRecordingV1 := cloudrecording.NewAPI(c).V1().MixRecording()
-	resp, err := mixRecordingV1.Acquire().Do(ctx, cname, uid, &v1.AcquirerMixRecodingClientRequest{
-		ResourceExpiredHour: 24,
-	})
+	resp, err := mixRecordingV1.Acquire().Do(ctx, cname, uid, &v1.AcquireMixRecodingClientRequest{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -129,7 +127,7 @@ func MixRecording() {
 		log.Printf("start resp:%+v", resp.ErrResponse)
 	}
 
-	starterResp, err := mixRecordingV1.Start().Do(ctx, resp.SuccessRes.ResourceId, cname, uid, &v1.StartMixRecordingClientRequest{
+	startResp, err := mixRecordingV1.Start().Do(ctx, resp.SuccessRes.ResourceId, cname, uid, &v1.StartMixRecordingClientRequest{
 		Token: token,
 		RecordingConfig: &v1.RecordingConfig{
 			ChannelType:  1,
@@ -162,15 +160,15 @@ func MixRecording() {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	if starterResp.IsSuccess() {
-		log.Printf("success:%+v", &starterResp.SuccessResp)
+	if startResp.IsSuccess() {
+		log.Printf("success:%+v", &startResp.SuccessResp)
 	} else {
-		log.Printf("failed:%+v", &starterResp.ErrResponse)
+		log.Printf("failed:%+v", &startResp.ErrResponse)
 	}
 
-	startSuccessResp := starterResp.SuccessResp
+	startSuccessResp := startResp.SuccessResp
 	defer func() {
-		stopResp, err := mixRecordingV1.Stop().DoHLSAndMP4(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, &v1.StopReqBody{
+		stopResp, err := mixRecordingV1.Stop().DoHLSAndMP4(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, &v1.StopReqBody{
 			Cname: cname,
 			Uid:   uid,
 			ClientRequest: &v1.StopClientRequest{
@@ -188,7 +186,7 @@ func MixRecording() {
 		log.Printf("stopServerResponse:%+v", stopResp.SuccessResp.ServerResponse)
 	}()
 
-	queryResp, err := mixRecordingV1.Query().DoHLSAndMP4(ctx, startSuccessResp.ResourceId, startSuccessResp.SID)
+	queryResp, err := mixRecordingV1.Query().DoHLSAndMP4(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -203,7 +201,7 @@ func MixRecording() {
 
 	time.Sleep(3 * time.Second)
 
-	updateLayoutResp, err := mixRecordingV1.UpdateLayout().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, cname, uid, &v1.UpdateLayoutUpdateMixRecordingClientRequest{
+	updateLayoutResp, err := mixRecordingV1.UpdateLayout().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, cname, uid, &v1.UpdateLayoutUpdateMixRecordingClientRequest{
 		MixedVideoLayout: 3,
 		BackgroundColor:  "#FF0000",
 		LayoutConfig: []v1.UpdateLayoutConfig{
@@ -239,7 +237,7 @@ func MixRecording() {
 	}
 	time.Sleep(3 * time.Second)
 
-	updateResp, err := mixRecordingV1.Update().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, cname, uid, &v1.UpdateMixRecordingClientRequest{
+	updateResp, err := mixRecordingV1.Update().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, cname, uid, &v1.UpdateMixRecordingClientRequest{
 		StreamSubscribe: &v1.UpdateStreamSubscribe{
 			AudioUidList: &v1.UpdateAudioUIDList{
 				SubscribeAudioUIDs: []string{
@@ -277,9 +275,7 @@ func IndividualRecording() {
 
 	individualRecordingV1 := cloudrecording.NewAPI(c).V1().IndividualRecording()
 
-	resp, err := individualRecordingV1.Acquire().Do(ctx, cname, uid, false, &v1.AcquirerIndividualRecodingClientRequest{
-		ResourceExpiredHour: 24,
-	})
+	resp, err := individualRecordingV1.Acquire().Do(ctx, cname, uid, false, &v1.AcquireIndividualRecodingClientRequest{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -289,7 +285,7 @@ func IndividualRecording() {
 		log.Fatalf("acquire failed:%+v", resp)
 	}
 
-	starterResp, err := individualRecordingV1.Start().Do(ctx, resp.SuccessRes.ResourceId, cname, uid, &v1.StartIndividualRecordingClientRequest{
+	startResp, err := individualRecordingV1.Start().Do(ctx, resp.SuccessRes.ResourceId, cname, uid, &v1.StartIndividualRecordingClientRequest{
 		Token: token,
 		RecordingConfig: &v1.RecordingConfig{
 			ChannelType: 1,
@@ -310,15 +306,15 @@ func IndividualRecording() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if starterResp.IsSuccess() {
-		log.Printf("starterResp success:%+v", &starterResp.SuccessResp)
+	if startResp.IsSuccess() {
+		log.Printf("startResp success:%+v", &startResp.SuccessResp)
 	} else {
-		log.Fatalf("starterResp failed:%+v", &starterResp.ErrResponse)
+		log.Fatalf("startResp failed:%+v", &startResp.ErrResponse)
 	}
-	startSuccessResp := starterResp.SuccessResp
+	startSuccessResp := startResp.SuccessResp
 
 	defer func() {
-		stopResp, err := individualRecordingV1.Stop().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, &v1.StopReqBody{
+		stopResp, err := individualRecordingV1.Stop().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, &v1.StopReqBody{
 			Cname: cname,
 			Uid:   uid,
 			ClientRequest: &v1.StopClientRequest{
@@ -336,7 +332,7 @@ func IndividualRecording() {
 
 		log.Printf("stopServerResponse:%+v", stopResp.SuccessResp.ServerResponse)
 	}()
-	queryResp, err := individualRecordingV1.Query().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID)
+	queryResp, err := individualRecordingV1.Query().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -349,7 +345,7 @@ func IndividualRecording() {
 	log.Printf("queryServerResponse:%+v", queryResp.SuccessResp.ServerResponse)
 
 	time.Sleep(3 * time.Second)
-	updateResp, err := individualRecordingV1.Update().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.SID, cname, uid, &v1.UpdateIndividualRecordingClientRequest{
+	updateResp, err := individualRecordingV1.Update().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, cname, uid, &v1.UpdateIndividualRecordingClientRequest{
 		StreamSubscribe: &v1.UpdateStreamSubscribe{
 			AudioUidList: &v1.UpdateAudioUIDList{
 				SubscribeAudioUIDs: []string{
@@ -375,6 +371,7 @@ func IndividualRecording() {
 	time.Sleep(2 * time.Second)
 }
 
+// WebRecording hls&mp4
 func WebRecording() {
 	ctx := context.Background()
 	c := core.NewClient(&core.Config{
@@ -387,9 +384,7 @@ func WebRecording() {
 	webRecordingV1 := cloudrecording.NewAPI(c).V1().WebRecording()
 
 	// acquire
-	resp, err := webRecordingV1.Acquire().Do(ctx, cname, uid, &v1.AcquirerWebRecodingClientRequest{
-		ResourceExpiredHour: 24,
-	})
+	resp, err := webRecordingV1.Acquire().Do(ctx, cname, uid, &v1.AcquireWebRecodingClientRequest{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -402,7 +397,7 @@ func WebRecording() {
 	resourceId := resp.SuccessRes.ResourceId
 
 	// start
-	starterResp, err := webRecordingV1.Start().Do(ctx, resourceId, cname, uid, &v1.StartWebRecordingClientRequest{
+	startResp, err := webRecordingV1.Start().Do(ctx, resourceId, cname, uid, &v1.StartWebRecordingClientRequest{
 		RecordingFileConfig: &v1.RecordingFileConfig{
 			AvFileType: []string{
 				"hls",
@@ -430,14 +425,14 @@ func WebRecording() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if starterResp.IsSuccess() {
-		log.Printf("starterResp success:%+v", &starterResp.SuccessResp)
+	if startResp.IsSuccess() {
+		log.Printf("startResp success:%+v", &startResp.SuccessResp)
 	} else {
-		log.Fatalf("starterResp failed:%+v", &starterResp.ErrResponse)
+		log.Fatalf("startResp failed:%+v", &startResp.ErrResponse)
 	}
 
-	startSuccessResp := starterResp.SuccessResp
-	sid := startSuccessResp.SID
+	startSuccessResp := startResp.SuccessResp
+	sid := startSuccessResp.Sid
 
 	defer func() {
 		// stop

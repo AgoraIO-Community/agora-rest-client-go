@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-type AcquirerMixRecodingClientRequest struct {
+type AcquireMixRecodingClientRequest struct {
 	ResourceExpiredHour int
 	ExcludeResourceIds  []string
 	RegionAffinity      int
@@ -17,12 +17,12 @@ type AcquirerMixRecodingClientRequest struct {
 }
 
 type AcquireMixRecording interface {
-	Do(ctx context.Context, cname string, uid string, clientRequest *AcquirerMixRecodingClientRequest) (*AcquirerResp, error)
+	Do(ctx context.Context, cname string, uid string, clientRequest *AcquireMixRecodingClientRequest) (*AcquireResp, error)
 }
 
 type QueryMixRecordingHLSSuccessResp struct {
 	ResourceId     string
-	SID            string
+	Sid            string
 	ServerResponse QueryMixRecordingHLSServerResponse
 }
 
@@ -33,7 +33,7 @@ type QueryMixRecordingHLSResp struct {
 
 type QueryMixRecordingHLSAndMP4SuccessResp struct {
 	ResourceId     string
-	SID            string
+	Sid            string
 	ServerResponse QueryMixRecordingHLSAndMP4ServerResponse
 }
 type QueryMixRecordingHLSAndMP4Resp struct {
@@ -54,12 +54,12 @@ type StartMixRecordingClientRequest struct {
 }
 
 type StartMixRecording interface {
-	Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *StartMixRecordingClientRequest) (*StarterResp, error)
+	Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *StartMixRecordingClientRequest) (*StartResp, error)
 }
 
 type StopMixRecordingHLSResp struct {
 	ResourceId     string
-	SID            string
+	Sid            string
 	ServerResponse StopMixRecordingHLSServerResponse
 }
 
@@ -70,7 +70,7 @@ type StopMixRecordingHLSSuccessResponse struct {
 
 type StopMixRecordingHLSAndMP4Resp struct {
 	ResourceId     string
-	SID            string
+	Sid            string
 	ServerResponse StopMixRecordingHLSAndMP4ServerResponse
 }
 

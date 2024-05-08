@@ -25,7 +25,7 @@ func (q *Query) Do(ctx context.Context, resourceID string, sid string) (*baseV1.
 		successResp := resp.SuccessResp
 		webResp.SuccessResp = baseV1.QueryWebRecordingSuccessResp{
 			ResourceId:     successResp.ResourceId,
-			SID:            successResp.SID,
+			Sid:            successResp.Sid,
 			ServerResponse: *successResp.GetWebRecording2CDNServerResponse(),
 		}
 	}

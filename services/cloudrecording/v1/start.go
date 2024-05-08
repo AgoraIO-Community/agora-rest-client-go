@@ -12,7 +12,7 @@ import (
 	"github.com/AgoraIO-Community/agora-rest-client-go/core"
 )
 
-type Starter struct {
+type Start struct {
 	module     string
 	logger     core.Logger
 	client     core.Client
@@ -30,9 +30,9 @@ const (
 	WebMode = "web"
 )
 
-// BuildPath returns the request path.
+// buildPath returns the request path.
 // /v1/apps/{appid}/cloud_recording/resourceid/{resourceid}/mode/{mode}/start
-func (s *Starter) BuildPath(resourceID string, mode string) string {
+func (s *Start) buildPath(resourceID string, mode string) string {
 	return s.prefixPath + "/resourceid/" + resourceID + "/mode/" + mode + "/start"
 }
 
@@ -60,7 +60,7 @@ type StartClientRequest struct {
 
 const (
 	DefaultCombinationPolicy              = "default"
-	PostPhoneTranscodingCombinationPolicy = "postphone_transcoding"
+	PostPhoneTranscodingCombinationPolicy = "postpone_transcoding"
 )
 
 // AppsCollection 应用配置项
@@ -642,7 +642,7 @@ type ServiceParam struct {
 	ReadyTimeout int `json:"readyTimeout"`
 }
 
-type StarterResp struct {
+type StartResp struct {
 	Response
 	SuccessResp StartSuccessResp
 }
@@ -660,12 +660,12 @@ type StartSuccessResp struct {
 	// 使用这个 Resource ID 可以开始一段云端录制。这个 Resource ID 的有效期为 5 分钟，超时需要重新请求。
 	ResourceId string `json:"resourceId"`
 
-	// SID 录制 ID。成功开始云端录制后，你会得到一个 Sid （录制 ID）。该 ID 是一次录制周期的唯一标识。
-	SID string `json:"sid"`
+	// Sid 录制 ID。成功开始云端录制后，你会得到一个 Sid （录制 ID）。该 ID 是一次录制周期的唯一标识。
+	Sid string `json:"sid"`
 }
 
-func (s *Starter) Do(ctx context.Context, resourceID string, mode string, payload *StartReqBody) (*StarterResp, error) {
-	path := s.BuildPath(resourceID, mode)
+func (s *Start) Do(ctx context.Context, resourceID string, mode string, payload *StartReqBody) (*StartResp, error) {
+	path := s.buildPath(resourceID, mode)
 
 	responseData, err := s.doRESTWithRetry(ctx, path, http.MethodPost, payload)
 	if err != nil {
@@ -675,7 +675,7 @@ func (s *Starter) Do(ctx context.Context, resourceID string, mode string, payloa
 		}
 	}
 
-	var resp StarterResp
+	var resp StartResp
 
 	if responseData.HttpStatusCode == http.StatusOK {
 		var successResp StartSuccessResp
@@ -700,7 +700,7 @@ func (s *Starter) Do(ctx context.Context, resourceID string, mode string, payloa
 
 const retryCount = 3
 
-func (s *Starter) doRESTWithRetry(ctx context.Context, path string, method string, requestBody interface{}) (*core.BaseResponse, error) {
+func (s *Start) doRESTWithRetry(ctx context.Context, path string, method string, requestBody interface{}) (*core.BaseResponse, error) {
 	var (
 		resp  *core.BaseResponse
 		err   error

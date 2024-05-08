@@ -6,13 +6,13 @@ import (
 	baseV1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1"
 )
 
-type Starter struct {
-	Base *baseV1.Starter
+type Start struct {
+	Base *baseV1.Start
 }
 
-var _ baseV1.StartIndividualRecording = (*Starter)(nil)
+var _ baseV1.StartIndividualRecording = (*Start)(nil)
 
-func (s *Starter) Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *baseV1.StartIndividualRecordingClientRequest) (*baseV1.StarterResp, error) {
+func (s *Start) Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *baseV1.StartIndividualRecordingClientRequest) (*baseV1.StartResp, error) {
 	return s.Base.Do(ctx, resourceID, baseV1.IndividualMode, &baseV1.StartReqBody{
 		Cname: cname,
 		Uid:   uid,

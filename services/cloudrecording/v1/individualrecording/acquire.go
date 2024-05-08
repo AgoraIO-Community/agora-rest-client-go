@@ -12,7 +12,7 @@ type Acquire struct {
 
 var _ baseV1.AcquireIndividualRecording = (*Acquire)(nil)
 
-func (a *Acquire) Do(ctx context.Context, cname string, uid string, enablePostponeTranscodingMix bool, clientRequest *baseV1.AcquirerIndividualRecodingClientRequest) (*baseV1.AcquirerResp, error) {
+func (a *Acquire) Do(ctx context.Context, cname string, uid string, enablePostponeTranscodingMix bool, clientRequest *baseV1.AcquireIndividualRecodingClientRequest) (*baseV1.AcquireResp, error) {
 	var startParameter *baseV1.StartClientRequest
 	if clientRequest.StartParameter != nil {
 		startParameter = &baseV1.StartClientRequest{
@@ -30,10 +30,10 @@ func (a *Acquire) Do(ctx context.Context, cname string, uid string, enablePostpo
 	if enablePostponeTranscodingMix {
 		scene = 2
 	}
-	return a.Base.Do(ctx, &baseV1.AcquirerReqBody{
+	return a.Base.Do(ctx, &baseV1.AcquireReqBody{
 		Cname: cname,
 		Uid:   uid,
-		ClientRequest: &baseV1.AcquirerClientRequest{
+		ClientRequest: &baseV1.AcquireClientRequest{
 			Scene:               scene,
 			ResourceExpiredHour: clientRequest.ResourceExpiredHour,
 			ExcludeResourceIds:  clientRequest.ExcludeResourceIds,
