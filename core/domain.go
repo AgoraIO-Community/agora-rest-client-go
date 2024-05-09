@@ -145,7 +145,7 @@ func (d *DomainPool) SelectBestDomain(ctx context.Context) error {
 
 	if d.domainNeedUpdate() {
 		d.logger.Debug(ctx, d.module, "need update domainPool")
-		domain, err := d.resolver.Resolve(ctx, d.AllDomainsSuffixes(), d.currentRegionPrefixes[0])
+		domain, err := d.resolver.Resolve(ctx, d.domainSuffixes, d.currentRegionPrefixes[0])
 		if err != nil {
 			return err
 		}
@@ -172,17 +172,12 @@ func (d *DomainPool) selectDomain(domain string) {
 	}
 }
 
-func (d *DomainPool) AllDomainsSuffixes() []string {
-	return d.domainSuffixes
-}
-
-func (d *DomainPool) GetCurrentRegion() string {
+func (d *DomainPool) GetCurrentUrl() string {
 	d.locker.Lock()
 	defer d.locker.Unlock()
 
-	return d.currentRegionPrefixes[0]
-}
+	currentRegion := d.currentRegionPrefixes[0]
+	currentDomain := d.currentDomain
 
-func (d *DomainPool) GetCurrentUrl() string {
-	return fmt.Sprintf("https://%s.%s", d.GetCurrentRegion(), d.currentDomain)
+	return fmt.Sprintf("https://%s.%s", currentRegion, currentDomain)
 }
