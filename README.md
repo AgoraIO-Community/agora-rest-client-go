@@ -1,7 +1,23 @@
 # Agora REST Client for Go
-[![Go](https://github.com/AgoraIO-Community/agora-rest-client-go/actions/workflows/go.yml/badge.svg)](https://github.com/seymourtang/agora-rest-client-go/actions/workflows/go.yml)
+<p>
+<img alt="GitHub License" src="https://img.shields.io/github/license/AgoraIO-Community/agora-rest-client-go">
+<a href="https://pkg.go.dev/github.com/AgoraIO-Community/agora-rest-client-go">
+<img src="https://pkg.go.dev/badge/github.com/AgoraIO-Community/agora-rest-client-go.svg"/>
+</a>
+<a href="https://github.com/seymourtang/agora-rest-client-go/actions/workflows/go.yml">
+<img src="https://github.com/AgoraIO-Community/agora-rest-client-go/actions/workflows/go.yml/badge.svg"/>
+</a>
+<img alt="GitHub go.mod Go version" src="https://img.shields.io/github/go-mod/go-version/AgoraIO-Community/agora-rest-client-go">
+<img alt="GitHub" src="https://img.shields.io/github/v/release/AgoraIO-Community/agora-rest-client-go">
+<img alt="GitHub Issues or Pull Requests" src="https://img.shields.io/github/issues-pr/AgoraIO-Community/agora-rest-client-go">
 
+</p>
 `agora-rest-client-go`是用Go语言编写的一个开源项目，专门为 Agora REST API设计。它包含了 Agora 官方提供的REST API接口的包装和内部实现，可以帮助开发者更加方便的集成服务端Agora REST API。
+
+> 注意： 该SDK是我们团队开发的一个Go REST客户端库，经过一些测试以确保其基本功能正常运作。然而，由于软件开发的复杂性，我们无法保证它是完全没有缺陷的。
+>
+>该SDK目前可能存在一些潜在的BUG或不稳定性。我们鼓励社区的开发者和用户积极参与，共同改进这个项目。
+
 ## 特性
 * 封装了Agora REST API的请求和响应处理，简化与Agora REST API 的通信流程
 * 当遇到 DNS 解析失败、网络错误或者请求超时等问题的时候，提供了自动切换最佳域名的能力，以保障请求 REST API 服务的可用性
