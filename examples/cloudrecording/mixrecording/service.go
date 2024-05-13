@@ -45,12 +45,14 @@ func (s *Service) RunHLS(token string, storageConfig *v1.StorageConfig) {
 	// acquire
 	acquireResp, err := impl.Acquire().Do(ctx, s.cname, s.uid, &v1.AcquireMixRecodingClientRequest{})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if acquireResp.IsSuccess() {
 		log.Printf("acquire success:%+v\n", acquireResp)
 	} else {
-		log.Fatalf("acquire failed:%+v\n", acquireResp)
+		log.Printf("acquire failed:%+v\n", acquireResp)
+		return
 	}
 
 	resourceId := acquireResp.SuccessRes.ResourceId
@@ -80,44 +82,49 @@ func (s *Service) RunHLS(token string, storageConfig *v1.StorageConfig) {
 		RecordingFileConfig: &v1.RecordingFileConfig{
 			AvFileType: []string{
 				"hls",
-				"mp4",
 			},
 		},
 		StorageConfig: storageConfig,
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if startResp.IsSuccess() {
 		log.Printf("start success:%+v\n", startResp)
 	} else {
-		log.Fatalf("start failed:%+v\n", startResp)
+		log.Printf("start failed:%+v\n", startResp)
+		return
 	}
 
 	sid := startResp.SuccessResp.Sid
 	// stop
 	defer func() {
-		stopResp, err := impl.Stop().DoHLSAndMP4(ctx, resourceId, sid, s.cname, s.uid, false)
+		stopResp, err := impl.Stop().DoHLS(ctx, resourceId, sid, s.cname, s.uid, false)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if stopResp.IsSuccess() {
 			log.Printf("stop success:%+v\n", stopResp)
 		} else {
-			log.Fatalf("stop failed:%+v\n", stopResp)
+			log.Printf("stop failed:%+v\n", stopResp)
+			return
 		}
 	}()
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().DoHLSAndMP4(ctx, resourceId, sid)
+		queryResp, err := impl.Query().DoHLS(ctx, resourceId, sid)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if queryResp.IsSuccess() {
 			log.Printf("query success:%+v\n", queryResp)
 		} else {
-			log.Fatalf("query failed:%+v\n", queryResp)
+			log.Printf("query failed:%+v\n", queryResp)
+			return
 		}
 		time.Sleep(time.Second * 10)
 	}
@@ -138,12 +145,14 @@ func (s *Service) RunHLS(token string, storageConfig *v1.StorageConfig) {
 		},
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if updateResp.IsSuccess() {
 		log.Printf("update success:%+v\n", updateResp)
 	} else {
-		log.Fatalf("update failed:%+v\n", updateResp)
+		log.Printf("update failed:%+v\n", updateResp)
+		return
 	}
 
 	// updateLayout
@@ -153,24 +162,28 @@ func (s *Service) RunHLS(token string, storageConfig *v1.StorageConfig) {
 	},
 	)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if updateLayoutResp.IsSuccess() {
 		log.Printf("updateLayout success:%+v\n", updateLayoutResp)
 	} else {
-		log.Fatalf("updateLayout failed:%+v\n", updateLayoutResp)
+		log.Printf("updateLayout failed:%+v\n", updateLayoutResp)
+		return
 	}
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().DoHLSAndMP4(ctx, resourceId, sid)
+		queryResp, err := impl.Query().DoHLS(ctx, resourceId, sid)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if queryResp.IsSuccess() {
 			log.Printf("query success:%+v\n", queryResp)
 		} else {
-			log.Fatalf("query failed:%+v\n", queryResp)
+			log.Printf("query failed:%+v\n", queryResp)
+			return
 		}
 		time.Sleep(time.Second * 10)
 	}
@@ -189,12 +202,14 @@ func (s *Service) RunHLSAndMP4(token string, storageConfig *v1.StorageConfig) {
 	// acquire
 	acquireResp, err := impl.Acquire().Do(ctx, s.cname, s.uid, &v1.AcquireMixRecodingClientRequest{})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if acquireResp.IsSuccess() {
 		log.Printf("acquire success:%+v\n", acquireResp)
 	} else {
-		log.Fatalf("acquire failed:%+v\n", acquireResp)
+		log.Printf("acquire failed:%+v\n", acquireResp)
+		return
 	}
 
 	resourceId := acquireResp.SuccessRes.ResourceId
@@ -230,12 +245,14 @@ func (s *Service) RunHLSAndMP4(token string, storageConfig *v1.StorageConfig) {
 		StorageConfig: storageConfig,
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if startResp.IsSuccess() {
 		log.Printf("start success:%+v\n", startResp)
 	} else {
-		log.Fatalf("start failed:%+v\n", startResp)
+		log.Printf("start failed:%+v\n", startResp)
+		return
 	}
 
 	sid := startResp.SuccessResp.Sid
@@ -243,12 +260,14 @@ func (s *Service) RunHLSAndMP4(token string, storageConfig *v1.StorageConfig) {
 	defer func() {
 		stopResp, err := impl.Stop().DoHLSAndMP4(ctx, resourceId, sid, s.cname, s.uid, false)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if stopResp.IsSuccess() {
 			log.Printf("stop success:%+v\n", stopResp)
 		} else {
-			log.Fatalf("stop failed:%+v\n", stopResp)
+			log.Printf("stop failed:%+v\n", stopResp)
+			return
 		}
 	}()
 
@@ -256,12 +275,14 @@ func (s *Service) RunHLSAndMP4(token string, storageConfig *v1.StorageConfig) {
 	for i := 0; i < 3; i++ {
 		queryResp, err := impl.Query().DoHLSAndMP4(ctx, resourceId, sid)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if queryResp.IsSuccess() {
 			log.Printf("query success:%+v\n", queryResp)
 		} else {
-			log.Fatalf("query failed:%+v\n", queryResp)
+			log.Printf("query failed:%+v\n", queryResp)
+			return
 		}
 		time.Sleep(time.Second * 10)
 	}
@@ -282,12 +303,14 @@ func (s *Service) RunHLSAndMP4(token string, storageConfig *v1.StorageConfig) {
 		},
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if updateResp.IsSuccess() {
 		log.Printf("update success:%+v\n", updateResp)
 	} else {
-		log.Fatalf("update failed:%+v\n", updateResp)
+		log.Printf("update failed:%+v\n", updateResp)
+		return
 	}
 
 	// updateLayout
@@ -297,24 +320,28 @@ func (s *Service) RunHLSAndMP4(token string, storageConfig *v1.StorageConfig) {
 	},
 	)
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if updateLayoutResp.IsSuccess() {
 		log.Printf("updateLayout success:%+v\n", updateLayoutResp)
 	} else {
-		log.Fatalf("updateLayout failed:%+v\n", updateLayoutResp)
+		log.Printf("updateLayout failed:%+v\n", updateLayoutResp)
+		return
 	}
 
 	// query
 	for i := 0; i < 3; i++ {
 		queryResp, err := impl.Query().DoHLSAndMP4(ctx, resourceId, sid)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if queryResp.IsSuccess() {
 			log.Printf("query success:%+v\n", queryResp)
 		} else {
-			log.Fatalf("query failed:%+v\n", queryResp)
+			log.Printf("query failed:%+v\n", queryResp)
+			return
 		}
 		time.Sleep(time.Second * 10)
 	}

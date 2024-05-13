@@ -253,7 +253,7 @@ type Container struct {
 type TranscodeOptions struct {
 	Container   *Container   `json:"container"`
 	TransConfig *TransConfig `json:"transConfig"`
-	Audio       *Audio       `json:"audio"`
+	Audio       *Audio       `json:"audio,omitempty"`
 }
 
 type TransConfig struct {

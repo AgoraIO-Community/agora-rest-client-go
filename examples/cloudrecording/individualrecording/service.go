@@ -45,12 +45,14 @@ func (s *Service) RunRecording(token string, storageConfig *v1.StorageConfig) {
 	// acquire
 	acquireResp, err := impl.Acquire().Do(ctx, s.cname, s.uid, false, &v1.AcquireIndividualRecodingClientRequest{})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if acquireResp.IsSuccess() {
 		log.Printf("acquire success:%+v\n", acquireResp)
 	} else {
-		log.Fatalf("acquire failed:%+v\n", acquireResp)
+		log.Printf("acquire failed:%+v\n", acquireResp)
+		return
 	}
 
 	resourceId := acquireResp.SuccessRes.ResourceId
@@ -77,12 +79,14 @@ func (s *Service) RunRecording(token string, storageConfig *v1.StorageConfig) {
 		StorageConfig: storageConfig,
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if startResp.IsSuccess() {
 		log.Printf("start success:%+v\n", startResp)
 	} else {
-		log.Fatalf("start failed:%+v\n", startResp)
+		log.Printf("start failed:%+v\n", startResp)
+		return
 	}
 
 	sid := startResp.SuccessResp.Sid
@@ -90,12 +94,14 @@ func (s *Service) RunRecording(token string, storageConfig *v1.StorageConfig) {
 	defer func() {
 		stopResp, err := impl.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if stopResp.IsSuccess() {
 			log.Printf("stop success:%+v\n", stopResp)
 		} else {
-			log.Fatalf("stop failed:%+v\n", stopResp)
+			log.Printf("stop failed:%+v\n", stopResp)
+			return
 		}
 	}()
 
@@ -103,12 +109,14 @@ func (s *Service) RunRecording(token string, storageConfig *v1.StorageConfig) {
 	for i := 0; i < 3; i++ {
 		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if queryResp.IsSuccess() {
 			log.Printf("query success:%+v\n", queryResp)
 		} else {
-			log.Fatalf("query failed:%+v\n", queryResp)
+			log.Printf("query failed:%+v\n", queryResp)
+			return
 		}
 		time.Sleep(time.Second * 10)
 	}
@@ -129,24 +137,28 @@ func (s *Service) RunRecording(token string, storageConfig *v1.StorageConfig) {
 		},
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if updateResp.IsSuccess() {
 		log.Printf("update success:%+v\n", updateResp)
 	} else {
-		log.Fatalf("update failed:%+v\n", updateResp)
+		log.Printf("update failed:%+v\n", updateResp)
+		return
 	}
 
 	// query
 	for i := 0; i < 3; i++ {
 		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if queryResp.IsSuccess() {
 			log.Printf("query success:%+v\n", queryResp)
 		} else {
-			log.Fatalf("query failed:%+v\n", queryResp)
+			log.Printf("query failed:%+v\n", queryResp)
+			return
 		}
 		time.Sleep(time.Second * 10)
 	}
@@ -165,12 +177,14 @@ func (s *Service) RunSnapshot(token string, storageConfig *v1.StorageConfig) {
 	// acquire
 	acquireResp, err := impl.Acquire().Do(ctx, s.cname, s.uid, false, &v1.AcquireIndividualRecodingClientRequest{})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if acquireResp.IsSuccess() {
 		log.Printf("acquire success:%+v\n", acquireResp)
 	} else {
-		log.Fatalf("acquire failed:%+v\n", acquireResp)
+		log.Printf("acquire failed:%+v\n", acquireResp)
+		return
 	}
 
 	resourceId := acquireResp.SuccessRes.ResourceId
@@ -196,12 +210,14 @@ func (s *Service) RunSnapshot(token string, storageConfig *v1.StorageConfig) {
 		StorageConfig: storageConfig,
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if startResp.IsSuccess() {
 		log.Printf("start success:%+v\n", startResp)
 	} else {
-		log.Fatalf("start failed:%+v\n", startResp)
+		log.Printf("start failed:%+v\n", startResp)
+		return
 	}
 
 	sid := startResp.SuccessResp.Sid
@@ -209,12 +225,14 @@ func (s *Service) RunSnapshot(token string, storageConfig *v1.StorageConfig) {
 	defer func() {
 		stopResp, err := impl.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if stopResp.IsSuccess() {
 			log.Printf("stop success:%+v\n", stopResp)
 		} else {
-			log.Fatalf("stop failed:%+v\n", stopResp)
+			log.Printf("stop failed:%+v\n", stopResp)
+			return
 		}
 	}()
 
@@ -222,12 +240,14 @@ func (s *Service) RunSnapshot(token string, storageConfig *v1.StorageConfig) {
 	for i := 0; i < 3; i++ {
 		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if queryResp.IsSuccess() {
 			log.Printf("query success:%+v\n", queryResp)
 		} else {
-			log.Fatalf("query failed:%+v\n", queryResp)
+			log.Printf("query failed:%+v\n", queryResp)
+			return
 		}
 		time.Sleep(time.Second * 10)
 	}
@@ -248,24 +268,28 @@ func (s *Service) RunSnapshot(token string, storageConfig *v1.StorageConfig) {
 		},
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if updateResp.IsSuccess() {
 		log.Printf("update success:%+v\n", updateResp)
 	} else {
-		log.Fatalf("update failed:%+v\n", updateResp)
+		log.Printf("update failed:%+v\n", updateResp)
+		return
 	}
 
 	// query
 	for i := 0; i < 3; i++ {
 		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if queryResp.IsSuccess() {
 			log.Printf("query success:%+v\n", queryResp)
 		} else {
-			log.Fatalf("query failed:%+v\n", queryResp)
+			log.Printf("query failed:%+v\n", queryResp)
+			return
 		}
 		time.Sleep(time.Second * 10)
 	}
@@ -284,12 +308,14 @@ func (s *Service) RunRecordingAndSnapshot(token string, storageConfig *v1.Storag
 	// acquire
 	acquireResp, err := impl.Acquire().Do(ctx, s.cname, s.uid, false, &v1.AcquireIndividualRecodingClientRequest{})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if acquireResp.IsSuccess() {
 		log.Printf("acquire success:%+v\n", acquireResp)
 	} else {
-		log.Fatalf("acquire failed:%+v\n", acquireResp)
+		log.Printf("acquire failed:%+v\n", acquireResp)
+		return
 	}
 
 	resourceId := acquireResp.SuccessRes.ResourceId
@@ -320,12 +346,14 @@ func (s *Service) RunRecordingAndSnapshot(token string, storageConfig *v1.Storag
 		StorageConfig: storageConfig,
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if startResp.IsSuccess() {
 		log.Printf("start success:%+v\n", startResp)
 	} else {
-		log.Fatalf("start failed:%+v\n", startResp)
+		log.Printf("start failed:%+v\n", startResp)
+		return
 	}
 
 	sid := startResp.SuccessResp.Sid
@@ -333,12 +361,14 @@ func (s *Service) RunRecordingAndSnapshot(token string, storageConfig *v1.Storag
 	defer func() {
 		stopResp, err := impl.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if stopResp.IsSuccess() {
 			log.Printf("stop success:%+v\n", stopResp)
 		} else {
-			log.Fatalf("stop failed:%+v\n", stopResp)
+			log.Printf("stop failed:%+v\n", stopResp)
+			return
 		}
 	}()
 
@@ -346,12 +376,14 @@ func (s *Service) RunRecordingAndSnapshot(token string, storageConfig *v1.Storag
 	for i := 0; i < 3; i++ {
 		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if queryResp.IsSuccess() {
 			log.Printf("query success:%+v\n", queryResp)
 		} else {
-			log.Fatalf("query failed:%+v\n", queryResp)
+			log.Printf("query failed:%+v\n", queryResp)
+			return
 		}
 		time.Sleep(time.Second * 10)
 	}
@@ -372,24 +404,28 @@ func (s *Service) RunRecordingAndSnapshot(token string, storageConfig *v1.Storag
 		},
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if updateResp.IsSuccess() {
 		log.Printf("update success:%+v\n", updateResp)
 	} else {
-		log.Fatalf("update failed:%+v\n", updateResp)
+		log.Printf("update failed:%+v\n", updateResp)
+		return
 	}
 
 	// query
 	for i := 0; i < 3; i++ {
 		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if queryResp.IsSuccess() {
 			log.Printf("query success:%+v\n", queryResp)
 		} else {
-			log.Fatalf("query failed:%+v\n", queryResp)
+			log.Printf("query failed:%+v\n", queryResp)
+			return
 		}
 		time.Sleep(time.Second * 10)
 	}
@@ -408,12 +444,14 @@ func (s *Service) RunRecordingAndPostponeTranscoding(token string, storageConfig
 	// acquire
 	acquireResp, err := impl.Acquire().Do(ctx, s.cname, s.uid, true, &v1.AcquireIndividualRecodingClientRequest{})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if acquireResp.IsSuccess() {
 		log.Printf("acquire success:%+v\n", acquireResp)
 	} else {
-		log.Fatalf("acquire failed:%+v\n", acquireResp)
+		log.Printf("acquire failed:%+v\n", acquireResp)
+		return
 	}
 
 	resourceId := acquireResp.SuccessRes.ResourceId
@@ -451,12 +489,14 @@ func (s *Service) RunRecordingAndPostponeTranscoding(token string, storageConfig
 		},
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if startResp.IsSuccess() {
 		log.Printf("start success:%+v\n", startResp)
 	} else {
-		log.Fatalf("start failed:%+v\n", startResp)
+		log.Printf("start failed:%+v\n", startResp)
+		return
 	}
 
 	sid := startResp.SuccessResp.Sid
@@ -464,12 +504,14 @@ func (s *Service) RunRecordingAndPostponeTranscoding(token string, storageConfig
 	defer func() {
 		stopResp, err := impl.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if stopResp.IsSuccess() {
 			log.Printf("stop success:%+v\n", stopResp)
 		} else {
-			log.Fatalf("stop failed:%+v\n", stopResp)
+			log.Printf("stop failed:%+v\n", stopResp)
+			return
 		}
 	}()
 
@@ -477,12 +519,14 @@ func (s *Service) RunRecordingAndPostponeTranscoding(token string, storageConfig
 	for i := 0; i < 3; i++ {
 		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if queryResp.IsSuccess() {
 			log.Printf("query success:%+v\n", queryResp)
 		} else {
-			log.Fatalf("query failed:%+v\n", queryResp)
+			log.Printf("query failed:%+v\n", queryResp)
+			return
 		}
 		time.Sleep(time.Second * 10)
 	}
@@ -503,24 +547,28 @@ func (s *Service) RunRecordingAndPostponeTranscoding(token string, storageConfig
 		},
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if updateResp.IsSuccess() {
 		log.Printf("update success:%+v\n", updateResp)
 	} else {
-		log.Fatalf("update failed:%+v\n", updateResp)
+		log.Printf("update failed:%+v\n", updateResp)
+		return
 	}
 
 	// query
 	for i := 0; i < 3; i++ {
 		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if queryResp.IsSuccess() {
 			log.Printf("query success:%+v\n", queryResp)
 		} else {
-			log.Fatalf("query failed:%+v\n", queryResp)
+			log.Printf("query failed:%+v\n", queryResp)
+			return
 		}
 		time.Sleep(time.Second * 10)
 	}
@@ -539,12 +587,14 @@ func (s *Service) RunRecordingAndAudioMix(token string, storageConfig *v1.Storag
 	// acquire
 	acquireResp, err := impl.Acquire().Do(ctx, s.cname, s.uid, true, &v1.AcquireIndividualRecodingClientRequest{})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if acquireResp.IsSuccess() {
 		log.Printf("acquire success:%+v\n", acquireResp)
 	} else {
-		log.Fatalf("acquire failed:%+v\n", acquireResp)
+		log.Printf("acquire failed:%+v\n", acquireResp)
+		return
 	}
 
 	resourceId := acquireResp.SuccessRes.ResourceId
@@ -553,12 +603,10 @@ func (s *Service) RunRecordingAndAudioMix(token string, storageConfig *v1.Storag
 		Token: token,
 		RecordingConfig: &v1.RecordingConfig{
 			ChannelType: 1,
-			StreamTypes: 2,
+			StreamTypes: 0,
+			StreamMode:  "original",
 			MaxIdleTime: 30,
 			SubscribeAudioUIDs: []string{
-				"#allstream#",
-			},
-			SubscribeVideoUIDs: []string{
 				"#allstream#",
 			},
 			SubscribeUidGroup: 0,
@@ -587,12 +635,14 @@ func (s *Service) RunRecordingAndAudioMix(token string, storageConfig *v1.Storag
 		},
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if startResp.IsSuccess() {
 		log.Printf("start success:%+v\n", startResp)
 	} else {
-		log.Fatalf("start failed:%+v\n", startResp)
+		log.Printf("start failed:%+v\n", startResp)
+		return
 	}
 
 	sid := startResp.SuccessResp.Sid
@@ -600,12 +650,14 @@ func (s *Service) RunRecordingAndAudioMix(token string, storageConfig *v1.Storag
 	defer func() {
 		stopResp, err := impl.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if stopResp.IsSuccess() {
 			log.Printf("stop success:%+v\n", stopResp)
 		} else {
-			log.Fatalf("stop failed:%+v\n", stopResp)
+			log.Printf("stop failed:%+v\n", stopResp)
+			return
 		}
 	}()
 
@@ -613,12 +665,14 @@ func (s *Service) RunRecordingAndAudioMix(token string, storageConfig *v1.Storag
 	for i := 0; i < 3; i++ {
 		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if queryResp.IsSuccess() {
 			log.Printf("query success:%+v\n", queryResp)
 		} else {
-			log.Fatalf("query failed:%+v\n", queryResp)
+			log.Printf("query failed:%+v\n", queryResp)
+			return
 		}
 		time.Sleep(time.Second * 10)
 	}
@@ -631,32 +685,31 @@ func (s *Service) RunRecordingAndAudioMix(token string, storageConfig *v1.Storag
 					"#allstream#",
 				},
 			},
-			VideoUidList: &v1.UpdateVideoUIDList{
-				SubscribeVideoUIDs: []string{
-					"#allstream#",
-				},
-			},
 		},
 	})
 	if err != nil {
-		log.Fatalln(err)
+		log.Println(err)
+		return
 	}
 	if updateResp.IsSuccess() {
 		log.Printf("update success:%+v\n", updateResp)
 	} else {
-		log.Fatalf("update failed:%+v\n", updateResp)
+		log.Printf("update failed:%+v\n", updateResp)
+		return
 	}
 
 	// query
 	for i := 0; i < 3; i++ {
 		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
 		if err != nil {
-			log.Fatalln(err)
+			log.Println(err)
+			return
 		}
 		if queryResp.IsSuccess() {
 			log.Printf("query success:%+v\n", queryResp)
 		} else {
-			log.Fatalf("query failed:%+v\n", queryResp)
+			log.Printf("query failed:%+v\n", queryResp)
+			return
 		}
 		time.Sleep(time.Second * 10)
 	}
