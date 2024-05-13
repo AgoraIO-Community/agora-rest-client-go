@@ -113,15 +113,15 @@ func main() {
 	case "mix":
 		service := mixrecording.NewService(region, appId, cname, uid)
 		service.SetCredential(username, password)
-		service.MixRecording(token, storageConfig)
+		service.RunHLSAndMP4(token, storageConfig)
 	case "individual":
 		service := individualrecording.NewService(region, appId, cname, uid)
 		service.SetCredential(username, password)
-		service.IndividualRecording(token, storageConfig)
+		service.RunRecording(token, storageConfig)
 	case "web":
 		service := webrecording.NewService(region, appId, cname, uid)
 		service.SetCredential(username, password)
-		service.WebRecording(storageConfig)
+		service.RunWebRecorder(storageConfig)
 	default:
 		panic("invalid mode")
 	}
