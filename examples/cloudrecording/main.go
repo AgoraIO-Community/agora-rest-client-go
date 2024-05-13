@@ -107,21 +107,54 @@ func main() {
 	}
 
 	mode := flag.String("mode", "mix", "recording mode, options is mix/individual/web")
+	mix_scene := flag.String("mix_scene", "hls", "scene for mix mode, options is hls/hls_and_mp4")
+	individual_scene := flag.String("individual_scene", "recording", "scene for individual mode, options is recording/snapshot/recording_and_snapshot/recording_and_postpone_transcoding/recording_and_audio_mix")
+	web_scene := flag.String("web_scene", "web_recorder", "scene for web mode, options is web_recorder/web_recorder_and_rtmp_publish")
 	flag.Parse()
 
 	switch *mode {
 	case "mix":
 		service := mixrecording.NewService(region, appId, cname, uid)
 		service.SetCredential(username, password)
-		service.RunHLSAndMP4(token, storageConfig)
+
+		switch *mix_scene {
+		case "hls":
+			service.RunHLS(token, storageConfig)
+		case "hls_and_mp4":
+			service.RunHLSAndMP4(token, storageConfig)
+		default:
+			panic("invalid mix_scene")
+		}
 	case "individual":
 		service := individualrecording.NewService(region, appId, cname, uid)
 		service.SetCredential(username, password)
-		service.RunRecording(token, storageConfig)
+
+		switch *individual_scene {
+		case "recording":
+			service.RunRecording(token, storageConfig)
+		case "snapshot":
+			service.RunSnapshot(token, storageConfig)
+		case "recording_and_snapshot":
+			service.RunRecordingAndSnapshot(token, storageConfig)
+		case "recording_and_postpone_transcoding":
+			service.RunRecordingAndPostponeTranscoding(token, storageConfig)
+		case "recording_and_audio_mix":
+			service.RunRecordingAndAudioMix(token, storageConfig)
+		default:
+			panic("invalid individual_scene")
+		}
 	case "web":
 		service := webrecording.NewService(region, appId, cname, uid)
 		service.SetCredential(username, password)
-		service.RunWebRecorder(storageConfig)
+
+		switch *web_scene {
+		case "web_recorder":
+			service.RunWebRecorder(storageConfig)
+		case "web_recorder_and_rtmp_publish":
+			service.RunWebRecorderAndRtmpPublish(storageConfig)
+		default:
+			panic("invalid web_scene")
+		}
 	default:
 		panic("invalid mode")
 	}
