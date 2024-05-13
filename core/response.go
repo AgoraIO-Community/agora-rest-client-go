@@ -13,7 +13,7 @@ type BaseResponse struct {
 	HttpStatusCode int
 }
 
-// UnmarshalToTarget unmarshall body into target var
+// UnmarshalToTarget unmarshal body into target var
 // successful if err is nil
 func (r *BaseResponse) UnmarshalToTarget(target interface{}) error {
 	err := json.Unmarshal(r.RawBody, target)
