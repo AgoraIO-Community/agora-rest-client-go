@@ -42,6 +42,7 @@ package main
 import (
 	"context"
 	"log"
+	"time"
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/core"
 	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording"
@@ -50,11 +51,23 @@ import (
 
 const (
 	appId    = "<your appId>"
-	username = "<the username of basic auth credential>"
-	password = "<the password of basic auth credential>"
 	cname    = "<your cname>"
 	uid      = "<your uid>"
+	username = "<the username of basic auth credential>"
+	password = "<the password of basic auth credential>"
+	token    = "<your token>"
 )
+
+var storageConfig = &v1.StorageConfig{
+	Vendor:    0,
+	Region:    0,
+	Bucket:    "",
+	AccessKey: "",
+	SecretKey: "",
+	FileNamePrefix: []string{
+		"recordings",
+	},
+}
 
 func main() {
 	// 初始化Agora REST API客户端
@@ -62,32 +75,88 @@ func main() {
 		AppID:      appId,
 		Credential: core.NewBasicAuthCredential(username, password),
 		// 指定服务器所在的区域，可选值有CN, NA, EU, AP,client 将会根据配置的区域自动切换使用最佳的域名
-		RegionCode: core.CN,
-        // 指定日志输出的级别，可选值有LogDebug, LogInfo, LogWarn, LogError
-        // 如果要关闭日志输出，可将 logger 设置为 DiscardLogger
-		Logger:     core.NewDefaultLogger(core.LogDebug),
-	}) 
-    // 初始化云端录制服务 API
-	cloudRecordingAPI := cloudrecording.NewAPI(client)
-
-    // 调用云端录制服务 API 的Acquire接口
-	resp, err := cloudRecordingAPI.V1().Acquire().Do(context.TODO(), &v1.AcquireReqBody{
-		Cname: cname,
-		Uid:   uid,
-		ClientRequest: &v1.AcquireClientRequest{
-			Scene:               0,
-		},
+		RegionCode: core.CNRegionArea,
+		// 指定日志输出的级别，可选值有LogDebug, LogInfo, LogWarn, LogError
+		// 如果要关闭日志输出，可将 logger 设置为 DiscardLogger
+		Logger: core.NewDefaultLogger(core.LogDebug),
 	})
-    // 处理非业务错误
+
+	// 初始化云端录制服务 API
+	impl := cloudrecording.NewAPI(client).V1().MixRecording()
+
+	// 调用云端录制服务 API 的 Acquire 接口
+	acquireResp, err := impl.Acquire().Do(context.TODO(), cname, uid, &v1.AcquireMixRecodingClientRequest{})
+	// 处理非业务错误
 	if err != nil {
 		log.Fatal(err)
 	}
-	if resp.IsSuccess() {
-		// 处理业务上成功响应
-		log.Printf("resourceId:%s", resp.SuccessRes.ResourceId)
+
+	// 处理业务响应
+	if acquireResp.IsSuccess() {
+		log.Printf("acquire success:%+v\n", acquireResp)
 	} else {
-        // 处理业务上失败响应
-		log.Printf("resp:%+v", resp)
+		log.Fatalf("acquire failed:%+v\n", acquireResp)
+	}
+
+	// 调用云端录制服务 API 的 Start 接口
+	resourceId := acquireResp.SuccessRes.ResourceId
+	startResp, err := impl.Start().Do(context.TODO(), resourceId, cname, uid, &v1.StartMixRecordingClientRequest{
+		Token: token,
+		RecordingConfig: &v1.RecordingConfig{
+			ChannelType:  1,
+			StreamTypes:  2,
+			MaxIdleTime:  30,
+			AudioProfile: 2,
+			TranscodingConfig: &v1.TranscodingConfig{
+				Width:            640,
+				Height:           640,
+				FPS:              15,
+				BitRate:          800,
+				MixedVideoLayout: 0,
+				BackgroundColor:  "#000000",
+			},
+			SubscribeAudioUIDs: []string{
+				"#allstream#",
+			},
+			SubscribeVideoUIDs: []string{
+				"#allstream#",
+			},
+		},
+		RecordingFileConfig: &v1.RecordingFileConfig{
+			AvFileType: []string{
+				"hls",
+				"mp4",
+			},
+		},
+		StorageConfig: storageConfig,
+	})
+	// 处理非业务错误
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// 处理业务响应
+	if startResp.IsSuccess() {
+		log.Printf("start success:%+v\n", startResp)
+	} else {
+		log.Fatalf("start failed:%+v\n", startResp)
+	}
+
+	sid := startResp.SuccessResp.Sid
+	time.Sleep(time.Second * 60)
+
+	// 调用云端录制服务 API 的 Stop 接口
+	stopResp, err := impl.Stop().DoHLSAndMP4(context.TODO(), resourceId, sid, cname, uid, false)
+	// 处理非业务错误
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// 处理业务响应
+	if stopResp.IsSuccess() {
+		log.Printf("stop success:%+v\n", stopResp)
+	} else {
+		log.Printf("stop failed:%+v\n", stopResp)
 	}
 }
 ```
