@@ -19,7 +19,7 @@ func (a *Acquire) WithForwardRegion(prefix core.ForwardedReginPrefix) baseV1.Acq
 	return a
 }
 
-func (a *Acquire) Do(ctx context.Context, cname string, uid string, enablePostponeTranscodingMix bool, clientRequest *baseV1.AcquireIndividualRecodingClientRequest) (*baseV1.AcquireResp, error) {
+func (a *Acquire) Do(ctx context.Context, cname string, uid string, enablePostpone bool, clientRequest *baseV1.AcquireIndividualRecodingClientRequest) (*baseV1.AcquireResp, error) {
 	var startParameter *baseV1.StartClientRequest
 	if clientRequest.StartParameter != nil {
 		startParameter = &baseV1.StartClientRequest{
@@ -34,7 +34,7 @@ func (a *Acquire) Do(ctx context.Context, cname string, uid string, enablePostpo
 	}
 
 	scene := 0
-	if enablePostponeTranscodingMix {
+	if enablePostpone {
 		scene = 2
 	}
 	return a.Base.Do(ctx, &baseV1.AcquireReqBody{

@@ -17,7 +17,7 @@ type Acquire struct {
 }
 
 // buildPath returns the request path.
-// /v1/apps/{appid}/cloud_recording/acquire
+// [(/cn)|(/ap)|(/na)/(/eu)]/v1/apps/{appid}/cloud_recording/acquire
 func (a *Acquire) buildPath() string {
 	return string(a.forwardedRegionPrefix) + a.prefixPath + "/acquire"
 }
@@ -55,6 +55,7 @@ func (a *Acquire) WithForwardRegion(prefix core.ForwardedReginPrefix) *Acquire {
 
 	return a
 }
+
 func (a *Acquire) Do(ctx context.Context, payload *AcquireReqBody) (*AcquireResp, error) {
 	path := a.buildPath()
 

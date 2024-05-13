@@ -41,10 +41,10 @@ type AcquireIndividualRecording interface {
 	//
 	// uid:RTC User ID.
 	//
-	// enablePostponeTranscodingMix: Whether to enable the postpone transcoding mix.
+	// enablePostpone: Whether to enable postponeTranscoding or audioMix.
 	//
 	// clientRequest: AcquireIndividualRecodingClientRequest
-	Do(ctx context.Context, cname string, uid string, enablePostponeTranscodingMix bool, clientRequest *AcquireIndividualRecodingClientRequest) (*AcquireResp, error)
+	Do(ctx context.Context, cname string, uid string, enablePostpone bool, clientRequest *AcquireIndividualRecodingClientRequest) (*AcquireResp, error)
 }
 
 type StartIndividualRecordingClientRequest struct {
