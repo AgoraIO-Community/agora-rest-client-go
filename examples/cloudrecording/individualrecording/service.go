@@ -41,26 +41,30 @@ func (s *Service) IndividualRecording(token string, storageConfig *v1.StorageCon
 		Logger:     core.NewDefaultLogger(core.LogDebug),
 	})
 
-	individualRecordingV1 := cloudrecording.NewAPI(c).V1().IndividualRecording()
-
-	resp, err := individualRecordingV1.Acquire().Do(ctx, s.cname, s.uid, false, &v1.AcquireIndividualRecodingClientRequest{})
+	impl := cloudrecording.NewAPI(c).V1().IndividualRecording()
+	// acquire
+	acquireResp, err := impl.Acquire().Do(ctx, s.cname, s.uid, false, &v1.AcquireIndividualRecodingClientRequest{})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
-	if resp.IsSuccess() {
-		log.Printf("acquire success:%+v", resp.SuccessRes)
+	if acquireResp.IsSuccess() {
+		log.Printf("acquire success:%+v\n", acquireResp)
 	} else {
-		log.Fatalf("acquire failed:%+v", resp)
+		log.Fatalf("acquire failed:%+v\n", acquireResp)
 	}
 
-	startResp, err := individualRecordingV1.Start().Do(ctx, resp.SuccessRes.ResourceId, s.cname, s.uid, &v1.StartIndividualRecordingClientRequest{
+	resourceId := acquireResp.SuccessRes.ResourceId
+	// start
+	startResp, err := impl.Start().Do(ctx, resourceId, s.cname, s.uid, &v1.StartIndividualRecordingClientRequest{
 		Token: token,
 		RecordingConfig: &v1.RecordingConfig{
 			ChannelType: 1,
 			StreamTypes: 2,
 			SubscribeAudioUIDs: []string{
-				"22",
-				"456",
+				"#allstream#",
+			},
+			SubscribeVideoUIDs: []string{
+				"#allstream#",
 			},
 			SubscribeUidGroup: 0,
 		},
@@ -72,51 +76,53 @@ func (s *Service) IndividualRecording(token string, storageConfig *v1.StorageCon
 		StorageConfig: storageConfig,
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 	if startResp.IsSuccess() {
-		log.Printf("startResp success:%+v", &startResp.SuccessResp)
+		log.Printf("start success:%+v\n", startResp)
 	} else {
-		log.Fatalf("startResp failed:%+v", &startResp.ErrResponse)
+		log.Fatalf("start failed:%+v\n", startResp)
 	}
-	startSuccessResp := startResp.SuccessResp
 
+	sid := startResp.SuccessResp.Sid
+	// stop
 	defer func() {
-		stopResp, err := individualRecordingV1.Stop().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, s.cname, s.uid, false)
+		stopResp, err := impl.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)
 		if err != nil {
 			log.Fatalln(err)
 		}
 		if stopResp.IsSuccess() {
-			log.Printf("stopResp success:%+v", &stopResp.SuccessResp)
+			log.Printf("stop success:%+v\n", stopResp)
 		} else {
-			log.Fatalf("stopResp failed:%+v", &stopResp.ErrResponse)
+			log.Fatalf("stop failed:%+v\n", stopResp)
 		}
-
-		log.Printf("stopServerResponse:%+v", stopResp.SuccessResp.ServerResponse)
 	}()
-	queryResp, err := individualRecordingV1.Query().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	if queryResp.IsSuccess() {
-		log.Printf("queryResp success:%+v", queryResp.SuccessResp)
-	} else {
-		log.Fatalf("queryResp failed:%+v", queryResp.ErrResponse)
+
+	// query
+	for i := 0; i < 3; i++ {
+		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		if queryResp.IsSuccess() {
+			log.Printf("query success:%+v\n", queryResp)
+		} else {
+			log.Fatalf("query failed:%+v\n", queryResp)
+		}
+		time.Sleep(time.Second * 10)
 	}
 
-	log.Printf("queryServerResponse:%+v", queryResp.SuccessResp.ServerResponse)
-
-	time.Sleep(3 * time.Second)
-	updateResp, err := individualRecordingV1.Update().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, s.cname, s.uid, &v1.UpdateIndividualRecordingClientRequest{
+	// update
+	updateResp, err := impl.Update().Do(ctx, resourceId, sid, s.cname, s.uid, &v1.UpdateIndividualRecordingClientRequest{
 		StreamSubscribe: &v1.UpdateStreamSubscribe{
 			AudioUidList: &v1.UpdateAudioUIDList{
 				SubscribeAudioUIDs: []string{
-					"999",
+					"#allstream#",
 				},
 			},
 			VideoUidList: &v1.UpdateVideoUIDList{
 				SubscribeVideoUIDs: []string{
-					"999",
+					"#allstream#",
 				},
 			},
 		},
@@ -125,10 +131,22 @@ func (s *Service) IndividualRecording(token string, storageConfig *v1.StorageCon
 		log.Fatalln(err)
 	}
 	if updateResp.IsSuccess() {
-		log.Printf("update success:%+v", updateResp.SuccessResp)
+		log.Printf("update success:%+v\n", updateResp)
 	} else {
-		log.Printf("update failed:%+v", updateResp.ErrResponse)
-		return
+		log.Fatalf("update failed:%+v\n", updateResp)
 	}
-	time.Sleep(2 * time.Second)
+
+	// query
+	for i := 0; i < 3; i++ {
+		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		if queryResp.IsSuccess() {
+			log.Printf("query success:%+v\n", queryResp)
+		} else {
+			log.Fatalf("query failed:%+v\n", queryResp)
+		}
+		time.Sleep(time.Second * 10)
+	}
 }

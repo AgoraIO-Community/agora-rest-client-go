@@ -41,18 +41,21 @@ func (s *Service) MixRecording(token string, storageConfig *v1.StorageConfig) {
 		Logger:     core.NewDefaultLogger(core.LogDebug),
 	})
 
-	mixRecordingV1 := cloudrecording.NewAPI(c).V1().MixRecording()
-	resp, err := mixRecordingV1.Acquire().WithForwardRegion(core.CNForwardedReginPrefix).Do(ctx, s.cname, s.uid, &v1.AcquireMixRecodingClientRequest{})
+	impl := cloudrecording.NewAPI(c).V1().MixRecording()
+	// acquire
+	acquireResp, err := impl.Acquire().WithForwardRegion(core.CNForwardedReginPrefix).Do(ctx, s.cname, s.uid, &v1.AcquireMixRecodingClientRequest{})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
-	if resp.IsSuccess() {
-		log.Printf("start resourceId:%s", resp.SuccessRes.ResourceId)
+	if acquireResp.IsSuccess() {
+		log.Printf("acquire success:%+v\n", acquireResp)
 	} else {
-		log.Printf("start resp:%+v", resp.ErrResponse)
+		log.Fatalf("acquire failed:%+v\n", acquireResp)
 	}
 
-	startResp, err := mixRecordingV1.Start().Do(ctx, resp.SuccessRes.ResourceId, s.cname, s.uid, &v1.StartMixRecordingClientRequest{
+	resourceId := acquireResp.SuccessRes.ResourceId
+	// start
+	startResp, err := impl.Start().Do(ctx, resourceId, s.cname, s.uid, &v1.StartMixRecordingClientRequest{
 		Token: token,
 		RecordingConfig: &v1.RecordingConfig{
 			ChannelType:  1,
@@ -61,9 +64,9 @@ func (s *Service) MixRecording(token string, storageConfig *v1.StorageConfig) {
 			MaxIdleTime:  30,
 			TranscodingConfig: &v1.TranscodingConfig{
 				Width:            640,
-				Height:           260,
+				Height:           640,
 				FPS:              15,
-				BitRate:          500,
+				BitRate:          800,
 				MixedVideoLayout: 0,
 				BackgroundColor:  "#000000",
 			},
@@ -86,77 +89,41 @@ func (s *Service) MixRecording(token string, storageConfig *v1.StorageConfig) {
 		log.Fatalln(err)
 	}
 	if startResp.IsSuccess() {
-		log.Printf("success:%+v", &startResp.SuccessResp)
+		log.Printf("start success:%+v\n", startResp)
 	} else {
-		log.Printf("failed:%+v", &startResp.ErrResponse)
+		log.Fatalf("start failed:%+v\n", startResp)
 	}
 
-	startSuccessResp := startResp.SuccessResp
+	sid := startResp.SuccessResp.Sid
+	// stop
 	defer func() {
-		stopResp, err := mixRecordingV1.Stop().DoHLSAndMP4(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, s.cname, s.uid, false)
+		stopResp, err := impl.Stop().DoHLSAndMP4(ctx, resourceId, sid, s.cname, s.uid, false)
 		if err != nil {
 			log.Fatalln(err)
 		}
 		if stopResp.IsSuccess() {
-			log.Printf("stop success:%+v", &stopResp.SuccessResp)
+			log.Printf("stop success:%+v\n", stopResp)
 		} else {
-			log.Fatalf("stop failed:%+v", &stopResp.ErrResponse)
+			log.Fatalf("stop failed:%+v\n", stopResp)
 		}
-		log.Printf("stopServerResponse:%+v", stopResp.SuccessResp.ServerResponse)
 	}()
 
-	queryResp, err := mixRecordingV1.Query().DoHLSAndMP4(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	if queryResp.IsSuccess() {
-		log.Printf("query success:%+v", queryResp.SuccessResp)
-	} else {
-		log.Printf("query failed:%+v", queryResp.ErrResponse)
-		return
+	// query
+	for i := 0; i < 3; i++ {
+		queryResp, err := impl.Query().DoHLSAndMP4(ctx, resourceId, sid)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		if queryResp.IsSuccess() {
+			log.Printf("query success:%+v\n", queryResp)
+		} else {
+			log.Fatalf("query failed:%+v\n", queryResp)
+		}
+		time.Sleep(time.Second * 10)
 	}
 
-	log.Printf("queryServerResponse:%+v", queryResp.SuccessResp.ServerResponse)
-
-	time.Sleep(3 * time.Second)
-
-	updateLayoutResp, err := mixRecordingV1.UpdateLayout().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, s.cname, s.uid, &v1.UpdateLayoutUpdateMixRecordingClientRequest{
-		MixedVideoLayout: 3,
-		BackgroundColor:  "#FF0000",
-		LayoutConfig: []v1.UpdateLayoutConfig{
-			{
-				UID:        "22",
-				XAxis:      0.1,
-				YAxis:      0.1,
-				Width:      0.1,
-				Height:     0.1,
-				Alpha:      1,
-				RenderMode: 1,
-			},
-			{
-				UID:        "2",
-				XAxis:      0.2,
-				YAxis:      0.2,
-				Width:      0.1,
-				Height:     0.1,
-				Alpha:      1,
-				RenderMode: 1,
-			},
-		},
-	},
-	)
-	if err != nil {
-		log.Fatalln(err)
-	}
-	if updateLayoutResp.IsSuccess() {
-		log.Printf("updateLayout success:%+v", updateLayoutResp.SuccessResp)
-	} else {
-		log.Printf("updateLayout failed:%+v", updateLayoutResp.ErrResponse)
-		return
-	}
-	time.Sleep(3 * time.Second)
-
-	updateResp, err := mixRecordingV1.Update().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, s.cname, s.uid, &v1.UpdateMixRecordingClientRequest{
+	// update
+	updateResp, err := impl.Update().Do(ctx, resourceId, sid, s.cname, s.uid, &v1.UpdateMixRecordingClientRequest{
 		StreamSubscribe: &v1.UpdateStreamSubscribe{
 			AudioUidList: &v1.UpdateAudioUIDList{
 				SubscribeAudioUIDs: []string{
@@ -174,10 +141,37 @@ func (s *Service) MixRecording(token string, storageConfig *v1.StorageConfig) {
 		log.Fatalln(err)
 	}
 	if updateResp.IsSuccess() {
-		log.Printf("update success:%+v", updateResp.SuccessResp)
+		log.Printf("update success:%+v\n", updateResp)
 	} else {
-		log.Printf("update failed:%+v", updateResp.ErrResponse)
-		return
+		log.Fatalf("update failed:%+v\n", updateResp)
 	}
-	time.Sleep(2 * time.Second)
+
+	// updateLayout
+	updateLayoutResp, err := impl.UpdateLayout().Do(ctx, resourceId, sid, s.cname, s.uid, &v1.UpdateLayoutUpdateMixRecordingClientRequest{
+		MixedVideoLayout: 1,
+		BackgroundColor:  "#FF0000",
+	},
+	)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	if updateLayoutResp.IsSuccess() {
+		log.Printf("updateLayout success:%+v\n", updateLayoutResp)
+	} else {
+		log.Fatalf("updateLayout failed:%+v\n", updateLayoutResp)
+	}
+
+	// query
+	for i := 0; i < 3; i++ {
+		queryResp, err := impl.Query().DoHLSAndMP4(ctx, resourceId, sid)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		if queryResp.IsSuccess() {
+			log.Printf("query success:%+v\n", queryResp)
+		} else {
+			log.Fatalf("query failed:%+v\n", queryResp)
+		}
+		time.Sleep(time.Second * 10)
+	}
 }

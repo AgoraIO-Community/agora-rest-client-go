@@ -41,23 +41,21 @@ func (s *Service) WebRecording(storageConfig *v1.StorageConfig) {
 		Logger:     core.NewDefaultLogger(core.LogDebug),
 	})
 
-	webRecordingV1 := cloudrecording.NewAPI(c).V1().WebRecording()
-
+	impl := cloudrecording.NewAPI(c).V1().WebRecording()
 	// acquire
-	resp, err := webRecordingV1.Acquire().Do(ctx, s.cname, s.uid, &v1.AcquireWebRecodingClientRequest{})
+	acquireResp, err := impl.Acquire().Do(ctx, s.cname, s.uid, &v1.AcquireWebRecodingClientRequest{})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
-	if resp.IsSuccess() {
-		log.Printf("acquire success:%+v", resp.SuccessRes)
+	if acquireResp.IsSuccess() {
+		log.Printf("acquire success:%+v\n", acquireResp)
 	} else {
-		log.Fatalf("acquire failed:%+v", resp)
+		log.Fatalf("acquire failed:%+v\n", acquireResp)
 	}
 
-	resourceId := resp.SuccessRes.ResourceId
-
+	resourceId := acquireResp.SuccessRes.ResourceId
 	// start
-	startResp, err := webRecordingV1.Start().Do(ctx, resourceId, s.cname, s.uid, &v1.StartWebRecordingClientRequest{
+	startResp, err := impl.Start().Do(ctx, resourceId, s.cname, s.uid, &v1.StartWebRecordingClientRequest{
 		RecordingFileConfig: &v1.RecordingFileConfig{
 			AvFileType: []string{
 				"hls",
@@ -83,47 +81,44 @@ func (s *Service) WebRecording(storageConfig *v1.StorageConfig) {
 		},
 	})
 	if err != nil {
-		log.Fatal(err)
+		log.Fatalln(err)
 	}
 	if startResp.IsSuccess() {
-		log.Printf("startResp success:%+v", &startResp.SuccessResp)
+		log.Printf("start success:%+v\n", startResp)
 	} else {
-		log.Fatalf("startResp failed:%+v", &startResp.ErrResponse)
+		log.Fatalf("start failed:%+v\n", startResp)
 	}
 
-	startSuccessResp := startResp.SuccessResp
-	sid := startSuccessResp.Sid
-
+	sid := startResp.SuccessResp.Sid
+	// stop
 	defer func() {
-		// stop
-		stopResp, err := webRecordingV1.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)
+		stopResp, err := impl.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)
 		if err != nil {
 			log.Fatalln(err)
 		}
 		if stopResp.IsSuccess() {
-			log.Printf("stopResp success:%+v", &stopResp.SuccessResp)
+			log.Printf("stop success:%+v\n", stopResp)
 		} else {
-			log.Fatalf("stopResp failed:%+v", &stopResp.ErrResponse)
+			log.Fatalf("stop failed:%+v\n", stopResp)
 		}
-		log.Printf("stopServerResponse:%+v", stopResp.SuccessResp.ServerResponse)
 	}()
 
 	// query
-	queryResp, err := webRecordingV1.Query().Do(ctx, resourceId, sid)
-	if err != nil {
-		log.Fatalln(err)
+	for i := 0; i < 3; i++ {
+		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		if queryResp.IsSuccess() {
+			log.Printf("query success:%+v\n", queryResp)
+		} else {
+			log.Fatalf("query failed:%+v\n", queryResp)
+		}
+		time.Sleep(time.Second * 10)
 	}
-	if queryResp.IsSuccess() {
-		log.Printf("queryResp success:%+v", queryResp.SuccessResp)
-	} else {
-		log.Fatalf("queryResp failed:%+v", queryResp.ErrResponse)
-	}
-	log.Printf("queryServerResponse:%+v", queryResp.SuccessResp.ServerResponse)
-
-	time.Sleep(3 * time.Second)
 
 	// update
-	updateResp, err := webRecordingV1.Update().Do(ctx, resourceId, sid, s.cname, s.uid, &v1.UpdateWebRecordingClientRequest{
+	updateResp, err := impl.Update().Do(ctx, resourceId, sid, s.cname, s.uid, &v1.UpdateWebRecordingClientRequest{
 		WebRecordingConfig: &v1.UpdateWebRecordingConfig{
 			Onhold: false,
 		},
@@ -132,10 +127,22 @@ func (s *Service) WebRecording(storageConfig *v1.StorageConfig) {
 		log.Fatalln(err)
 	}
 	if updateResp.IsSuccess() {
-		log.Printf("updateResp success:%+v", updateResp.SuccessResp)
+		log.Printf("update success:%+v\n", updateResp)
 	} else {
-		log.Fatalf("updateResp failed:%+v", updateResp.ErrResponse)
+		log.Fatalf("update failed:%+v\n", updateResp)
 	}
 
-	time.Sleep(3 * time.Second)
+	// query
+	for i := 0; i < 3; i++ {
+		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
+		if err != nil {
+			log.Fatalln(err)
+		}
+		if queryResp.IsSuccess() {
+			log.Printf("query success:%+v\n", queryResp)
+		} else {
+			log.Fatalf("query failed:%+v\n", queryResp)
+		}
+		time.Sleep(time.Second * 10)
+	}
 }
