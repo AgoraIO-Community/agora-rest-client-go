@@ -223,7 +223,7 @@ func (s *Service) RunSnapshot(token string, storageConfig *v1.StorageConfig) {
 	sid := startResp.SuccessResp.Sid
 	// stop
 	defer func() {
-		stopResp, err := impl.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)
+		stopResp, err := impl.Stop().DoVideoScreenshot(ctx, resourceId, sid, s.cname, s.uid, false)
 		if err != nil {
 			log.Println(err)
 			return
@@ -238,7 +238,7 @@ func (s *Service) RunSnapshot(token string, storageConfig *v1.StorageConfig) {
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
+		queryResp, err := impl.Query().DoVideoScreenshot(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
@@ -280,7 +280,7 @@ func (s *Service) RunSnapshot(token string, storageConfig *v1.StorageConfig) {
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
+		queryResp, err := impl.Query().DoVideoScreenshot(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
