@@ -399,7 +399,7 @@ func WebRecording() {
 				{
 					ServiceName:       "web_recorder_service",
 					ErrorHandlePolicy: "error_abort",
-					ServiceParam: &v1.ServiceParam{
+					ServiceParam: &v1.WebRecordingServiceParam{
 						URL:              "https://live.bilibili.com/",
 						AudioProfile:     2,
 						VideoWidth:       1280,
