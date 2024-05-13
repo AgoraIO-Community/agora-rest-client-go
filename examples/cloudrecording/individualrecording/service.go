@@ -10,19 +10,40 @@ import (
 	v1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1"
 )
 
-// IndividualRecording hls
-func IndividualRecording(appId, username, password, token, cname, uid string, storageConfig *v1.StorageConfig, region core.RegionArea) {
+type Service struct {
+	region     core.RegionArea
+	appId      string
+	cname      string
+	uid        string
+	credential core.Credential
+}
+
+func NewService(region core.RegionArea, appId, cname, uid string) *Service {
+	return &Service{
+		region:     region,
+		appId:      appId,
+		cname:      cname,
+		uid:        uid,
+		credential: nil,
+	}
+}
+
+func (s *Service) SetCredential(username, password string) {
+	s.credential = core.NewBasicAuthCredential(username, password)
+}
+
+func (s *Service) IndividualRecording(token string, storageConfig *v1.StorageConfig) {
 	ctx := context.Background()
 	c := core.NewClient(&core.Config{
-		AppID:      appId,
-		Credential: core.NewBasicAuthCredential(username, password),
-		RegionCode: region,
+		AppID:      s.appId,
+		Credential: s.credential,
+		RegionCode: s.region,
 		Logger:     core.NewDefaultLogger(core.LogDebug),
 	})
 
 	individualRecordingV1 := cloudrecording.NewAPI(c).V1().IndividualRecording()
 
-	resp, err := individualRecordingV1.Acquire().Do(ctx, cname, uid, false, &v1.AcquireIndividualRecodingClientRequest{})
+	resp, err := individualRecordingV1.Acquire().Do(ctx, s.cname, s.uid, false, &v1.AcquireIndividualRecodingClientRequest{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -32,7 +53,7 @@ func IndividualRecording(appId, username, password, token, cname, uid string, st
 		log.Fatalf("acquire failed:%+v", resp)
 	}
 
-	startResp, err := individualRecordingV1.Start().Do(ctx, resp.SuccessRes.ResourceId, cname, uid, &v1.StartIndividualRecordingClientRequest{
+	startResp, err := individualRecordingV1.Start().Do(ctx, resp.SuccessRes.ResourceId, s.cname, s.uid, &v1.StartIndividualRecordingClientRequest{
 		Token: token,
 		RecordingConfig: &v1.RecordingConfig{
 			ChannelType: 1,
@@ -61,7 +82,7 @@ func IndividualRecording(appId, username, password, token, cname, uid string, st
 	startSuccessResp := startResp.SuccessResp
 
 	defer func() {
-		stopResp, err := individualRecordingV1.Stop().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, cname, uid, false)
+		stopResp, err := individualRecordingV1.Stop().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, s.cname, s.uid, false)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -86,7 +107,7 @@ func IndividualRecording(appId, username, password, token, cname, uid string, st
 	log.Printf("queryServerResponse:%+v", queryResp.SuccessResp.ServerResponse)
 
 	time.Sleep(3 * time.Second)
-	updateResp, err := individualRecordingV1.Update().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, cname, uid, &v1.UpdateIndividualRecordingClientRequest{
+	updateResp, err := individualRecordingV1.Update().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, s.cname, s.uid, &v1.UpdateIndividualRecordingClientRequest{
 		StreamSubscribe: &v1.UpdateStreamSubscribe{
 			AudioUidList: &v1.UpdateAudioUIDList{
 				SubscribeAudioUIDs: []string{

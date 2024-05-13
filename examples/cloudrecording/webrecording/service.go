@@ -10,20 +10,41 @@ import (
 	v1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1"
 )
 
-// WebRecording hls&mp4
-func WebRecording(appId, username, password, token, cname, uid string, storageConfig *v1.StorageConfig, region core.RegionArea) {
+type Service struct {
+	region     core.RegionArea
+	appId      string
+	cname      string
+	uid        string
+	credential core.Credential
+}
+
+func NewService(region core.RegionArea, appId, cname, uid string) *Service {
+	return &Service{
+		region:     region,
+		appId:      appId,
+		cname:      cname,
+		uid:        uid,
+		credential: nil,
+	}
+}
+
+func (s *Service) SetCredential(username, password string) {
+	s.credential = core.NewBasicAuthCredential(username, password)
+}
+
+func (s *Service) WebRecording(storageConfig *v1.StorageConfig) {
 	ctx := context.Background()
 	c := core.NewClient(&core.Config{
-		AppID:      appId,
-		Credential: core.NewBasicAuthCredential(username, password),
-		RegionCode: region,
+		AppID:      s.appId,
+		Credential: s.credential,
+		RegionCode: s.region,
 		Logger:     core.NewDefaultLogger(core.LogDebug),
 	})
 
 	webRecordingV1 := cloudrecording.NewAPI(c).V1().WebRecording()
 
 	// acquire
-	resp, err := webRecordingV1.Acquire().Do(ctx, cname, uid, &v1.AcquireWebRecodingClientRequest{})
+	resp, err := webRecordingV1.Acquire().Do(ctx, s.cname, s.uid, &v1.AcquireWebRecodingClientRequest{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -36,7 +57,7 @@ func WebRecording(appId, username, password, token, cname, uid string, storageCo
 	resourceId := resp.SuccessRes.ResourceId
 
 	// start
-	startResp, err := webRecordingV1.Start().Do(ctx, resourceId, cname, uid, &v1.StartWebRecordingClientRequest{
+	startResp, err := webRecordingV1.Start().Do(ctx, resourceId, s.cname, s.uid, &v1.StartWebRecordingClientRequest{
 		RecordingFileConfig: &v1.RecordingFileConfig{
 			AvFileType: []string{
 				"hls",
@@ -75,7 +96,7 @@ func WebRecording(appId, username, password, token, cname, uid string, storageCo
 
 	defer func() {
 		// stop
-		stopResp, err := webRecordingV1.Stop().Do(ctx, resourceId, sid, cname, uid, false)
+		stopResp, err := webRecordingV1.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -102,7 +123,7 @@ func WebRecording(appId, username, password, token, cname, uid string, storageCo
 	time.Sleep(3 * time.Second)
 
 	// update
-	updateResp, err := webRecordingV1.Update().Do(ctx, resourceId, sid, cname, uid, &v1.UpdateWebRecordingClientRequest{
+	updateResp, err := webRecordingV1.Update().Do(ctx, resourceId, sid, s.cname, s.uid, &v1.UpdateWebRecordingClientRequest{
 		WebRecordingConfig: &v1.UpdateWebRecordingConfig{
 			Onhold: false,
 		},

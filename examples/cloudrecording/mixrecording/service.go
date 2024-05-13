@@ -10,18 +10,39 @@ import (
 	v1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1"
 )
 
-// MixRecording hls&mp4
-func MixRecording(appId, username, password, token, cname, uid string, storageConfig *v1.StorageConfig, region core.RegionArea) {
+type Service struct {
+	region     core.RegionArea
+	appId      string
+	cname      string
+	uid        string
+	credential core.Credential
+}
+
+func NewService(region core.RegionArea, appId, cname, uid string) *Service {
+	return &Service{
+		region:     region,
+		appId:      appId,
+		cname:      cname,
+		uid:        uid,
+		credential: nil,
+	}
+}
+
+func (s *Service) SetCredential(username, password string) {
+	s.credential = core.NewBasicAuthCredential(username, password)
+}
+
+func (s *Service) MixRecording(token string, storageConfig *v1.StorageConfig) {
 	ctx := context.Background()
 	c := core.NewClient(&core.Config{
-		AppID:      appId,
-		Credential: core.NewBasicAuthCredential(username, password),
-		RegionCode: region,
+		AppID:      s.appId,
+		Credential: s.credential,
+		RegionCode: s.region,
 		Logger:     core.NewDefaultLogger(core.LogDebug),
 	})
 
 	mixRecordingV1 := cloudrecording.NewAPI(c).V1().MixRecording()
-	resp, err := mixRecordingV1.Acquire().WithForwardRegion(core.CNForwardedReginPrefix).Do(ctx, cname, uid, &v1.AcquireMixRecodingClientRequest{})
+	resp, err := mixRecordingV1.Acquire().WithForwardRegion(core.CNForwardedReginPrefix).Do(ctx, s.cname, s.uid, &v1.AcquireMixRecodingClientRequest{})
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -31,7 +52,7 @@ func MixRecording(appId, username, password, token, cname, uid string, storageCo
 		log.Printf("start resp:%+v", resp.ErrResponse)
 	}
 
-	startResp, err := mixRecordingV1.Start().Do(ctx, resp.SuccessRes.ResourceId, cname, uid, &v1.StartMixRecordingClientRequest{
+	startResp, err := mixRecordingV1.Start().Do(ctx, resp.SuccessRes.ResourceId, s.cname, s.uid, &v1.StartMixRecordingClientRequest{
 		Token: token,
 		RecordingConfig: &v1.RecordingConfig{
 			ChannelType:  1,
@@ -72,7 +93,7 @@ func MixRecording(appId, username, password, token, cname, uid string, storageCo
 
 	startSuccessResp := startResp.SuccessResp
 	defer func() {
-		stopResp, err := mixRecordingV1.Stop().DoHLSAndMP4(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, cname, uid, false)
+		stopResp, err := mixRecordingV1.Stop().DoHLSAndMP4(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, s.cname, s.uid, false)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -99,7 +120,7 @@ func MixRecording(appId, username, password, token, cname, uid string, storageCo
 
 	time.Sleep(3 * time.Second)
 
-	updateLayoutResp, err := mixRecordingV1.UpdateLayout().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, cname, uid, &v1.UpdateLayoutUpdateMixRecordingClientRequest{
+	updateLayoutResp, err := mixRecordingV1.UpdateLayout().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, s.cname, s.uid, &v1.UpdateLayoutUpdateMixRecordingClientRequest{
 		MixedVideoLayout: 3,
 		BackgroundColor:  "#FF0000",
 		LayoutConfig: []v1.UpdateLayoutConfig{
@@ -135,7 +156,7 @@ func MixRecording(appId, username, password, token, cname, uid string, storageCo
 	}
 	time.Sleep(3 * time.Second)
 
-	updateResp, err := mixRecordingV1.Update().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, cname, uid, &v1.UpdateMixRecordingClientRequest{
+	updateResp, err := mixRecordingV1.Update().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, s.cname, s.uid, &v1.UpdateMixRecordingClientRequest{
 		StreamSubscribe: &v1.UpdateStreamSubscribe{
 			AudioUidList: &v1.UpdateAudioUIDList{
 				SubscribeAudioUIDs: []string{
