@@ -86,8 +86,8 @@ type StopMixRecordingHLSAndMP4SuccessResponse struct {
 
 type StopMixRecording interface {
 	WithForwardRegion(prefix core.ForwardedReginPrefix) StopMixRecording
-	DoHLS(ctx context.Context, resourceID string, sid string, payload *StopReqBody) (*StopMixRecordingHLSSuccessResponse, error)
-	DoHLSAndMP4(ctx context.Context, resourceID string, sid string, payload *StopReqBody) (*StopMixRecordingHLSAndMP4SuccessResponse, error)
+	DoHLS(ctx context.Context, resourceID string, sid string, cname string, uid string, asyncStop bool) (*StopMixRecordingHLSSuccessResponse, error)
+	DoHLSAndMP4(ctx context.Context, resourceID string, sid string, cname string, uid string, asyncStop bool) (*StopMixRecordingHLSAndMP4SuccessResponse, error)
 }
 
 type UpdateMixRecordingClientRequest struct {

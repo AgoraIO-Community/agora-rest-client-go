@@ -168,13 +168,7 @@ func MixRecording() {
 
 	startSuccessResp := startResp.SuccessResp
 	defer func() {
-		stopResp, err := mixRecordingV1.Stop().DoHLSAndMP4(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, &v1.StopReqBody{
-			Cname: cname,
-			Uid:   uid,
-			ClientRequest: &v1.StopClientRequest{
-				AsyncStop: false,
-			},
-		})
+		stopResp, err := mixRecordingV1.Stop().DoHLSAndMP4(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, cname, uid, false)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -314,13 +308,7 @@ func IndividualRecording() {
 	startSuccessResp := startResp.SuccessResp
 
 	defer func() {
-		stopResp, err := individualRecordingV1.Stop().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, &v1.StopReqBody{
-			Cname: cname,
-			Uid:   uid,
-			ClientRequest: &v1.StopClientRequest{
-				AsyncStop: false,
-			},
-		})
+		stopResp, err := individualRecordingV1.Stop().Do(ctx, startSuccessResp.ResourceId, startSuccessResp.Sid, cname, uid, false)
 		if err != nil {
 			log.Fatalln(err)
 		}
@@ -436,13 +424,7 @@ func WebRecording() {
 
 	defer func() {
 		// stop
-		stopResp, err := webRecordingV1.Stop().Do(ctx, resourceId, sid, &v1.StopReqBody{
-			Cname: cname,
-			Uid:   uid,
-			ClientRequest: &v1.StopClientRequest{
-				AsyncStop: false,
-			},
-		})
+		stopResp, err := webRecordingV1.Stop().Do(ctx, resourceId, sid, cname, uid, false)
 		if err != nil {
 			log.Fatalln(err)
 		}
