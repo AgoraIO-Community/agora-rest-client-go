@@ -19,8 +19,14 @@ func (s *Stop) WithForwardRegion(prefix core.ForwardedReginPrefix) baseV1.StopIn
 	return s
 }
 
-func (s *Stop) Do(ctx context.Context, resourceID string, sid string, payload *baseV1.StopReqBody) (*baseV1.StopIndividualRecordingResp, error) {
-	resp, err := s.BaseStop.Do(ctx, resourceID, sid, baseV1.IndividualMode, payload)
+func (s *Stop) Do(ctx context.Context, resourceID string, sid string, cname string, uid string, asyncStop bool) (*baseV1.StopIndividualRecordingResp, error) {
+	resp, err := s.BaseStop.Do(ctx, resourceID, sid, baseV1.IndividualMode, &baseV1.StopReqBody{
+		Cname: cname,
+		Uid:   uid,
+		ClientRequest: &baseV1.StopClientRequest{
+			AsyncStop: asyncStop,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -40,8 +46,14 @@ func (s *Stop) Do(ctx context.Context, resourceID string, sid string, payload *b
 	return &individualResp, nil
 }
 
-func (s *Stop) DoVideoScreenshot(ctx context.Context, resourceID string, sid string, payload *baseV1.StopReqBody) (*baseV1.StopIndividualRecordingVideoScreenshotResp, error) {
-	resp, err := s.BaseStop.Do(ctx, resourceID, sid, baseV1.IndividualMode, payload)
+func (s *Stop) DoVideoScreenshot(ctx context.Context, resourceID string, sid string, cname string, uid string, asyncStop bool) (*baseV1.StopIndividualRecordingVideoScreenshotResp, error) {
+	resp, err := s.BaseStop.Do(ctx, resourceID, sid, baseV1.IndividualMode, &baseV1.StopReqBody{
+		Cname: cname,
+		Uid:   uid,
+		ClientRequest: &baseV1.StopClientRequest{
+			AsyncStop: asyncStop,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}

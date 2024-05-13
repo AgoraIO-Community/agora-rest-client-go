@@ -62,7 +62,7 @@ type StopWebRecordingSuccessResp struct {
 
 type StopWebRecording interface {
 	WithForwardRegion(prefix core.ForwardedReginPrefix) StopWebRecording
-	Do(ctx context.Context, resourceID string, sid string, payload *StopReqBody) (*StopWebRecordingResp, error)
+	Do(ctx context.Context, resourceID string, sid string, cname string, uid string, asyncStop bool) (*StopWebRecordingResp, error)
 }
 
 type UpdateWebRecordingClientRequest struct {

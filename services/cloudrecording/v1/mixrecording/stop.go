@@ -19,8 +19,14 @@ func (s *Stop) WithForwardRegion(prefix core.ForwardedReginPrefix) baseV1.StopMi
 	return s
 }
 
-func (s *Stop) DoHLS(ctx context.Context, resourceID string, sid string, payload *baseV1.StopReqBody) (*baseV1.StopMixRecordingHLSSuccessResponse, error) {
-	resp, err := s.Base.Do(ctx, resourceID, sid, baseV1.MixMode, payload)
+func (s *Stop) DoHLS(ctx context.Context, resourceID string, sid string, cname string, uid string, asyncStop bool) (*baseV1.StopMixRecordingHLSSuccessResponse, error) {
+	resp, err := s.Base.Do(ctx, resourceID, sid, baseV1.MixMode, &baseV1.StopReqBody{
+		Cname: cname,
+		Uid:   uid,
+		ClientRequest: &baseV1.StopClientRequest{
+			AsyncStop: asyncStop,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -40,8 +46,14 @@ func (s *Stop) DoHLS(ctx context.Context, resourceID string, sid string, payload
 	return &mixResp, nil
 }
 
-func (s *Stop) DoHLSAndMP4(ctx context.Context, resourceID string, sid string, payload *baseV1.StopReqBody) (*baseV1.StopMixRecordingHLSAndMP4SuccessResponse, error) {
-	resp, err := s.Base.Do(ctx, resourceID, sid, baseV1.MixMode, payload)
+func (s *Stop) DoHLSAndMP4(ctx context.Context, resourceID string, sid string, cname string, uid string, asyncStop bool) (*baseV1.StopMixRecordingHLSAndMP4SuccessResponse, error) {
+	resp, err := s.Base.Do(ctx, resourceID, sid, baseV1.MixMode, &baseV1.StopReqBody{
+		Cname: cname,
+		Uid:   uid,
+		ClientRequest: &baseV1.StopClientRequest{
+			AsyncStop: asyncStop,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}

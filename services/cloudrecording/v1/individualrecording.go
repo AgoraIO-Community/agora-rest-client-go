@@ -145,8 +145,8 @@ type StopIndividualRecordingVideoScreenshotResp struct {
 
 type StopIndividualRecording interface {
 	WithForwardRegion(prefix core.ForwardedReginPrefix) StopIndividualRecording
-	Do(ctx context.Context, resourceID string, sid string, payload *StopReqBody) (*StopIndividualRecordingResp, error)
-	DoVideoScreenshot(ctx context.Context, resourceID string, sid string, payload *StopReqBody) (*StopIndividualRecordingVideoScreenshotResp, error)
+	Do(ctx context.Context, resourceID string, sid string, cname string, uid string, asyncStop bool) (*StopIndividualRecordingResp, error)
+	DoVideoScreenshot(ctx context.Context, resourceID string, sid string, cname string, uid string, asyncStop bool) (*StopIndividualRecordingVideoScreenshotResp, error)
 }
 
 type IndividualRecording interface {

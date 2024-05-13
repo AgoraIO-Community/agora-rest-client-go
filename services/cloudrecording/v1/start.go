@@ -520,6 +520,10 @@ type ExtensionServiceConfig struct {
 	ExtensionServices []ExtensionService `json:"extensionServices"`
 }
 
+type ServiceParamInterface interface {
+	ServiceParam()
+}
+
 // ExtensionService 扩展服务
 type ExtensionService struct {
 	// ServiceName 扩展服务的名称
@@ -541,7 +545,7 @@ type ExtensionService struct {
 	ErrorHandlePolicy string `json:"errorHandlePolicy"`
 
 	// ServiceParam 扩展服务的参数
-	ServiceParam *ServiceParam `json:"serviceParam"`
+	ServiceParam ServiceParamInterface `json:"serviceParam"`
 }
 
 type Outputs struct {
@@ -549,10 +553,7 @@ type Outputs struct {
 	RtmpURL string `json:"rtmpUrl"`
 }
 
-type ServiceParam struct {
-	// Outputs 转推页面录制到 CDN 时需设置如下字段
-	Outputs []Outputs `json:"outputs,omitempty"`
-
+type WebRecordingServiceParam struct {
 	// URL 待录制页面的地址
 	URL string `json:"url"`
 
@@ -641,6 +642,17 @@ type ServiceParam struct {
 	//
 	// 默认值：0
 	ReadyTimeout int `json:"readyTimeout"`
+}
+
+func (w *WebRecordingServiceParam) ServiceParam() {
+}
+
+type RtmpPublishServiceParam struct {
+	// Outputs 转推页面录制到 CDN 时需设置如下字段
+	Outputs []Outputs `json:"outputs,omitempty"`
+}
+
+func (r *RtmpPublishServiceParam) ServiceParam() {
 }
 
 type StartResp struct {

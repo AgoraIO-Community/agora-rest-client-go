@@ -19,9 +19,15 @@ func (s *Stop) WithForwardRegion(prefix core.ForwardedReginPrefix) baseV1.StopWe
 	return s
 }
 
-func (s *Stop) Do(ctx context.Context, resourceID string, sid string, payload *baseV1.StopReqBody) (*baseV1.StopWebRecordingResp, error) {
+func (s *Stop) Do(ctx context.Context, resourceID string, sid string, cname string, uid string, asyncStop bool) (*baseV1.StopWebRecordingResp, error) {
 	mode := baseV1.WebMode
-	resp, err := s.BaseStop.Do(ctx, resourceID, sid, mode, payload)
+	resp, err := s.BaseStop.Do(ctx, resourceID, sid, mode, &baseV1.StopReqBody{
+		Cname: cname,
+		Uid:   uid,
+		ClientRequest: &baseV1.StopClientRequest{
+			AsyncStop: asyncStop,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
