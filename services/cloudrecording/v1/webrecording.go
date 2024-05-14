@@ -31,7 +31,7 @@ type QueryWebRecordingResp struct {
 type QueryWebRecordingSuccessResp struct {
 	ResourceId     string
 	Sid            string
-	ServerResponse QueryWebRecordingServerResponse
+	ServerResponse *QueryWebRecordingServerResponse
 }
 type QueryWebRecording interface {
 	WithForwardRegion(prefix core.ForwardedReginPrefix) QueryWebRecording
@@ -57,7 +57,7 @@ type StopWebRecordingResp struct {
 type StopWebRecordingSuccessResp struct {
 	ResourceId     string
 	Sid            string
-	ServerResponse StopWebRecordingServerResponse
+	ServerResponse *StopWebRecordingServerResponse
 }
 
 type StopWebRecording interface {

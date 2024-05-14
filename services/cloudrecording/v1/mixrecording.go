@@ -26,7 +26,7 @@ type AcquireMixRecording interface {
 type QueryMixRecordingHLSSuccessResp struct {
 	ResourceId     string
 	Sid            string
-	ServerResponse QueryMixRecordingHLSServerResponse
+	ServerResponse *QueryMixRecordingHLSServerResponse
 }
 
 type QueryMixRecordingHLSResp struct {
@@ -37,7 +37,7 @@ type QueryMixRecordingHLSResp struct {
 type QueryMixRecordingHLSAndMP4SuccessResp struct {
 	ResourceId     string
 	Sid            string
-	ServerResponse QueryMixRecordingHLSAndMP4ServerResponse
+	ServerResponse *QueryMixRecordingHLSAndMP4ServerResponse
 }
 type QueryMixRecordingHLSAndMP4Resp struct {
 	Response
@@ -65,7 +65,7 @@ type StartMixRecording interface {
 type StopMixRecordingHLSResp struct {
 	ResourceId     string
 	Sid            string
-	ServerResponse StopMixRecordingHLSServerResponse
+	ServerResponse *StopMixRecordingHLSServerResponse
 }
 
 type StopMixRecordingHLSSuccessResponse struct {
@@ -76,7 +76,7 @@ type StopMixRecordingHLSSuccessResponse struct {
 type StopMixRecordingHLSAndMP4Resp struct {
 	ResourceId     string
 	Sid            string
-	ServerResponse StopMixRecordingHLSAndMP4ServerResponse
+	ServerResponse *StopMixRecordingHLSAndMP4ServerResponse
 }
 
 type StopMixRecordingHLSAndMP4SuccessResponse struct {

@@ -40,7 +40,7 @@ func (s *Stop) Do(ctx context.Context, resourceID string, sid string, cname stri
 		webResp.SuccessResp = baseV1.StopWebRecordingSuccessResp{
 			ResourceId:     successResp.ResourceId,
 			Sid:            successResp.Sid,
-			ServerResponse: *successResp.GetWebRecordingServerResponse(),
+			ServerResponse: successResp.GetWebRecordingServerResponse(),
 		}
 	}
 
