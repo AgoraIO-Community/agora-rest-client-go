@@ -33,7 +33,7 @@ func (q *Query) Do(ctx context.Context, resourceID string, sid string) (*baseV1.
 		webResp.SuccessResp = baseV1.QueryWebRecordingSuccessResp{
 			ResourceId:     successResp.ResourceId,
 			Sid:            successResp.Sid,
-			ServerResponse: *successResp.GetWebRecording2CDNServerResponse(),
+			ServerResponse: successResp.GetWebRecording2CDNServerResponse(),
 		}
 	}
 

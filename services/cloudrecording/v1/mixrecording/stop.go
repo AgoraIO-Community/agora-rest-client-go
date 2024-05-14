@@ -39,7 +39,7 @@ func (s *Stop) DoHLS(ctx context.Context, resourceID string, sid string, cname s
 		mixResp.SuccessResp = baseV1.StopMixRecordingHLSResp{
 			ResourceId:     successResp.ResourceId,
 			Sid:            successResp.Sid,
-			ServerResponse: *successResp.GetMixRecordingHLSServerResponse(),
+			ServerResponse: successResp.GetMixRecordingHLSServerResponse(),
 		}
 	}
 
@@ -66,7 +66,7 @@ func (s *Stop) DoHLSAndMP4(ctx context.Context, resourceID string, sid string, c
 		mixResp.SuccessResp = baseV1.StopMixRecordingHLSAndMP4Resp{
 			ResourceId:     successResp.ResourceId,
 			Sid:            successResp.Sid,
-			ServerResponse: *successResp.GetMixRecordingHLSAndMP4ServerResponse(),
+			ServerResponse: successResp.GetMixRecordingHLSAndMP4ServerResponse(),
 		}
 	}
 
