@@ -143,7 +143,22 @@ func main() {
 	}
 
 	sid := startResp.SuccessResponse.Sid
-	time.Sleep(time.Second * 60)
+	// query
+	for i := 0; i < 6; i++ {
+		queryResp, err := impl.Query().DoHLSAndMP4(context.TODO(), resourceId, sid)
+		// 处理非业务错误
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// 处理业务响应
+		if queryResp.IsSuccess() {
+			log.Printf("query success:%+v\n", queryResp)
+		} else {
+			log.Printf("query failed:%+v\n", queryResp)
+		}
+		time.Sleep(time.Second * 10)
+	}
 
 	// 调用云端录制服务 API 的 Stop 接口
 	stopResp, err := impl.Stop().DoHLSAndMP4(context.TODO(), resourceId, sid, cname, uid, false)
