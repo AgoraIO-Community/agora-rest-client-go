@@ -31,7 +31,7 @@ type QueryMixRecordingHLSSuccessResp struct {
 
 type QueryMixRecordingHLSResp struct {
 	Response
-	SuccessResp QueryMixRecordingHLSSuccessResp
+	SuccessResponse QueryMixRecordingHLSSuccessResp
 }
 
 type QueryMixRecordingHLSAndMP4SuccessResp struct {
@@ -41,7 +41,7 @@ type QueryMixRecordingHLSAndMP4SuccessResp struct {
 }
 type QueryMixRecordingHLSAndMP4Resp struct {
 	Response
-	SuccessResp QueryMixRecordingHLSAndMP4SuccessResp
+	SuccessResponse QueryMixRecordingHLSAndMP4SuccessResp
 }
 
 type QueryMixRecording interface {
@@ -70,7 +70,7 @@ type StopMixRecordingHLSResp struct {
 
 type StopMixRecordingHLSSuccessResponse struct {
 	Response
-	SuccessResp StopMixRecordingHLSResp
+	SuccessResponse StopMixRecordingHLSResp
 }
 
 type StopMixRecordingHLSAndMP4Resp struct {
@@ -81,7 +81,7 @@ type StopMixRecordingHLSAndMP4Resp struct {
 
 type StopMixRecordingHLSAndMP4SuccessResponse struct {
 	Response
-	SuccessResp StopMixRecordingHLSAndMP4Resp
+	SuccessResponse StopMixRecordingHLSAndMP4Resp
 }
 
 type StopMixRecording interface {

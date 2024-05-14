@@ -128,7 +128,7 @@
 		log.Fatalln(err)
 	}
 	if startResp.IsSuccess() {
-		log.Printf("success:%+v", &startResp.SuccessResp)
+		log.Printf("success:%+v", &startResp.SuccessResponse)
 	} else {
 		log.Printf("failed:%+v", &startResp.ErrResponse)
 	}
@@ -160,11 +160,11 @@
 		log.Fatalln(err)
 	}
 	if stopResp.IsSuccess() {
-		log.Printf("stop success:%+v", &stopResp.SuccessResp)
+		log.Printf("stop success:%+v", &stopResp.SuccessResponse)
 	} else {
 		log.Fatalf("stop failed:%+v", &stopResp.ErrResponse)
 	}
-	stopSuccess := stopResp.SuccessResp
+	stopSuccess := stopResp.SuccessResponse
 	var stopServerResponse interface{}
 	switch stopSuccess.GetServerResponseMode() {
 	case v1.StopServerResponseUnknownMode:
@@ -209,7 +209,7 @@
 		log.Fatalln(err)
 	}
 	if queryResp.IsSuccess() {
-		log.Printf("query success:%+v", queryResp.SuccessResp)
+		log.Printf("query success:%+v", queryResp.SuccessResponse)
 	} else {
 		log.Printf("query failed:%+v", queryResp.ErrResponse)
 		return
@@ -217,7 +217,7 @@
 
 	var queryServerResponse interface{}
 
-	querySuccess := queryResp.SuccessResp
+	querySuccess := queryResp.SuccessResponse
 	switch querySuccess.GetServerResponseMode() {
 	case v1.QueryServerResponseUnknownMode:
 		log.Fatalln("unknown mode")
@@ -279,7 +279,7 @@
 		log.Fatalln(err)
 	}
 	if updateResp.IsSuccess() {
-		log.Printf("update success:%+v", updateResp.SuccessResp)
+		log.Printf("update success:%+v", updateResp.SuccessResponse)
 	} else {
 		log.Printf("update failed:%+v", updateResp.ErrResponse)
 		return
@@ -332,7 +332,7 @@
 		log.Fatalln(err)
 	}
 	if updateLayoutResp.IsSuccess() {
-		log.Printf("updateLayout success:%+v", updateLayoutResp.SuccessResp)
+		log.Printf("updateLayout success:%+v", updateLayoutResp.SuccessResponse)
 	} else {
 		log.Printf("updateLayout failed:%+v", updateLayoutResp.ErrResponse)
 		return

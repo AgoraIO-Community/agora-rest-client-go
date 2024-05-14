@@ -93,7 +93,7 @@ func (s *Service) RunWebRecorder(storageConfig *v1.StorageConfig) {
 		return
 	}
 
-	sid := startResp.SuccessResp.Sid
+	sid := startResp.SuccessResponse.Sid
 	// stop
 	defer func() {
 		stopResp, err := impl.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)
@@ -231,7 +231,7 @@ func (s *Service) RunWebRecorderAndRtmpPublish(storageConfig *v1.StorageConfig) 
 		return
 	}
 
-	sid := startResp.SuccessResp.Sid
+	sid := startResp.SuccessResponse.Sid
 	// stop
 	defer func() {
 		stopResp, err := impl.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)

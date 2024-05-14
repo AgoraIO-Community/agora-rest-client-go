@@ -122,7 +122,7 @@ type UpdateOutput struct {
 
 type UpdateResp struct {
 	Response
-	SuccessResp UpdateSuccessResp
+	SuccessResponse UpdateSuccessResp
 }
 
 type UpdateSuccessResp struct {
@@ -154,7 +154,7 @@ func (u *Update) Do(ctx context.Context, resourceID string, sid string, mode str
 		if err = responseData.UnmarshalToTarget(&successResponse); err != nil {
 			return nil, err
 		}
-		resp.SuccessResp = successResponse
+		resp.SuccessResponse = successResponse
 	} else {
 		codeResult := gjson.GetBytes(responseData.RawBody, "code")
 		if !codeResult.Exists() {

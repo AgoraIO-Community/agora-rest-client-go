@@ -48,7 +48,7 @@ type QuerySuccessResp struct {
 
 type QueryResp struct {
 	Response
-	SuccessResp QuerySuccessResp
+	SuccessResponse QuerySuccessResp
 }
 
 type QueryIndividualRecordingServerResponse struct {
@@ -445,8 +445,8 @@ func (q *Query) Do(ctx context.Context, resourceID string, sid string, mode stri
 		if err = responseData.UnmarshalToTarget(&successResponse); err != nil {
 			return nil, err
 		}
-		resp.SuccessResp = successResponse
-		if err = resp.SuccessResp.setServerResponse(responseData.RawBody, mode); err != nil {
+		resp.SuccessResponse = successResponse
+		if err = resp.SuccessResponse.setServerResponse(responseData.RawBody, mode); err != nil {
 			return nil, err
 		}
 	} else {
