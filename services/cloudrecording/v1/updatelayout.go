@@ -143,7 +143,7 @@ type UpdateLayoutSuccessResp struct {
 
 type UpdateLayoutResp struct {
 	Response
-	SuccessResp UpdateLayoutSuccessResp
+	SuccessResponse UpdateLayoutSuccessResp
 }
 
 func (u *UpdateLayout) WithForwardRegion(prefix core.ForwardedReginPrefix) *UpdateLayout {
@@ -169,7 +169,7 @@ func (u *UpdateLayout) Do(ctx context.Context, resourceID string, sid string, mo
 		if err = responseData.UnmarshalToTarget(&successResponse); err != nil {
 			return nil, err
 		}
-		resp.SuccessResp = successResponse
+		resp.SuccessResponse = successResponse
 	} else {
 		codeResult := gjson.GetBytes(responseData.RawBody, "code")
 		if !codeResult.Exists() {

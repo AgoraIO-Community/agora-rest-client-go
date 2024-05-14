@@ -89,7 +89,7 @@ func (s *Service) RunRecording(token string, storageConfig *v1.StorageConfig) {
 		return
 	}
 
-	sid := startResp.SuccessResp.Sid
+	sid := startResp.SuccessResponse.Sid
 	// stop
 	defer func() {
 		stopResp, err := impl.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)
@@ -220,7 +220,7 @@ func (s *Service) RunSnapshot(token string, storageConfig *v1.StorageConfig) {
 		return
 	}
 
-	sid := startResp.SuccessResp.Sid
+	sid := startResp.SuccessResponse.Sid
 	// stop
 	defer func() {
 		stopResp, err := impl.Stop().DoVideoScreenshot(ctx, resourceId, sid, s.cname, s.uid, false)
@@ -356,7 +356,7 @@ func (s *Service) RunRecordingAndSnapshot(token string, storageConfig *v1.Storag
 		return
 	}
 
-	sid := startResp.SuccessResp.Sid
+	sid := startResp.SuccessResponse.Sid
 	// stop
 	defer func() {
 		stopResp, err := impl.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)
@@ -499,7 +499,7 @@ func (s *Service) RunRecordingAndPostponeTranscoding(token string, storageConfig
 		return
 	}
 
-	sid := startResp.SuccessResp.Sid
+	sid := startResp.SuccessResponse.Sid
 	// stop
 	defer func() {
 		stopResp, err := impl.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)
@@ -645,7 +645,7 @@ func (s *Service) RunRecordingAndAudioMix(token string, storageConfig *v1.Storag
 		return
 	}
 
-	sid := startResp.SuccessResp.Sid
+	sid := startResp.SuccessResponse.Sid
 	// stop
 	defer func() {
 		stopResp, err := impl.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)

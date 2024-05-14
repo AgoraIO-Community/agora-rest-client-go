@@ -142,7 +142,7 @@ func main() {
 		log.Fatalf("start failed:%+v\n", startResp)
 	}
 
-	sid := startResp.SuccessResp.Sid
+	sid := startResp.SuccessResponse.Sid
 	time.Sleep(time.Second * 60)
 
 	// 调用云端录制服务 API 的 Stop 接口

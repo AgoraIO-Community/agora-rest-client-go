@@ -97,7 +97,7 @@ func (s *Service) RunHLS(token string, storageConfig *v1.StorageConfig) {
 		return
 	}
 
-	sid := startResp.SuccessResp.Sid
+	sid := startResp.SuccessResponse.Sid
 	// stop
 	defer func() {
 		stopResp, err := impl.Stop().DoHLS(ctx, resourceId, sid, s.cname, s.uid, false)
@@ -255,7 +255,7 @@ func (s *Service) RunHLSAndMP4(token string, storageConfig *v1.StorageConfig) {
 		return
 	}
 
-	sid := startResp.SuccessResp.Sid
+	sid := startResp.SuccessResponse.Sid
 	// stop
 	defer func() {
 		stopResp, err := impl.Stop().DoHLSAndMP4(ctx, resourceId, sid, s.cname, s.uid, false)

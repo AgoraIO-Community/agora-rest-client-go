@@ -48,7 +48,7 @@ type StopClientRequest struct {
 
 type StopResp struct {
 	Response
-	SuccessResp StopSuccessResp
+	SuccessResponse StopSuccessResp
 }
 
 type StopSuccessResp struct {
@@ -377,8 +377,8 @@ func (s *Stop) Do(ctx context.Context, resourceID string, sid string, mode strin
 		if err = responseData.UnmarshalToTarget(&successResp); err != nil {
 			return nil, err
 		}
-		resp.SuccessResp = successResp
-		if err = resp.SuccessResp.setServerResponse(responseData.RawBody, mode); err != nil {
+		resp.SuccessResponse = successResp
+		if err = resp.SuccessResponse.setServerResponse(responseData.RawBody, mode); err != nil {
 			return nil, err
 		}
 	} else {

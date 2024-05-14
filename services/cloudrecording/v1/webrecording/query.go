@@ -29,8 +29,8 @@ func (q *Query) Do(ctx context.Context, resourceID string, sid string) (*baseV1.
 
 	webResp.Response = resp.Response
 	if resp.IsSuccess() {
-		successResp := resp.SuccessResp
-		webResp.SuccessResp = baseV1.QueryWebRecordingSuccessResp{
+		successResp := resp.SuccessResponse
+		webResp.SuccessResponse = baseV1.QueryWebRecordingSuccessResp{
 			ResourceId:     successResp.ResourceId,
 			Sid:            successResp.Sid,
 			ServerResponse: successResp.GetWebRecording2CDNServerResponse(),

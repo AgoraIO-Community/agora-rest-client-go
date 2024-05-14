@@ -657,7 +657,7 @@ func (r *RtmpPublishServiceParam) ServiceParam() {
 
 type StartResp struct {
 	Response
-	SuccessResp StartSuccessResp
+	SuccessResponse StartSuccessResp
 }
 
 // StartSuccessResp 云端录制服务成功开始云端录制后返回的响应
@@ -701,7 +701,7 @@ func (s *Start) Do(ctx context.Context, resourceID string, mode string, payload 
 		if err = responseData.UnmarshalToTarget(&successResp); err != nil {
 			return nil, err
 		}
-		resp.SuccessResp = successResp
+		resp.SuccessResponse = successResp
 	} else {
 		codeResult := gjson.GetBytes(responseData.RawBody, "code")
 		if !codeResult.Exists() {

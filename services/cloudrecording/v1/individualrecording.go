@@ -92,7 +92,7 @@ type QueryIndividualRecordingSuccessResp struct {
 
 type QueryIndividualRecordingResp struct {
 	Response
-	SuccessResp QueryIndividualRecordingSuccessResp
+	SuccessResponse QueryIndividualRecordingSuccessResp
 }
 
 type QueryIndividualRecordingVideoScreenshotSuccessResp struct {
@@ -103,7 +103,7 @@ type QueryIndividualRecordingVideoScreenshotSuccessResp struct {
 
 type QueryIndividualRecordingVideoScreenshotResp struct {
 	Response
-	SuccessResp QueryIndividualRecordingVideoScreenshotSuccessResp
+	SuccessResponse QueryIndividualRecordingVideoScreenshotSuccessResp
 }
 
 type QueryIndividualRecording interface {
@@ -135,12 +135,12 @@ type StopIndividualRecordingVideoScreenshotSuccessResp struct {
 
 type StopIndividualRecordingResp struct {
 	Response
-	SuccessResp StopIndividualRecordingSuccessResp
+	SuccessResponse StopIndividualRecordingSuccessResp
 }
 
 type StopIndividualRecordingVideoScreenshotResp struct {
 	Response
-	SuccessResp StopIndividualRecordingVideoScreenshotSuccessResp
+	SuccessResponse StopIndividualRecordingVideoScreenshotSuccessResp
 }
 
 type StopIndividualRecording interface {

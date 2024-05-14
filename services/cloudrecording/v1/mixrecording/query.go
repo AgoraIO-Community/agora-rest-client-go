@@ -29,8 +29,8 @@ func (q *Query) DoHLS(ctx context.Context, resourceID string, sid string) (*base
 
 	mixResp.Response = resp.Response
 	if resp.IsSuccess() {
-		successResp := resp.SuccessResp
-		mixResp.SuccessResp = baseV1.QueryMixRecordingHLSSuccessResp{
+		successResp := resp.SuccessResponse
+		mixResp.SuccessResponse = baseV1.QueryMixRecordingHLSSuccessResp{
 			ResourceId:     successResp.ResourceId,
 			Sid:            successResp.Sid,
 			ServerResponse: successResp.GetMixRecordingHLSServerResponse(),
@@ -50,8 +50,8 @@ func (q *Query) DoHLSAndMP4(ctx context.Context, resourceID string, sid string) 
 
 	mixResp.Response = resp.Response
 	if resp.IsSuccess() {
-		successResp := resp.SuccessResp
-		mixResp.SuccessResp = baseV1.QueryMixRecordingHLSAndMP4SuccessResp{
+		successResp := resp.SuccessResponse
+		mixResp.SuccessResponse = baseV1.QueryMixRecordingHLSAndMP4SuccessResp{
 			ResourceId:     successResp.ResourceId,
 			Sid:            successResp.Sid,
 			ServerResponse: successResp.GetMixRecordingHLSAndMP4ServerResponse(),

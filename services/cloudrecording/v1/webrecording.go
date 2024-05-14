@@ -25,7 +25,7 @@ type AcquireWebRecording interface {
 
 type QueryWebRecordingResp struct {
 	Response
-	SuccessResp QueryWebRecordingSuccessResp
+	SuccessResponse QueryWebRecordingSuccessResp
 }
 
 type QueryWebRecordingSuccessResp struct {
@@ -51,7 +51,7 @@ type StartWebRecording interface {
 
 type StopWebRecordingResp struct {
 	Response
-	SuccessResp StopWebRecordingSuccessResp
+	SuccessResponse StopWebRecordingSuccessResp
 }
 
 type StopWebRecordingSuccessResp struct {
