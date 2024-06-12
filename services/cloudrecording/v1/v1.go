@@ -29,51 +29,45 @@ func NewCollection(prefixPath string, client core.Client, webRecording WebRecord
 
 func (c *BaseCollection) Acquire() *Acquire {
 	return &Acquire{
-		forwardedRegionPrefix: core.DefaultForwardedReginPrefix,
-		client:                c.client,
-		prefixPath:            c.prefixPath,
+		client:     c.client,
+		prefixPath: c.prefixPath,
 	}
 }
 
 func (c *BaseCollection) Start() *Start {
 	return &Start{
-		forwardedRegionPrefix: core.DefaultForwardedReginPrefix,
-		module:                "cloudRecording:start",
-		logger:                c.client.GetLogger(),
-		client:                c.client,
-		prefixPath:            c.prefixPath,
+		module:     "cloudRecording:start",
+		logger:     c.client.GetLogger(),
+		client:     c.client,
+		prefixPath: c.prefixPath,
 	}
 }
 
 func (c *BaseCollection) Stop() *Stop {
 	return &Stop{
-		forwardedRegionPrefix: core.DefaultForwardedReginPrefix,
-		client:                c.client,
-		prefixPath:            c.prefixPath,
+		client:     c.client,
+		prefixPath: c.prefixPath,
 	}
 }
 
 func (c *BaseCollection) Query() *Query {
 	return &Query{
-		forwardedRegionPrefix: core.DefaultForwardedReginPrefix,
-		client:                c.client,
-		prefixPath:            c.prefixPath,
+		client:     c.client,
+		prefixPath: c.prefixPath,
 	}
 }
 
 func (c *BaseCollection) Update() *Update {
 	return &Update{
-		forwardedRegionPrefix: core.DefaultForwardedReginPrefix,
-		client:                c.client,
-		prefixPath:            c.prefixPath,
+		client:     c.client,
+		prefixPath: c.prefixPath,
 	}
 }
 
 func (c *BaseCollection) UpdateLayout() *UpdateLayout {
 	return &UpdateLayout{
-		forwardedRegionPrefix: core.DefaultForwardedReginPrefix,
-		client:                c.client,
-		prefixPath:            c.prefixPath,
+		client:     c.client,
+		prefixPath: c.prefixPath,
 	}
 }
 

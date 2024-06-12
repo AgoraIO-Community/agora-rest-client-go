@@ -11,15 +11,14 @@ import (
 )
 
 type Update struct {
-	forwardedRegionPrefix core.ForwardedReginPrefix
-	client                core.Client
-	prefixPath            string // /v1/apps/{appid}/cloud_recording
+	client     core.Client
+	prefixPath string // /v1/apps/{appid}/cloud_recording
 }
 
 // buildPath returns the request path.
 // /v1/apps/{appid}/cloud_recording/resourceid/{resourceid}/sid/{sid}/mode/{mode}/update
 func (u *Update) buildPath(resourceID string, sid string, mode string) string {
-	return string(u.forwardedRegionPrefix) + u.prefixPath + "/resourceid/" + resourceID + "/sid/" + sid + "/mode/" + mode + "/update"
+	return u.prefixPath + "/resourceid/" + resourceID + "/sid/" + sid + "/mode/" + mode + "/update"
 }
 
 type UpdateReqBody struct {
@@ -130,12 +129,6 @@ type UpdateSuccessResp struct {
 	Sid        string `json:"sid"`
 	UID        string `json:"uid"`
 	Cname      string `json:"cname"`
-}
-
-func (u *Update) WithForwardRegion(prefix core.ForwardedReginPrefix) *Update {
-	u.forwardedRegionPrefix = prefix
-
-	return u
 }
 
 func (u *Update) Do(ctx context.Context, resourceID string, sid string, mode string, payload *UpdateReqBody) (*UpdateResp, error) {

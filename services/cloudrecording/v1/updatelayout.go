@@ -11,15 +11,14 @@ import (
 )
 
 type UpdateLayout struct {
-	forwardedRegionPrefix core.ForwardedReginPrefix
-	client                core.Client
-	prefixPath            string // /apps/{appid}/cloud_recording
+	client     core.Client
+	prefixPath string // /apps/{appid}/cloud_recording
 }
 
 // buildPath returns the request path.
 // /v1/apps/{appid}/cloud_recording/resourceid/{resourceid}/sid/{sid}/mode/{mode}/updateLayout
 func (u *UpdateLayout) buildPath(resourceID string, sid string, mode string) string {
-	return string(u.forwardedRegionPrefix) + u.prefixPath + "/resourceid/" + resourceID + "/sid/" + sid + "/mode/" + mode + "/updateLayout"
+	return u.prefixPath + "/resourceid/" + resourceID + "/sid/" + sid + "/mode/" + mode + "/updateLayout"
 }
 
 type UpdateLayoutReqBody struct {
@@ -144,12 +143,6 @@ type UpdateLayoutSuccessResp struct {
 type UpdateLayoutResp struct {
 	Response
 	SuccessResponse UpdateLayoutSuccessResp
-}
-
-func (u *UpdateLayout) WithForwardRegion(prefix core.ForwardedReginPrefix) *UpdateLayout {
-	u.forwardedRegionPrefix = prefix
-
-	return u
 }
 
 func (u *UpdateLayout) Do(ctx context.Context, resourceID string, sid string, mode string, payload *UpdateLayoutReqBody) (*UpdateLayoutResp, error) {

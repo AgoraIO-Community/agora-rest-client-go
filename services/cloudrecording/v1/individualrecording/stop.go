@@ -3,7 +3,6 @@ package individualrecording
 import (
 	"context"
 
-	"github.com/AgoraIO-Community/agora-rest-client-go/core"
 	baseV1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1"
 )
 
@@ -12,12 +11,6 @@ type Stop struct {
 }
 
 var _ baseV1.StopIndividualRecording = (*Stop)(nil)
-
-func (s *Stop) WithForwardRegion(prefix core.ForwardedReginPrefix) baseV1.StopIndividualRecording {
-	s.BaseStop.WithForwardRegion(prefix)
-
-	return s
-}
 
 func (s *Stop) Do(ctx context.Context, resourceID string, sid string, cname string, uid string, asyncStop bool) (*baseV1.StopIndividualRecordingResp, error) {
 	resp, err := s.BaseStop.Do(ctx, resourceID, sid, baseV1.IndividualMode, &baseV1.StopReqBody{

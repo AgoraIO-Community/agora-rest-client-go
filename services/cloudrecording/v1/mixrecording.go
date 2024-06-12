@@ -2,8 +2,6 @@ package v1
 
 import (
 	"context"
-
-	"github.com/AgoraIO-Community/agora-rest-client-go/core"
 )
 
 type AcquireMixRecodingClientRequest struct {
@@ -19,7 +17,6 @@ type AcquireMixRecodingClientRequest struct {
 }
 
 type AcquireMixRecording interface {
-	WithForwardRegion(prefix core.ForwardedReginPrefix) AcquireMixRecording
 	Do(ctx context.Context, cname string, uid string, clientRequest *AcquireMixRecodingClientRequest) (*AcquireResp, error)
 }
 
@@ -45,7 +42,6 @@ type QueryMixRecordingHLSAndMP4Resp struct {
 }
 
 type QueryMixRecording interface {
-	WithForwardRegion(prefix core.ForwardedReginPrefix) QueryMixRecording
 	DoHLS(ctx context.Context, resourceID string, sid string) (*QueryMixRecordingHLSResp, error)
 	DoHLSAndMP4(ctx context.Context, resourceID string, sid string) (*QueryMixRecordingHLSAndMP4Resp, error)
 }
@@ -58,7 +54,6 @@ type StartMixRecordingClientRequest struct {
 }
 
 type StartMixRecording interface {
-	WithForwardRegion(prefix core.ForwardedReginPrefix) StartMixRecording
 	Do(ctx context.Context, resourceID string, cname string, uid string, clientRequest *StartMixRecordingClientRequest) (*StartResp, error)
 }
 
@@ -85,7 +80,6 @@ type StopMixRecordingHLSAndMP4SuccessResponse struct {
 }
 
 type StopMixRecording interface {
-	WithForwardRegion(prefix core.ForwardedReginPrefix) StopMixRecording
 	DoHLS(ctx context.Context, resourceID string, sid string, cname string, uid string, asyncStop bool) (*StopMixRecordingHLSSuccessResponse, error)
 	DoHLSAndMP4(ctx context.Context, resourceID string, sid string, cname string, uid string, asyncStop bool) (*StopMixRecordingHLSAndMP4SuccessResponse, error)
 }
@@ -94,7 +88,6 @@ type UpdateMixRecordingClientRequest struct {
 	StreamSubscribe *UpdateStreamSubscribe
 }
 type UpdateMixRecording interface {
-	WithForwardRegion(prefix core.ForwardedReginPrefix) UpdateMixRecording
 	Do(ctx context.Context, resourceID string, sid string, cname string, uid string, clientRequest *UpdateMixRecordingClientRequest) (*UpdateResp, error)
 }
 
@@ -109,7 +102,6 @@ type UpdateLayoutUpdateMixRecordingClientRequest struct {
 }
 
 type UpdateLayoutMixRecording interface {
-	WithForwardRegion(prefix core.ForwardedReginPrefix) UpdateLayoutMixRecording
 	Do(ctx context.Context, resourceID string, sid string, cname string, uid string, clientRequest *UpdateLayoutUpdateMixRecordingClientRequest) (*UpdateLayoutResp, error)
 }
 
