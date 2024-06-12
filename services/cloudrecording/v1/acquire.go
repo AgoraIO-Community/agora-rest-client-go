@@ -11,15 +11,14 @@ import (
 )
 
 type Acquire struct {
-	forwardedRegionPrefix core.ForwardedReginPrefix
-	client                core.Client
-	prefixPath            string // /v1/apps/{appid}/cloud_recording/
+	client     core.Client
+	prefixPath string // /v1/apps/{appid}/cloud_recording/
 }
 
 // buildPath returns the request path.
-// [(/cn)|(/ap)|(/na)/(/eu)]/v1/apps/{appid}/cloud_recording/acquire
+// /v1/apps/{appid}/cloud_recording/acquire
 func (a *Acquire) buildPath() string {
-	return string(a.forwardedRegionPrefix) + a.prefixPath + "/acquire"
+	return a.prefixPath + "/acquire"
 }
 
 type AcquireReqBody struct {
@@ -48,12 +47,6 @@ type AcquireResp struct {
 
 type AcquireSuccessResp struct {
 	ResourceId string `json:"resourceId"`
-}
-
-func (a *Acquire) WithForwardRegion(prefix core.ForwardedReginPrefix) *Acquire {
-	a.forwardedRegionPrefix = prefix
-
-	return a
 }
 
 func (a *Acquire) Do(ctx context.Context, payload *AcquireReqBody) (*AcquireResp, error) {

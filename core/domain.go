@@ -23,16 +23,6 @@ const (
 	CNRegionArea
 )
 
-type ForwardedReginPrefix string
-
-const (
-	DefaultForwardedReginPrefix ForwardedReginPrefix = ""
-	CNForwardedReginPrefix      ForwardedReginPrefix = "/cn"
-	APForwardedReginPrefix      ForwardedReginPrefix = "/ap"
-	NAForwardedReginPrefix      ForwardedReginPrefix = "/na"
-	EUForwardedReginPrefix      ForwardedReginPrefix = "/eu"
-)
-
 const (
 	USWestRegionDomainPrefix = "api-us-west-1"
 	USEastRegionDomainPrefix = "api-us-east-1"
