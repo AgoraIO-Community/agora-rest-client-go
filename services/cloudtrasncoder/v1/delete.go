@@ -23,7 +23,7 @@ func (d *Delete) buildPath(taskId string, tokenName string) string {
 
 type DeleteResp struct {
 	Response
-	SuccessRes DeleteSuccessResp
+	SuccessResp DeleteSuccessResp
 }
 
 type DeleteSuccessResp struct {
@@ -49,7 +49,7 @@ func (d *Delete) Do(ctx context.Context, taskId string, tokenName string) (*Dele
 		if err = responseData.UnmarshalToTarget(&successResponse); err != nil {
 			return nil, err
 		}
-		resp.SuccessRes = successResponse
+		resp.SuccessResp = successResponse
 	} else {
 		codeResult := gjson.GetBytes(responseData.RawBody, "code")
 		if !codeResult.Exists() {

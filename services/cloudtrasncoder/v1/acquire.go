@@ -12,7 +12,7 @@ import (
 
 type Acquire struct {
 	client     core.Client
-	prefixPath string // /v1/apps/{appid}/cloud_recording/
+	prefixPath string // /v1/projects/{appid}/rtsc/cloud-transcoder
 }
 
 // buildPath returns the request path.
@@ -27,7 +27,7 @@ type AcquireReqBody struct {
 
 type AcquireResp struct {
 	Response
-	SuccessRes AcquireSuccessResp
+	SuccessResp AcquireSuccessResp
 }
 
 type AcquireSuccessResp struct {
@@ -54,7 +54,7 @@ func (a *Acquire) Do(ctx context.Context, payload *AcquireReqBody) (*AcquireResp
 		if err = responseData.UnmarshalToTarget(&successResponse); err != nil {
 			return nil, err
 		}
-		resp.SuccessRes = successResponse
+		resp.SuccessResp = successResponse
 	} else {
 		codeResult := gjson.GetBytes(responseData.RawBody, "code")
 		if !codeResult.Exists() {
