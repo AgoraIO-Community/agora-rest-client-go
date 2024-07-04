@@ -39,7 +39,7 @@ type AcquireSuccessResp struct {
 func (a *Acquire) Do(ctx context.Context, payload *AcquireReqBody) (*AcquireResp, error) {
 	path := a.buildPath()
 
-	responseData, err := a.client.DoREST(ctx, path, "POST", payload)
+	responseData, err := a.client.DoREST(ctx, path, http.MethodPost, payload)
 	if err != nil {
 		var internalErr *core.InternalErr
 		if !errors.As(err, &internalErr) {

@@ -34,7 +34,7 @@ type QuerySuccessResp struct {
 
 func (q *Query) Do(ctx context.Context, taskId string, tokenName string) (*QueryResp, error) {
 	path := q.buildPath(taskId, tokenName)
-	responseData, err := q.client.DoREST(ctx, path, http.MethodPost, nil)
+	responseData, err := q.client.DoREST(ctx, path, http.MethodGet, nil)
 	if err != nil {
 		var internalErr *core.InternalErr
 		if !errors.As(err, &internalErr) {
