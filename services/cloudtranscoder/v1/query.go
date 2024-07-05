@@ -27,9 +27,33 @@ type QueryResp struct {
 }
 
 type QuerySuccessResp struct {
-	TaskID   string `json:"taskId"`
-	CreateTs int64  `json:"createTs"`
-	Status   string `json:"status"`
+	// 转码任务 ID，为 UUID，用于标识本次请求操作的 cloud transcoder
+	TaskID string `json:"taskId"`
+	// 转码任务创建时的 Unix 时间戳（秒）
+	CreateTs int64 `json:"createTs"`
+	// 转码任务的运行状态：
+	//  - "IDLE": 任务未开始。
+	//
+	//  - "PREPARED": 任务已收到开启请求。
+	//
+	//  - "STARTING": 任务正在开启。
+	//
+	//  - "CREATED": 任务初始化完成。
+	//
+	//  - "STARTED": 任务已经启动。
+	//
+	//  - "IN_PROGRESS": 任务正在进行。
+	//
+	//  - "STOPPING": 任务正在停止。
+	//
+	//  - "STOPPED": 任务已经停止。
+	//
+	//  - "EXIT": 任务正常退出。
+	//
+	//  - "FAILURE_STOP": 任务异常退出。
+	//
+	// 注意：你可以用该字段监听任务的状态。
+	Status string `json:"status"`
 }
 
 func (q *Query) Do(ctx context.Context, taskId string, tokenName string) (*QueryResp, error) {

@@ -22,6 +22,17 @@ func (a *Acquire) buildPath() string {
 }
 
 type AcquireReqBody struct {
+	// 用户指定的实例 ID。长度必须在 64 个字符以内，支持的字符集范围为：
+	//
+	//   - 所有小写英文字母（a-z）
+	//
+	//   - 所有大写英文字母（A-Z）
+	//
+	//   - 数字 0-9
+	//
+	//   - "-", "_"
+	//
+	// 注意：一个 instanceId 可以生成多个 builderToken，但在一个任务中只能使用一个 builderToken 发起请求。
 	InstanceId string `json:"instanceId"`
 }
 
@@ -31,9 +42,12 @@ type AcquireResp struct {
 }
 
 type AcquireSuccessResp struct {
-	CreateTs   string `json:"createTs"`
+	// 生成 builderToken 时的 Unix 时间戳（秒）
+	CreateTs string `json:"createTs"`
+	// 请求时设置的 instanceId
 	InstanceId string `json:"instanceId"`
-	TokenName  string `json:"tokenName"`
+	// 代表 builderToken 的值，在后续调用其他方法时需要传入该值
+	TokenName string `json:"tokenName"`
 }
 
 func (a *Acquire) Do(ctx context.Context, payload *AcquireReqBody) (*AcquireResp, error) {
