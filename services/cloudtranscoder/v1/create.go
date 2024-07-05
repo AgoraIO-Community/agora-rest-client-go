@@ -26,10 +26,10 @@ type CreateReqBody struct {
 }
 
 type CreateReqServices struct {
-	Cloudtranscoder *CloudtranscoderPayload `json:"cloudTranscoder"`
+	CloudTranscoder *CloudTranscoderPayload `json:"cloudTranscoder"`
 }
 
-type CloudtranscoderPayload struct {
+type CloudTranscoderPayload struct {
 	// 服务类型，此处为 "cloudTranscoderV2"
 	ServiceType string                 `json:"serviceType"`
 	Config      *CloudTranscoderConfig `json:"config"`
@@ -47,9 +47,9 @@ type CloudTranscoderConfigPayload struct {
 	//
 	// 默认值:300
 	IdleTimeout uint                        `json:"idleTimeout"`
-	AuidoInputs []CloudTranscoderAudioInput `json:"audioInputs"`
+	AudioInputs []CloudTranscoderAudioInput `json:"audioInputs"`
 	VideoInputs []CloudTranscoderVideoInput `json:"videoInputs"`
-	Cavas       *CloudTranscoderCanvas      `json:"canvas"`
+	Canvas      *CloudTranscoderCanvas      `json:"canvas"`
 	WaterMarks  []CloudTranscoderWaterMark  `json:"waterMarks"`
 	Outputs     []CloudTranscoderOutput     `json:"outputs"`
 }
@@ -162,7 +162,7 @@ type CloudTranscoderWaterMark struct {
 	FillMode string `json:"fillMode"`
 }
 
-type CloudTranscoderOutputAduioOption struct {
+type CloudTranscoderOutputAudioOption struct {
 	// 转码输出的音频属性：
 	//   - "AUDIO_PROFILE_DEFAULT"：48 kHz 采样率，音乐编码，单声道，编码码率最大值为 64 Kbps。
 	//   - "AUDIO_PROFILE_SPEECH_STANDARD"：32 kHz 采样率，语音编码，单声道，编码码率最大值为 18 Kbps。
@@ -213,7 +213,7 @@ type CloudTranscoderOutputVideoOption struct {
 
 type CloudTranscoderOutput struct {
 	Rtc         *CloudTranscoderRtc               `json:"rtc"`
-	AudioOption *CloudTranscoderOutputAduioOption `json:"audioOption"`
+	AudioOption *CloudTranscoderOutputAudioOption `json:"audioOption"`
 	VideoOption *CloudTranscoderOutputVideoOption `json:"videoOption"`
 }
 
