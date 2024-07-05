@@ -1,8 +1,8 @@
-package cloudtrasncoder
+package cloudtranscoder
 
 import (
 	"github.com/AgoraIO-Community/agora-rest-client-go/core"
-	v1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudtrasncoder/v1"
+	v1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudtranscoder/v1"
 )
 
 const projectName = "rtsc/cloud-transcoder"

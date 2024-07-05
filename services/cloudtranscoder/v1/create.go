@@ -26,44 +26,44 @@ type CreateReqBody struct {
 }
 
 type CreateReqServices struct {
-	CloudTrasncoder *CloudTrasncoderPayload `json:"cloudTranscoder"`
+	Cloudtranscoder *CloudtranscoderPayload `json:"cloudTranscoder"`
 }
 
-type CloudTrasncoderPayload struct {
+type CloudtranscoderPayload struct {
 	ServiceType string                 `json:"serviceType"`
-	Config      *CloudTrasncoderConfig `json:"config"`
+	Config      *CloudTranscoderConfig `json:"config"`
 }
 
-type CloudTrasncoderConfig struct {
-	Transcoder *CloudTrasncoderConfigPayload `json:"transcoder"`
+type CloudTranscoderConfig struct {
+	Transcoder *CloudTranscoderConfigPayload `json:"transcoder"`
 }
 
-type CloudTrasncoderConfigPayload struct {
+type CloudTranscoderConfigPayload struct {
 	IdleTimeout uint                        `json:"idleTimeout"`
-	AuidoInputs []CloudTrasncoderAudioInput `json:"audioInputs"`
-	VideoInputs []CloudTrasncoderVideoInput `json:"videoInputs"`
-	Cavas       *CloudTrasncoderCanvas      `json:"canvas"`
+	AuidoInputs []CloudTranscoderAudioInput `json:"audioInputs"`
+	VideoInputs []CloudTranscoderVideoInput `json:"videoInputs"`
+	Cavas       *CloudTranscoderCanvas      `json:"canvas"`
 	WaterMarks  []CloudTranscoderWaterMark  `json:"waterMarks"`
-	Outputs     []CloudTrasncoderOutput     `json:"outputs"`
+	Outputs     []CloudTranscoderOutput     `json:"outputs"`
 }
 
-type CloudTrasncoderAudioInput struct {
-	Rtc *CloudTrasncoderRtcInput `json:"rtc"`
+type CloudTranscoderAudioInput struct {
+	Rtc *CloudTranscoderRtcInput `json:"rtc"`
 }
 
-type CloudTrasncoderRtcInput struct {
+type CloudTranscoderRtcInput struct {
 	RtcChannel string `json:"rtcChannel"`
 	RtcUID     int    `json:"rtcUid"`
 	RtcToken   string `json:"rtcToken"`
 }
 
-type CloudTrasncoderVideoInput struct {
-	Rtc                 *CloudTrasncoderRtcInput `json:"rtc"`
+type CloudTranscoderVideoInput struct {
+	Rtc                 *CloudTranscoderRtcInput `json:"rtc"`
 	PlaceholderImageURL string                   `json:"placeholderImageUrl"`
-	Region              *CloudTrasncoderRegion   `json:"region"`
+	Region              *CloudTranscoderRegion   `json:"region"`
 }
 
-type CloudTrasncoderRegion struct {
+type CloudTranscoderRegion struct {
 	X      float64 `json:"x"`
 	Y      float64 `json:"y"`
 	Width  uint    `json:"width"`
@@ -71,7 +71,7 @@ type CloudTrasncoderRegion struct {
 	ZOrder int     `json:"zOrder"`
 }
 
-type CloudTrasncoderCanvas struct {
+type CloudTranscoderCanvas struct {
 	Width           uint   `json:"width"`
 	Height          uint   `json:"height"`
 	Color           uint   `json:"color"`
@@ -81,15 +81,15 @@ type CloudTrasncoderCanvas struct {
 
 type CloudTranscoderWaterMark struct {
 	ImageURL string                 `json:"imageUrl"`
-	Region   *CloudTrasncoderRegion `json:"region"`
+	Region   *CloudTranscoderRegion `json:"region"`
 	FillMode string                 `json:"fillMode"`
 }
 
-type CloudTrasncoderOutputAduioOption struct {
+type CloudTranscoderOutputAduioOption struct {
 	ProfileType string `json:"profileType"`
 }
 
-type CloudTrasncoderOutputVideoOption struct {
+type CloudTranscoderOutputVideoOption struct {
 	FPS                   uint   `json:"fps"`
 	Codec                 string `json:"codec"`
 	Bitrate               uint   `json:"bitrate"`
@@ -98,10 +98,10 @@ type CloudTrasncoderOutputVideoOption struct {
 	LowBitrateHighQuality bool   `json:"lowBitrateHighQuality"`
 }
 
-type CloudTrasncoderOutput struct {
-	Rtc         *CloudTrasncoderRtcInput          `json:"rtc"`
-	AudioOption *CloudTrasncoderOutputAduioOption `json:"audioOption"`
-	VideoOption *CloudTrasncoderOutputVideoOption `json:"videoOption"`
+type CloudTranscoderOutput struct {
+	Rtc         *CloudTranscoderRtcInput          `json:"rtc"`
+	AudioOption *CloudTranscoderOutputAduioOption `json:"audioOption"`
+	VideoOption *CloudTranscoderOutputVideoOption `json:"videoOption"`
 }
 
 type CreateSuccessResp struct {

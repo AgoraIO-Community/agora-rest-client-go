@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/core"
+
 	"github.com/tidwall/gjson"
 )
 
@@ -35,10 +36,10 @@ type UpdateResp struct {
 
 type UpdateSuccessResp struct{}
 
-func (a *Update) Do(ctx context.Context, taskId string, tokenName string, sequenceId uint, payload *UpdateReqBody) (*UpdateResp, error) {
-	path := a.buildPath(taskId, tokenName, sequenceId)
+func (u *Update) Do(ctx context.Context, taskId string, tokenName string, sequenceId uint, payload *UpdateReqBody) (*UpdateResp, error) {
+	path := u.buildPath(taskId, tokenName, sequenceId)
 
-	responseData, err := a.client.DoREST(ctx, path, http.MethodPatch, payload)
+	responseData, err := u.client.DoREST(ctx, path, http.MethodPatch, payload)
 	if err != nil {
 		var internalErr *core.InternalErr
 		if !errors.As(err, &internalErr) {
