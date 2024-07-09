@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"net/http"
 )
 
 type ResponseInterface interface {
@@ -9,6 +10,7 @@ type ResponseInterface interface {
 }
 
 type BaseResponse struct {
+	RawResponse    *http.Response
 	RawBody        []byte
 	HttpStatusCode int
 }
@@ -21,4 +23,12 @@ func (r *BaseResponse) UnmarshalToTarget(target interface{}) error {
 		return err
 	}
 	return nil
+}
+
+func (r *BaseResponse) GetRequestID() string {
+	if r.RawResponse != nil {
+		return r.RawResponse.Header.Get("X-Request-Id")
+	} else {
+		return ""
+	}
 }
