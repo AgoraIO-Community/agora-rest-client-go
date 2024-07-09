@@ -3,6 +3,8 @@ package main
 import (
 	"context"
 	"log"
+	"os"
+	"strconv"
 	"time"
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/core"
@@ -16,7 +18,7 @@ type Service struct {
 	credential core.Credential
 }
 
-func NewService(region core.RegionArea) *Service {
+func NewService(region core.RegionArea, appId string) *Service {
 	return &Service{
 		region:     region,
 		appId:      appId,
@@ -24,8 +26,8 @@ func NewService(region core.RegionArea) *Service {
 	}
 }
 
-func (s *Service) SetCredential(credential core.Credential) {
-	s.credential = credential
+func (s *Service) SetCredential(username string, password string) {
+	s.credential = core.NewBasicAuthCredential(username, password)
 }
 
 func (s *Service) acquireResource(ctx context.Context, v1Impl *v1.BaseCollection, instanceId string) string {
@@ -50,6 +52,76 @@ func (s *Service) acquireResource(ctx context.Context, v1Impl *v1.BaseCollection
 }
 
 func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
+	inputUID1 := os.Getenv("INPUT_UID_1")
+	if inputUID1 == "" {
+		panic("INPUT_UID_1 is required")
+	}
+
+	inputUID1Int, err := strconv.Atoi(inputUID1)
+	if err != nil {
+		panic(err)
+	}
+
+	inputUID2 := os.Getenv("INPUT_UID_2")
+	if inputUID2 == "" {
+		panic("INPUT_UID_2 is required")
+	}
+
+	inputUID2Int, err := strconv.Atoi(inputUID2)
+	if err != nil {
+		panic(err)
+	}
+
+	inputChannelName := os.Getenv("INPUT_CHANNEL_NAME")
+	if inputChannelName == "" {
+		panic("INPUT_CHANNEL_NAME is required")
+	}
+
+	inputToken1 := os.Getenv("INPUT_TOKEN_1")
+	if inputToken1 == "" {
+		panic("INPUT_TOKEN_1 is required")
+	}
+
+	inputToken2 := os.Getenv("INPUT_TOKEN_2")
+	if inputToken2 == "" {
+		panic("INPUT_TOKEN_2 is required")
+	}
+
+	outputChannelName := os.Getenv("OUTPUT_CHANNEL_NAME")
+	if outputChannelName == "" {
+		panic("OUTPUT_CHANNEL_NAME is required")
+	}
+
+	outputUID := os.Getenv("OUTPUT_UID")
+	if outputUID == "" {
+		panic("OUTPUT_UID is required")
+	}
+
+	outputUIDInt, err := strconv.Atoi(outputUID)
+	if err != nil {
+		panic(err)
+	}
+
+	outputToken := os.Getenv("OUTPUT_TOKEN")
+	if outputToken == "" {
+		panic("OUTPUT_TOKEN is required")
+	}
+
+	updateInputUID3 := os.Getenv("UPDATE_INPUT_UID_3")
+	if updateInputUID3 == "" {
+		panic("UPDATE_INPUT_UID_3 is required")
+	}
+
+	updateInputUID3Int, err := strconv.Atoi(updateInputUID3)
+	if err != nil {
+		panic(err)
+	}
+
+	updateInputToken3 := os.Getenv("UPDATE_INPUT_TOKEN")
+	if updateInputToken3 == "" {
+		panic("UPDATE_INPUT_TOKEN is required")
+	}
+
 	ctx := context.Background()
 	c := core.NewClient(&core.Config{
 		AppID:      s.appId,
@@ -73,25 +145,25 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 						AudioInputs: []v1.CloudTranscoderAudioInput{
 							{
 								Rtc: &v1.CloudTranscoderRtc{
-									RtcChannel: "test-abc",
-									RtcUID:     0,
-									RtcToken:   "",
+									RtcChannel: inputChannelName,
+									RtcUID:     inputUID1Int,
+									RtcToken:   inputToken1,
 								},
 							},
 							{
 								Rtc: &v1.CloudTranscoderRtc{
-									RtcChannel: "test-abc",
-									RtcUID:     18,
-									RtcToken:   "",
+									RtcChannel: inputChannelName,
+									RtcUID:     inputUID2Int,
+									RtcToken:   inputToken2,
 								},
 							},
 						},
 						VideoInputs: []v1.CloudTranscoderVideoInput{
 							{
 								Rtc: &v1.CloudTranscoderRtc{
-									RtcChannel: "",
-									RtcUID:     0,
-									RtcToken:   "",
+									RtcChannel: inputChannelName,
+									RtcUID:     inputUID1Int,
+									RtcToken:   inputToken1,
 								},
 								Region: &v1.CloudTranscoderRegion{
 									X:      0,
@@ -103,9 +175,9 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 							},
 							{
 								Rtc: &v1.CloudTranscoderRtc{
-									RtcChannel: "",
-									RtcUID:     0,
-									RtcToken:   "",
+									RtcChannel: inputChannelName,
+									RtcUID:     inputUID2Int,
+									RtcToken:   inputToken2,
 								},
 								Region: &v1.CloudTranscoderRegion{
 									X:      0,
@@ -124,9 +196,9 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 						Outputs: []v1.CloudTranscoderOutput{
 							{
 								Rtc: &v1.CloudTranscoderRtc{
-									RtcChannel: "test-efg",
-									RtcUID:     0,
-									RtcToken:   "",
+									RtcChannel: outputChannelName,
+									RtcUID:     outputUIDInt,
+									RtcToken:   outputToken,
 								},
 								AudioOption: &v1.CloudTranscoderOutputAudioOption{
 									ProfileType: "AUDIO_PROFILE_MUSIC_STANDARD",
@@ -199,32 +271,32 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 						AudioInputs: []v1.CloudTranscoderAudioInput{
 							{
 								Rtc: &v1.CloudTranscoderRtc{
-									RtcChannel: "test-abc",
-									RtcUID:     0,
-									RtcToken:   "",
+									RtcChannel: inputChannelName,
+									RtcUID:     inputUID1Int,
+									RtcToken:   inputToken1,
 								},
 							},
 							{
 								Rtc: &v1.CloudTranscoderRtc{
-									RtcChannel: "test-abc",
-									RtcUID:     18,
-									RtcToken:   "",
+									RtcChannel: inputChannelName,
+									RtcUID:     inputUID2Int,
+									RtcToken:   inputToken2,
 								},
 							},
 							{
 								Rtc: &v1.CloudTranscoderRtc{
-									RtcChannel: "",
-									RtcUID:     0,
-									RtcToken:   "",
+									RtcChannel: inputChannelName,
+									RtcUID:     updateInputUID3Int,
+									RtcToken:   updateInputToken3,
 								},
 							},
 						},
 						VideoInputs: []v1.CloudTranscoderVideoInput{
 							{
 								Rtc: &v1.CloudTranscoderRtc{
-									RtcChannel: "",
-									RtcUID:     0,
-									RtcToken:   "",
+									RtcChannel: inputChannelName,
+									RtcUID:     inputUID1Int,
+									RtcToken:   inputToken1,
 								},
 								Region: &v1.CloudTranscoderRegion{
 									X:      0,
@@ -236,15 +308,29 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 							},
 							{
 								Rtc: &v1.CloudTranscoderRtc{
-									RtcChannel: "",
-									RtcUID:     0,
-									RtcToken:   "",
+									RtcChannel: inputChannelName,
+									RtcUID:     inputUID2Int,
+									RtcToken:   inputToken2,
 								},
 								Region: &v1.CloudTranscoderRegion{
 									X:      0,
 									Y:      240,
 									Width:  480,
 									Height: 360,
+									ZOrder: 2,
+								},
+							},
+							{
+								Rtc: &v1.CloudTranscoderRtc{
+									RtcChannel: inputChannelName,
+									RtcUID:     updateInputUID3Int,
+									RtcToken:   updateInputToken3,
+								},
+								Region: &v1.CloudTranscoderRegion{
+									X:      240,
+									Y:      240,
+									Width:  240,
+									Height: 240,
 									ZOrder: 2,
 								},
 							},
@@ -257,9 +343,9 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 						Outputs: []v1.CloudTranscoderOutput{
 							{
 								Rtc: &v1.CloudTranscoderRtc{
-									RtcChannel: "test-efg",
-									RtcUID:     0,
-									RtcToken:   "",
+									RtcChannel: outputChannelName,
+									RtcUID:     outputUIDInt,
+									RtcToken:   outputToken,
 								},
 								AudioOption: &v1.CloudTranscoderOutputAudioOption{
 									ProfileType: "AUDIO_PROFILE_MUSIC_STANDARD",
@@ -309,6 +395,46 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 }
 
 func (s *Service) RunSingleChannelRtcPullFullChannelAudioMixerRtcPush(instanceId string) {
+	inputUID1 := os.Getenv("INPUT_UID_1")
+	if inputUID1 == "" {
+		panic("INPUT_UID_1 is required")
+	}
+
+	inputUID1Int, err := strconv.Atoi(inputUID1)
+	if err != nil {
+		panic(err)
+	}
+
+	inputToken1 := os.Getenv("INPUT_TOKEN_1")
+	if inputToken1 == "" {
+		panic("INPUT_TOKEN_1 is required")
+	}
+
+	inputChannelName := os.Getenv("INPUT_CHANNEL_NAME")
+	if inputChannelName == "" {
+		panic("INPUT_CHANNEL_NAME is required")
+	}
+
+	outputChannelName := os.Getenv("OUTPUT_CHANNEL_NAME")
+	if outputChannelName == "" {
+		panic("OUTPUT_CHANNEL_NAME is required")
+	}
+
+	outputUID := os.Getenv("OUTPUT_UID")
+	if outputUID == "" {
+		panic("OUTPUT_UID is required")
+	}
+
+	outputUIDInt, err := strconv.Atoi(outputUID)
+	if err != nil {
+		panic(err)
+	}
+
+	outputToken := os.Getenv("OUTPUT_TOKEN")
+	if outputToken == "" {
+		panic("OUTPUT_TOKEN is required")
+	}
+
 	ctx := context.Background()
 	c := core.NewClient(&core.Config{
 		AppID:      s.appId,
@@ -332,18 +458,18 @@ func (s *Service) RunSingleChannelRtcPullFullChannelAudioMixerRtcPush(instanceId
 						AudioInputs: []v1.CloudTranscoderAudioInput{
 							{
 								Rtc: &v1.CloudTranscoderRtc{
-									RtcChannel: "test-abc",
-									RtcUID:     0,
-									RtcToken:   "",
+									RtcChannel: inputChannelName,
+									RtcUID:     inputUID1Int,
+									RtcToken:   inputToken1,
 								},
 							},
 						},
 						Outputs: []v1.CloudTranscoderOutput{
 							{
 								Rtc: &v1.CloudTranscoderRtc{
-									RtcChannel: "test-efg",
-									RtcUID:     888,
-									RtcToken:   "",
+									RtcChannel: outputChannelName,
+									RtcUID:     outputUIDInt,
+									RtcToken:   outputToken,
 								},
 								AudioOption: &v1.CloudTranscoderOutputAudioOption{
 									ProfileType: "AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO",
@@ -408,18 +534,18 @@ func (s *Service) RunSingleChannelRtcPullFullChannelAudioMixerRtcPush(instanceId
 						AudioInputs: []v1.CloudTranscoderAudioInput{
 							{
 								Rtc: &v1.CloudTranscoderRtc{
-									RtcChannel: "test-abc",
-									RtcUID:     0,
-									RtcToken:   "",
+									RtcChannel: inputChannelName,
+									RtcUID:     inputUID1Int,
+									RtcToken:   inputToken1,
 								},
 							},
 						},
 						Outputs: []v1.CloudTranscoderOutput{
 							{
 								Rtc: &v1.CloudTranscoderRtc{
-									RtcChannel: "test-efg",
-									RtcUID:     888,
-									RtcToken:   "",
+									RtcChannel: outputChannelName,
+									RtcUID:     outputUIDInt,
+									RtcToken:   outputToken,
 								},
 								AudioOption: &v1.CloudTranscoderOutputAudioOption{
 									ProfileType: "AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO",

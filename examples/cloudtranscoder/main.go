@@ -37,16 +37,6 @@ func main() {
 		panic("APP_ID is required")
 	}
 
-	cname = os.Getenv("CNAME")
-	if cname == "" {
-		panic("CNAME is required")
-	}
-
-	uid = os.Getenv("UID")
-	if uid == "" {
-		panic("UID is required")
-	}
-
 	username = os.Getenv("BASIC_AUTH_USERNAME")
 	if username == "" {
 		panic("BASIC_AUTH_USERNAME is required")
@@ -57,14 +47,19 @@ func main() {
 		panic("BASIC_AUTH_PASSWORD is required")
 	}
 
-	token = os.Getenv("TOKEN")
-
 	scene := flag.String("scene", "single_channel_rtc_pull_mixer_rtc_push", "scene name")
+
+	instaceId := flag.String("instaceId", "", "instaceId for cloudTransCoder service")
+
+	s := NewService(region, appId)
+	s.SetCredential(username, password)
 
 	switch *scene {
 	case "single_channel_rtc_pull_mixer_rtc_push":
+		s.RunSingleChannelRtcPullMixerRtcPush(*instaceId)
 
 	case "single_channel_rtc_pull_fullchannel_audiomixer_rtc_push":
+		s.RunSingleChannelRtcPullFullChannelAudioMixerRtcPush(*instaceId)
 	default:
 		panic("invalid scene name")
 	}
