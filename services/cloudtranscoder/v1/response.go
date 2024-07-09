@@ -7,8 +7,7 @@ import (
 )
 
 type ErrResponse struct {
-	ErrorCode int    `json:"code"` // ErrorCode reference to https://doc.shengwang.cn/api-ref/cloud-recording/restful/response-code
-	Reason    string `json:"reason"`
+	Message string `json:"message"`
 }
 
 type Response struct {
@@ -23,3 +22,4 @@ func (b Response) IsSuccess() bool {
 		return false
 	}
 }
+

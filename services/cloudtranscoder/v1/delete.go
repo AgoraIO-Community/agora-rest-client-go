@@ -6,8 +6,6 @@ import (
 	"net/http"
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/core"
-
-	"github.com/tidwall/gjson"
 )
 
 type Delete struct {
@@ -68,6 +66,8 @@ func (d *Delete) Do(ctx context.Context, taskId string, tokenName string) (*Dele
 
 	var resp DeleteResp
 
+	resp.BaseResponse = responseData
+
 	if responseData.HttpStatusCode == http.StatusOK {
 		var successResponse DeleteSuccessResp
 		if err = responseData.UnmarshalToTarget(&successResponse); err != nil {
@@ -75,18 +75,12 @@ func (d *Delete) Do(ctx context.Context, taskId string, tokenName string) (*Dele
 		}
 		resp.SuccessResp = successResponse
 	} else {
-		codeResult := gjson.GetBytes(responseData.RawBody, "code")
-		if !codeResult.Exists() {
-			return nil, core.NewGatewayErr(responseData.HttpStatusCode, string(responseData.RawBody))
-		}
 		var errResponse ErrResponse
 		if err = responseData.UnmarshalToTarget(&errResponse); err != nil {
 			return nil, err
 		}
 		resp.ErrResponse = errResponse
 	}
-
-	resp.BaseResponse = responseData
 
 	return &resp, nil
 }

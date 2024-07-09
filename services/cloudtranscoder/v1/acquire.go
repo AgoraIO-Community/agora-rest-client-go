@@ -6,8 +6,6 @@ import (
 	"net/http"
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/core"
-
-	"github.com/tidwall/gjson"
 )
 
 type Acquire struct {
@@ -16,9 +14,9 @@ type Acquire struct {
 }
 
 // buildPath returns the request path.
-// /v1/projects/{appid}/rtsc/cloud-transcoder/buildTokens
+// /v1/projects/{appid}/rtsc/cloud-transcoder/builderTokens
 func (a *Acquire) buildPath() string {
-	return a.prefixPath + "/buildTokens"
+	return a.prefixPath + "/builderTokens"
 }
 
 type AcquireReqBody struct {
@@ -43,7 +41,7 @@ type AcquireResp struct {
 
 type AcquireSuccessResp struct {
 	// 生成 builderToken 时的 Unix 时间戳（秒）
-	CreateTs string `json:"createTs"`
+	CreateTs int64 `json:"createTs"`
 	// 请求时设置的 instanceId
 	InstanceId string `json:"instanceId"`
 	// 代表 builderToken 的值，在后续调用其他方法时需要传入该值
@@ -63,6 +61,8 @@ func (a *Acquire) Do(ctx context.Context, payload *AcquireReqBody) (*AcquireResp
 
 	var resp AcquireResp
 
+	resp.BaseResponse = responseData
+
 	if responseData.HttpStatusCode == http.StatusOK {
 		var successResponse AcquireSuccessResp
 		if err = responseData.UnmarshalToTarget(&successResponse); err != nil {
@@ -70,18 +70,12 @@ func (a *Acquire) Do(ctx context.Context, payload *AcquireReqBody) (*AcquireResp
 		}
 		resp.SuccessResp = successResponse
 	} else {
-		codeResult := gjson.GetBytes(responseData.RawBody, "code")
-		if !codeResult.Exists() {
-			return nil, core.NewGatewayErr(responseData.HttpStatusCode, string(responseData.RawBody))
-		}
 		var errResponse ErrResponse
 		if err = responseData.UnmarshalToTarget(&errResponse); err != nil {
 			return nil, err
 		}
 		resp.ErrResponse = errResponse
 	}
-
-	resp.BaseResponse = responseData
 
 	return &resp, nil
 }

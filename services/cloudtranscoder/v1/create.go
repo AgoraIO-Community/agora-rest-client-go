@@ -6,8 +6,6 @@ import (
 	"net/http"
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/core"
-
-	"github.com/tidwall/gjson"
 )
 
 type Create struct {
@@ -47,11 +45,11 @@ type CloudTranscoderConfigPayload struct {
 	//
 	// 默认值:300
 	IdleTimeout uint                        `json:"idleTimeout"`
-	AudioInputs []CloudTranscoderAudioInput `json:"audioInputs"`
-	VideoInputs []CloudTranscoderVideoInput `json:"videoInputs"`
-	Canvas      *CloudTranscoderCanvas      `json:"canvas"`
-	WaterMarks  []CloudTranscoderWaterMark  `json:"waterMarks"`
-	Outputs     []CloudTranscoderOutput     `json:"outputs"`
+	AudioInputs []CloudTranscoderAudioInput `json:"audioInputs,omitempty"`
+	VideoInputs []CloudTranscoderVideoInput `json:"videoInputs,omitempty"`
+	Canvas      *CloudTranscoderCanvas      `json:"canvas,omitempty"`
+	WaterMarks  []CloudTranscoderWaterMark  `json:"waterMarks,omitempty"`
+	Outputs     []CloudTranscoderOutput     `json:"outputs,omitempty"`
 }
 
 type CloudTranscoderAudioInput struct {
@@ -78,12 +76,12 @@ type CloudTranscoderRtc struct {
 }
 
 type CloudTranscoderVideoInput struct {
-	Rtc *CloudTranscoderRtc `json:"rtc"`
+	Rtc *CloudTranscoderRtc `json:"rtc,omitempty"`
 	// 用户离线时占位图片的 URL。
 	//
 	// 必须为合法 URL，且包含 jpg 或 png 后缀。
-	PlaceholderImageURL string                 `json:"placeholderImageUrl"`
-	Region              *CloudTranscoderRegion `json:"region"`
+	PlaceholderImageURL string                 `json:"placeholderImageUrl,omitempty"`
+	Region              *CloudTranscoderRegion `json:"region,omitempty"`
 }
 
 type CloudTranscoderRegion struct {
@@ -137,29 +135,29 @@ type CloudTranscoderCanvas struct {
 	// 必须为合法 URL，且包含 jpg 或 png 后缀。
 	//
 	// 注意：如果不传值，则没有画布背景图。
-	BackgroundImage string `json:"backgroundImage"`
+	BackgroundImage string `json:"backgroundImage,omitempty"`
 	// 画布背景图的填充模式：
 	//
 	//  - "FILL"：在保持长宽比的前提下，缩放画面，并居中剪裁。
 	//  - "FIT"：在保持长宽比的前提下，缩放画面，使其完整显示。
 	//
 	// 默认值："FILL"
-	FillMode string `json:"fillMode"`
+	FillMode string `json:"fillMode,omitempty"`
 }
 
 type CloudTranscoderWaterMark struct {
 	// 水印图片的 URL。
 	//
 	// 必须为合法 URL，且包含 jpg 或 png 后缀。
-	ImageURL string                 `json:"imageUrl"`
-	Region   *CloudTranscoderRegion `json:"region"`
+	ImageURL string                 `json:"imageUrl,omitempty"`
+	Region   *CloudTranscoderRegion `json:"region,omitempty"`
 	// 画布背景图的填充模式：
 	//
 	//  - "FILL"：在保持长宽比的前提下，缩放画面，并居中剪裁。
 	//  - "FIT"：在保持长宽比的前提下，缩放画面，使其完整显示。
 	//
 	// 默认值："FILL"
-	FillMode string `json:"fillMode"`
+	FillMode string `json:"fillMode,omitempty"`
 }
 
 type CloudTranscoderOutputAudioOption struct {
@@ -172,7 +170,7 @@ type CloudTranscoderOutputAudioOption struct {
 	// 	 - "AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO"：48 KHz 采样率，音乐编码，双声道，编码码率最大值为 128 Kbps。
 	//
 	// 默认值："AUDIO_PROFILE_DEFAULT"
-	ProfileType string `json:"profileType"`
+	ProfileType string `json:"profileType,omitempty"`
 }
 
 type CloudTranscoderOutputVideoOption struct {
@@ -181,17 +179,17 @@ type CloudTranscoderOutputVideoOption struct {
 	// 范围：[1,30]
 	//
 	// 默认值：15
-	FPS uint `json:"fps"`
+	FPS uint `json:"fps,omitempty"`
 	// 转码输出视频的 codec。取值包括：
 	//  - "H264"：标准 H.264 编码。
 	//  - "VP8"：标准 VP8 编码。
-	Codec string `json:"codec"`
+	Codec string `json:"codec,omitempty"`
 	// 	转码输出视频的码率。
 	//
 	// 范围：[1,10000]
 	//
 	// 注意：如果你不传值，声网会根据网络情况和其他视频属性自动设置视频码率。
-	Bitrate uint `json:"bitrate"`
+	Bitrate uint `json:"bitrate,omitempty"`
 	// 画面的宽度 (px)。
 	//
 	// 范围：[120,3840]
@@ -208,13 +206,13 @@ type CloudTranscoderOutputVideoOption struct {
 	//
 	// 注意：低码高清功能可以以较低的码率达到人眼感受的较高质量视频的效果。
 	// 该功能会增加费用，开通前请联系声网销售咨询费用。
-	LowBitrateHighQuality bool `json:"lowBitrateHighQuality"`
+	LowBitrateHighQuality bool `json:"lowBitrateHighQuality,omitempty"`
 }
 
 type CloudTranscoderOutput struct {
-	Rtc         *CloudTranscoderRtc               `json:"rtc"`
-	AudioOption *CloudTranscoderOutputAudioOption `json:"audioOption"`
-	VideoOption *CloudTranscoderOutputVideoOption `json:"videoOption"`
+	Rtc         *CloudTranscoderRtc               `json:"rtc,omitempty"`
+	AudioOption *CloudTranscoderOutputAudioOption `json:"audioOption,omitempty"`
+	VideoOption *CloudTranscoderOutputVideoOption `json:"videoOption,omitempty"`
 }
 
 type CreateSuccessResp struct {
@@ -271,10 +269,6 @@ func (c *Create) Do(ctx context.Context, tokenName string, payload *CreateReqBod
 		}
 		resp.SuccessResp = successResponse
 	} else {
-		codeResult := gjson.GetBytes(responseData.RawBody, "code")
-		if !codeResult.Exists() {
-			return nil, core.NewGatewayErr(responseData.HttpStatusCode, string(responseData.RawBody))
-		}
 		var errResponse ErrResponse
 		if err = responseData.UnmarshalToTarget(&errResponse); err != nil {
 			return nil, err
