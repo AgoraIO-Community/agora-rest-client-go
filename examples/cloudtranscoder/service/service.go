@@ -1,4 +1,4 @@
-package main
+package service
 
 import (
 	"context"
@@ -18,7 +18,7 @@ type Service struct {
 	credential core.Credential
 }
 
-func NewService(region core.RegionArea, appId string) *Service {
+func New(region core.RegionArea, appId string) *Service {
 	return &Service{
 		region:     region,
 		appId:      appId,
@@ -117,9 +117,9 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 		panic(err)
 	}
 
-	updateInputToken3 := os.Getenv("UPDATE_INPUT_TOKEN")
+	updateInputToken3 := os.Getenv("UPDATE_INPUT_TOKEN_3")
 	if updateInputToken3 == "" {
-		panic("UPDATE_INPUT_TOKEN is required")
+		panic("UPDATE_INPUT_TOKEN_3 is required")
 	}
 
 	ctx := context.Background()
@@ -261,7 +261,7 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 		time.Sleep(time.Second * 10)
 	}
 
-	updateResp, err := v1Impl.Update().Do(ctx, taskId, taskId, 1, &v1.UpdateReqBody{
+	updateResp, err := v1Impl.Update().Do(ctx, taskId, tokenName, 1, &v1.UpdateReqBody{
 		Services: v1.CreateReqServices{
 			CloudTranscoder: &v1.CloudTranscoderPayload{
 				ServiceType: "cloudTranscoderV2",
@@ -472,7 +472,7 @@ func (s *Service) RunSingleChannelRtcPullFullChannelAudioMixerRtcPush(instanceId
 									RtcToken:   outputToken,
 								},
 								AudioOption: &v1.CloudTranscoderOutputAudioOption{
-									ProfileType: "AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO",
+									ProfileType: "AUDIO_PROFILE_MUSIC_STANDARD",
 								},
 							},
 						},
@@ -524,7 +524,7 @@ func (s *Service) RunSingleChannelRtcPullFullChannelAudioMixerRtcPush(instanceId
 		time.Sleep(time.Second * 10)
 	}
 
-	updateResp, err := v1Impl.Update().Do(ctx, taskId, taskId, 1, &v1.UpdateReqBody{
+	updateResp, err := v1Impl.Update().Do(ctx, taskId, tokenName, 1, &v1.UpdateReqBody{
 		Services: v1.CreateReqServices{
 			CloudTranscoder: &v1.CloudTranscoderPayload{
 				ServiceType: "cloudTranscoderV2",

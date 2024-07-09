@@ -22,6 +22,7 @@
 
 ## 支持的服务
 * [云端录制 Cloud Recording ](./services/cloudrecording/README.md)
+* [云端转码 Cloud Transcoder](./services/cloudtranscoder/README.md)
 
 ## 环境准备
 * [Go 1.18 或以上版本](https://go.dev/)

@@ -5,9 +5,11 @@ import (
 	"log"
 	"os"
 
+	"github.com/google/uuid"
 	"github.com/joho/godotenv"
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/core"
+	"github.com/AgoraIO-Community/agora-rest-client-go/examples/cloudtranscoder/service"
 )
 
 var (
@@ -47,11 +49,11 @@ func main() {
 		panic("BASIC_AUTH_PASSWORD is required")
 	}
 
-	scene := flag.String("scene", "single_channel_rtc_pull_mixer_rtc_push", "scene name")
+	scene := flag.String("scene", "", "scene name")
+	instaceId := flag.String("instaceId", uuid.NewString(), "instaceId for cloudTransCoder service")
+	flag.Parse()
 
-	instaceId := flag.String("instaceId", "", "instaceId for cloudTransCoder service")
-
-	s := NewService(region, appId)
+	s := service.New(region, appId)
 	s.SetCredential(username, password)
 
 	switch *scene {
@@ -60,6 +62,7 @@ func main() {
 
 	case "single_channel_rtc_pull_fullchannel_audiomixer_rtc_push":
 		s.RunSingleChannelRtcPullFullChannelAudioMixerRtcPush(*instaceId)
+
 	default:
 		panic("invalid scene name")
 	}
