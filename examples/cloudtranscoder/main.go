@@ -14,11 +14,8 @@ import (
 
 var (
 	appId    string
-	cname    string
-	uid      string
 	username string
 	password string
-	token    string
 	// 选择你的区域，目前支持的区域有：
 	// USRegionArea: 北美
 	// EURegionArea: 欧洲
