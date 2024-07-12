@@ -47,7 +47,7 @@ func main() {
 	}
 
 	scene := flag.String("scene", "", "scene name")
-	instaceId := flag.String("instaceId", uuid.NewString(), "instaceId for cloudTransCoder service")
+	instanceId := flag.String("instanceId", uuid.NewString(), "instanceId for cloudTransCoder service")
 	flag.Parse()
 
 	s := service.New(region, appId)
@@ -55,10 +55,10 @@ func main() {
 
 	switch *scene {
 	case "single_channel_rtc_pull_mixer_rtc_push":
-		s.RunSingleChannelRtcPullMixerRtcPush(*instaceId)
+		s.RunSingleChannelRtcPullMixerRtcPush(*instanceId)
 
 	case "single_channel_rtc_pull_fullchannel_audiomixer_rtc_push":
-		s.RunSingleChannelRtcPullFullChannelAudioMixerRtcPush(*instaceId)
+		s.RunSingleChannelRtcPullFullChannelAudioMixerRtcPush(*instanceId)
 
 	default:
 		panic("invalid scene name")
