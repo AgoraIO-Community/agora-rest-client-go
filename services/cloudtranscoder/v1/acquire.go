@@ -35,7 +35,8 @@ type AcquireReqBody struct {
 	//   - "-", "_"
 	//
 	// 注意：一个 instanceId 可以生成多个 builderToken，但在一个任务中只能使用一个 builderToken 发起请求。
-	InstanceId string `json:"instanceId"`
+	InstanceId string             `json:"instanceId,omitempty"`
+	Services   *CreateReqServices `json:"services,omitempty"`
 }
 
 type AcquireResp struct {
