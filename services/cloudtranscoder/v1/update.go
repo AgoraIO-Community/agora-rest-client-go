@@ -20,23 +20,23 @@ type Update struct {
 
 // buildPath returns the request path.
 // /v1/projects/{appid}/rtsc/cloud-transcoder/tasks/{taskId}?token_name={tokenName}&sequence_id={sequenceId}&updateMask=services.cloudTranscoder.config
-func (u *Update) buildPath(taskId string, tokenName string, sequenceId uint) string {
+func (u *Update) buildPath(taskId string, tokenName string, sequenceId uint, updateMask string) string {
 	return u.prefixPath + "/tasks/" + taskId + "?" +
 		"builderToken=" + tokenName +
 		"&sequenceId=" + strconv.Itoa(int(sequenceId)) +
-		"&updateMask=services.cloudTranscoder.config"
+		"&updateMask=" + updateMask
 }
 
 type UpdateReqBody struct {
-	Services CreateReqServices `json:"services"`
+	Services *CreateReqServices `json:"services"`
 }
 
 type UpdateResp struct {
 	Response
 }
 
-func (u *Update) Do(ctx context.Context, taskId string, tokenName string, sequenceId uint, payload *UpdateReqBody) (*UpdateResp, error) {
-	path := u.buildPath(taskId, tokenName, sequenceId)
+func (u *Update) Do(ctx context.Context, taskId string, tokenName string, sequenceId uint, updateMask string, payload *UpdateReqBody) (*UpdateResp, error) {
+	path := u.buildPath(taskId, tokenName, sequenceId, updateMask)
 
 	responseData, err := u.doRESTWithRetry(ctx, path, http.MethodPatch, payload)
 	if err != nil {

@@ -136,7 +136,7 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 	log.Printf("tokenName:%s\n", tokenName)
 
 	createResp, err := v1Impl.Create().Do(context.Background(), tokenName, &v1.CreateReqBody{
-		Services: v1.CreateReqServices{
+		Services: &v1.CreateReqServices{
 			CloudTranscoder: &v1.CloudTranscoderPayload{
 				ServiceType: "cloudTranscoderV2",
 				Config: &v1.CloudTranscoderConfig{
@@ -204,12 +204,11 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 									ProfileType: "AUDIO_PROFILE_MUSIC_STANDARD",
 								},
 								VideoOption: &v1.CloudTranscoderOutputVideoOption{
-									FPS:                   15,
-									Codec:                 "H264",
-									Bitrate:               1500,
-									Width:                 1280,
-									Height:                720,
-									LowBitrateHighQuality: false,
+									FPS:     15,
+									Codec:   "H264",
+									Bitrate: 1500,
+									Width:   1280,
+									Height:  720,
 								},
 							},
 						},
@@ -261,8 +260,8 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 		time.Sleep(time.Second * 10)
 	}
 
-	updateResp, err := v1Impl.Update().Do(ctx, taskId, tokenName, 1, &v1.UpdateReqBody{
-		Services: v1.CreateReqServices{
+	updateResp, err := v1Impl.Update().Do(ctx, taskId, tokenName, 1, "services.cloudTranscoder.config", &v1.UpdateReqBody{
+		Services: &v1.CreateReqServices{
 			CloudTranscoder: &v1.CloudTranscoderPayload{
 				ServiceType: "cloudTranscoderV2",
 				Config: &v1.CloudTranscoderConfig{
@@ -351,12 +350,11 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 									ProfileType: "AUDIO_PROFILE_MUSIC_STANDARD",
 								},
 								VideoOption: &v1.CloudTranscoderOutputVideoOption{
-									FPS:                   15,
-									Codec:                 "H264",
-									Bitrate:               1500,
-									Width:                 1280,
-									Height:                720,
-									LowBitrateHighQuality: false,
+									FPS:     15,
+									Codec:   "H264",
+									Bitrate: 1500,
+									Width:   1280,
+									Height:  720,
 								},
 							},
 						},
@@ -449,7 +447,7 @@ func (s *Service) RunSingleChannelRtcPullFullChannelAudioMixerRtcPush(instanceId
 	log.Printf("tokenName:%s\n", tokenName)
 
 	createResp, err := v1Impl.Create().Do(ctx, tokenName, &v1.CreateReqBody{
-		Services: v1.CreateReqServices{
+		Services: &v1.CreateReqServices{
 			CloudTranscoder: &v1.CloudTranscoderPayload{
 				ServiceType: "cloudTranscoderV2",
 				Config: &v1.CloudTranscoderConfig{
@@ -524,8 +522,8 @@ func (s *Service) RunSingleChannelRtcPullFullChannelAudioMixerRtcPush(instanceId
 		time.Sleep(time.Second * 10)
 	}
 
-	updateResp, err := v1Impl.Update().Do(ctx, taskId, tokenName, 1, &v1.UpdateReqBody{
-		Services: v1.CreateReqServices{
+	updateResp, err := v1Impl.Update().Do(ctx, taskId, tokenName, 1, "services.cloudTranscoder.config", &v1.UpdateReqBody{
+		Services: &v1.CreateReqServices{
 			CloudTranscoder: &v1.CloudTranscoderPayload{
 				ServiceType: "cloudTranscoderV2",
 				Config: &v1.CloudTranscoderConfig{

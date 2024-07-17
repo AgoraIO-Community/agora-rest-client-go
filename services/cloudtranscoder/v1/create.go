@@ -3,6 +3,7 @@ package v1
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -23,21 +24,21 @@ func (c *Create) buildPath(tokenName string) string {
 }
 
 type CreateReqBody struct {
-	Services CreateReqServices `json:"services"`
+	Services *CreateReqServices `json:"services,omitempty"`
 }
 
 type CreateReqServices struct {
-	CloudTranscoder *CloudTranscoderPayload `json:"cloudTranscoder"`
+	CloudTranscoder *CloudTranscoderPayload `json:"cloudTranscoder,omitempty"`
 }
 
 type CloudTranscoderPayload struct {
 	// 服务类型，此处为 "cloudTranscoderV2"
-	ServiceType string                 `json:"serviceType"`
-	Config      *CloudTranscoderConfig `json:"config"`
+	ServiceType string                 `json:"serviceType,omitempty"`
+	Config      *CloudTranscoderConfig `json:"config,omitempty"`
 }
 
 type CloudTranscoderConfig struct {
-	Transcoder *CloudTranscoderConfigPayload `json:"transcoder"`
+	Transcoder *CloudTranscoderConfigPayload `json:"transcoder,omitempty"`
 }
 
 type CloudTranscoderConfigPayload struct {
@@ -56,17 +57,19 @@ type CloudTranscoderConfigPayload struct {
 }
 
 type CloudTranscoderAudioInput struct {
-	Rtc *CloudTranscoderRtc `json:"rtc"`
+	Rtc *CloudTranscoderRtc `json:"rtc,omitempty"`
 }
 
 type CloudTranscoderRtc struct {
 	// 音视频输入源（或输出）所属的 RTC 频道名
 	//
 	// 目前仅支持订阅单个频道的音视频源，音频源和视频源所属频道必须相同。
-	RtcChannel string `json:"rtcChannel"`
+	RtcChannel string `json:"rtcChannel,omitempty"`
 	// 音视频输入源（或输出）所对应的 UID
 	//
 	// RTC 频道内不允许存在相同的 UID，因此，请确保该值与频道内其他用户 UID 不同。
+	//
+	// 注意：rtcUid 默认值为0，AudioInputs表示业务侧将会使用全频道混音
 	RtcUID int `json:"rtcUid"`
 	// Cloud transcoder 在进入待转码视频源（或转码输出音视频流）所属 RTC 频道时所需设置的 Token。
 	//
@@ -75,7 +78,7 @@ type CloudTranscoderRtc struct {
 	// 注意：
 	//   - 当前配置输入流的时，Cloud transcoder 在待转码音视频源所属 RTC 频道内的 UID 为声网随机分配。因此，生成 Token 时，你使用的 uid 必须为 0。
 	//   - 当前配置输出流的时，Cloud transcoder 在转码输出音视频流所属 RTC 频道内的 UID 为你指定的 outputs.rtc.rtcUid，因此，生成 Token 时，你使用的 uid 必须和 outputs.rtc.rtcUid 一致
-	RtcToken string `json:"rtcToken"`
+	RtcToken string `json:"rtcToken,omitempty"`
 }
 
 type CloudTranscoderVideoInput struct {
@@ -93,38 +96,38 @@ type CloudTranscoderRegion struct {
 	// 以画布左上角为原点，x 坐标为画面左上角相对于原点的横向位移。
 	//
 	// 范围：[0,120]
-	X float64 `json:"x"`
+	X uint `json:"x"`
 	// 画面在画布上的 y 坐标 (px)。
 	//
 	// 以画布左上角为原点，y 坐标为画面左上角相对于原点的纵向位移。
 	//
 	// 范围：[0,3840]
-	Y float64 `json:"y"`
+	Y uint `json:"y"`
 	// 画面的宽度 (px)。
 	//
 	// 范围：[120,3840]
-	Width uint `json:"width"`
+	Width uint `json:"width,omitempty"`
 	// 画面的高度 (px)。
 	//
 	// 范围：[120,3840]
-	Height uint `json:"height"`
+	Height uint `json:"height,omitempty"`
 	// 画面的图层编号。
 	//  - 0 代表最下层的图层。
 	//  - 100 代表最上层的图层。
 	//
 	// 范围：[0,100]
-	ZOrder int `json:"zOrder"`
+	ZOrder uint `json:"zOrder"`
 }
 
 type CloudTranscoderCanvas struct {
 	// 画面的宽度 (px)。
 	//
 	// 范围：[120,3840]
-	Width uint `json:"width"`
+	Width uint `json:"width,omitempty"`
 	// 画面的高度 (px)。
 	//
 	// 范围：[120,3840]
-	Height uint `json:"height"`
+	Height uint `json:"height,omitempty"`
 	// 画布的背景色。
 	//
 	// RGB 颜色值，以十进制数表示。
@@ -196,20 +199,11 @@ type CloudTranscoderOutputVideoOption struct {
 	// 画面的宽度 (px)。
 	//
 	// 范围：[120,3840]
-	Width uint `json:"width"`
+	Width uint `json:"width,omitempty"`
 	// 画面的高度 (px)。
 	//
 	// 范围：[120,3840]
-	Height uint `json:"height"`
-	// 是否对转码输出的音视频流开启低码高清功能：
-	//  - true：开启。
-	//  - false：不开启。
-	//
-	// 默认值：false
-	//
-	// 注意：低码高清功能可以以较低的码率达到人眼感受的较高质量视频的效果。
-	// 该功能会增加费用，开通前请联系声网销售咨询费用。
-	LowBitrateHighQuality bool `json:"lowBitrateHighQuality,omitempty"`
+	Height uint `json:"height,omitempty"`
 }
 
 type CloudTranscoderOutput struct {
