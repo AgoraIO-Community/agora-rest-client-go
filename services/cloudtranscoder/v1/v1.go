@@ -18,6 +18,8 @@ func NewCollection(prefixPath string, client core.Client) *BaseCollection {
 
 func (b *BaseCollection) Acquire() *Acquire {
 	return &Acquire{
+		module:     "cloudTranscoder:acquire",
+		logger:     b.client.GetLogger(),
 		client:     b.client,
 		prefixPath: b.prefixPath,
 	}
@@ -25,6 +27,8 @@ func (b *BaseCollection) Acquire() *Acquire {
 
 func (b *BaseCollection) Create() *Create {
 	return &Create{
+		module:     "cloudTranscoder:create",
+		logger:     b.client.GetLogger(),
 		client:     b.client,
 		prefixPath: b.prefixPath,
 	}
@@ -32,6 +36,8 @@ func (b *BaseCollection) Create() *Create {
 
 func (b *BaseCollection) Query() *Query {
 	return &Query{
+		module:     "cloudTranscoder:query",
+		logger:     b.client.GetLogger(),
 		client:     b.client,
 		prefixPath: b.prefixPath,
 	}
@@ -39,6 +45,8 @@ func (b *BaseCollection) Query() *Query {
 
 func (b *BaseCollection) Delete() *Delete {
 	return &Delete{
+		module:     "cloudTranscoder:delete",
+		logger:     b.client.GetLogger(),
 		client:     b.client,
 		prefixPath: b.prefixPath,
 	}
@@ -46,6 +54,8 @@ func (b *BaseCollection) Delete() *Delete {
 
 func (b *BaseCollection) Update() *Update {
 	return &Update{
+		module:     "cloudTranscoder:update",
+		logger:     b.client.GetLogger(),
 		client:     b.client,
 		prefixPath: b.prefixPath,
 	}

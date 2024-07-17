@@ -4,11 +4,14 @@ import (
 	"context"
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/core"
 )
 
 type Create struct {
+	module     string
+	logger     core.Logger
 	client     core.Client
 	prefixPath string
 }
@@ -252,7 +255,7 @@ type CreateResp struct {
 
 func (c *Create) Do(ctx context.Context, tokenName string, payload *CreateReqBody) (*CreateResp, error) {
 	path := c.buildPath(tokenName)
-	responseData, err := c.client.DoREST(ctx, path, http.MethodPost, payload)
+	responseData, err := c.doRESTWithRetry(ctx, path, http.MethodPost, payload)
 	if err != nil {
 		var internalErr *core.InternalErr
 		if !errors.As(err, &internalErr) {
@@ -279,4 +282,52 @@ func (c *Create) Do(ctx context.Context, tokenName string, payload *CreateReqBod
 	resp.BaseResponse = responseData
 
 	return &resp, nil
+}
+
+const createRetryCount = 3
+
+func (c *Create) doRESTWithRetry(ctx context.Context, path string, method string, requestBody interface{}) (*core.BaseResponse, error) {
+	var (
+		resp  *core.BaseResponse
+		err   error
+		retry int
+	)
+
+	err = core.RetryDo(func(retryCount int) error {
+		var doErr error
+
+		resp, doErr = c.client.DoREST(ctx, path, method, requestBody)
+		if doErr != nil {
+			return core.NewRetryErr(false, doErr)
+		}
+
+		statusCode := resp.HttpStatusCode
+		switch {
+		case statusCode == 200 || statusCode == 201:
+			return nil
+		case statusCode >= 400 && statusCode < 499:
+			c.logger.Debugf(ctx, c.module, "http status code is %d, no retry,http response:%s", statusCode, resp.RawBody)
+			return core.NewRetryErr(
+				false,
+				core.NewInternalErr(fmt.Sprintf("http status code is %d, no retry,http response:%s", statusCode, resp.RawBody)),
+			)
+		default:
+			c.logger.Debugf(ctx, c.module, "http status code is %d, retry,http response:%s", statusCode, resp.RawBody)
+			return fmt.Errorf("http status code is %d, retry", resp.RawBody)
+		}
+	}, func() bool {
+		select {
+		case <-ctx.Done():
+			return true
+		default:
+		}
+		return retry >= createRetryCount
+	}, func(i int) time.Duration {
+		return time.Second * time.Duration(i+1)
+	}, func(err error) {
+		c.logger.Debugf(ctx, c.module, "http request err:%s", err)
+		retry++
+	})
+
+	return resp, err
 }
