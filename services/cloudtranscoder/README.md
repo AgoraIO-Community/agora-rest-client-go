@@ -79,7 +79,7 @@
 
 ```go
  createResp, err := v1Impl.Create().Do(ctx, tokenName, &v1.CreateReqBody{
-  Services: v1.CreateReqServices{
+  Services: &v1.CreateReqServices{
    CloudTranscoder: &v1.CloudTranscoderPayload{
     ServiceType: "cloudTranscoderV2",
     Config: &v1.CloudTranscoderConfig{
@@ -165,7 +165,7 @@
 
 ```go
  updateResp, err := v1Impl.Update().Do(ctx, taskId, tokenName, 1, &v1.UpdateReqBody{
-  Services: v1.CreateReqServices{
+  Services: &v1.CreateReqServices{
    CloudTranscoder: &v1.CloudTranscoderPayload{
     ServiceType: "cloudTranscoderV2",
     Config: &v1.CloudTranscoderConfig{
