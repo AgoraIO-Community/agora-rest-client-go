@@ -17,7 +17,8 @@ const GlobalDomainPrefix = "api"
 type RegionArea int
 
 const (
-	USRegionArea = iota
+	UnkonwnRegionArea RegionArea = iota
+	USRegionArea
 	EURegionArea
 	APRegionArea
 	CNRegionArea
@@ -106,6 +107,9 @@ type DomainPool struct {
 }
 
 func NewDomainPool(domainArea RegionArea, logger Logger) *DomainPool {
+	if _, ok := RegionDomain[domainArea]; !ok {
+		panic("invalid domain area")
+	}
 	d := &DomainPool{
 		domainArea:     domainArea,
 		domainSuffixes: RegionDomain[domainArea].MajorDomainSuffixes,

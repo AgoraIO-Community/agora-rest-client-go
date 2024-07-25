@@ -65,14 +65,17 @@ func NewClient(config *Config) *ClientImpl {
 }
 
 func (c *ClientImpl) marshalBody(body interface{}) (io.Reader, error) {
-	if body == nil {
+	if IsNil(body) {
 		return nil, nil
 	}
+
 	jsonBody, err := json.Marshal(body)
 	if err != nil {
 		return nil, err
 	}
+
 	c.logger.Debugf(context.Background(), c.module, "http request body:%s", jsonBody)
+
 	return bytes.NewReader(jsonBody), nil
 }
 
@@ -141,6 +144,7 @@ func (c *ClientImpl) DoREST(ctx context.Context, path string,
 	c.logger.Debugf(ctx, c.module, "http response:%s", body)
 
 	return &BaseResponse{
+		RawResponse:    resp,
 		RawBody:        body,
 		HttpStatusCode: resp.StatusCode,
 	}, nil

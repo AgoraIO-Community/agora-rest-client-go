@@ -710,7 +710,7 @@ func (s *Start) Do(ctx context.Context, resourceID string, mode string, payload 
 	return &resp, nil
 }
 
-const retryCount = 3
+const startRetryCount = 3
 
 func (s *Start) doRESTWithRetry(ctx context.Context, path string, method string, requestBody interface{}) (*core.BaseResponse, error) {
 	var (
@@ -731,7 +731,7 @@ func (s *Start) doRESTWithRetry(ctx context.Context, path string, method string,
 		switch {
 		case statusCode == 200 || statusCode == 201:
 			return nil
-		case statusCode >= 400 && statusCode < 410:
+		case statusCode >= 400 && statusCode < 499:
 			s.logger.Debugf(ctx, s.module, "http status code is %d, no retry,http response:%s", statusCode, resp.RawBody)
 			return core.NewRetryErr(
 				false,
@@ -747,7 +747,7 @@ func (s *Start) doRESTWithRetry(ctx context.Context, path string, method string,
 			return true
 		default:
 		}
-		return retry >= retryCount
+		return retry >= startRetryCount
 	}, func(i int) time.Duration {
 		return time.Second * time.Duration(i+1)
 	}, func(err error) {
