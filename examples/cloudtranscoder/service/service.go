@@ -30,9 +30,10 @@ func (s *Service) SetCredential(username string, password string) {
 	s.credential = core.NewBasicAuthCredential(username, password)
 }
 
-func (s *Service) acquireResource(ctx context.Context, v1Impl *v1.BaseCollection, instanceId string) string {
+func (s *Service) acquireResource(ctx context.Context, v1Impl *v1.BaseCollection, instanceId string, createBody *v1.CreateReqServices) string {
 	acquireResp, err := v1Impl.Acquire().Do(ctx, &v1.AcquireReqBody{
 		InstanceId: instanceId,
+		Services:   createBody,
 	})
 	if err != nil {
 		log.Fatalln(err)
@@ -132,10 +133,7 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 
 	v1Impl := cloudtranscoder.NewAPI(c).V1()
 
-	tokenName := s.acquireResource(ctx, v1Impl, instanceId)
-	log.Printf("tokenName:%s\n", tokenName)
-
-	createResp, err := v1Impl.Create().Do(context.Background(), tokenName, &v1.CreateReqBody{
+	createBody := &v1.CreateReqBody{
 		Services: &v1.CreateReqServices{
 			CloudTranscoder: &v1.CloudTranscoderPayload{
 				ServiceType: "cloudTranscoderV2",
@@ -216,7 +214,12 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 				},
 			},
 		},
-	})
+	}
+
+	tokenName := s.acquireResource(ctx, v1Impl, instanceId, createBody.Services)
+	log.Printf("tokenName:%s\n", tokenName)
+
+	createResp, err := v1Impl.Create().Do(context.Background(), tokenName, createBody)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -443,10 +446,7 @@ func (s *Service) RunSingleChannelRtcPullFullChannelAudioMixerRtcPush(instanceId
 
 	v1Impl := cloudtranscoder.NewAPI(c).V1()
 
-	tokenName := s.acquireResource(ctx, v1Impl, instanceId)
-	log.Printf("tokenName:%s\n", tokenName)
-
-	createResp, err := v1Impl.Create().Do(ctx, tokenName, &v1.CreateReqBody{
+	createBody := &v1.CreateReqBody{
 		Services: &v1.CreateReqServices{
 			CloudTranscoder: &v1.CloudTranscoderPayload{
 				ServiceType: "cloudTranscoderV2",
@@ -478,7 +478,12 @@ func (s *Service) RunSingleChannelRtcPullFullChannelAudioMixerRtcPush(instanceId
 				},
 			},
 		},
-	})
+	}
+
+	tokenName := s.acquireResource(ctx, v1Impl, instanceId, createBody.Services)
+	log.Printf("tokenName:%s\n", tokenName)
+
+	createResp, err := v1Impl.Create().Do(ctx, tokenName, createBody)
 	if err != nil {
 		log.Fatalln(err)
 	}
