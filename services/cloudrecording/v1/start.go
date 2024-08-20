@@ -195,7 +195,7 @@ type RecordingConfig struct {
 	// UnsubscribeAudioUIDs 指定不订阅哪几个 UID 的音频流。
 	//
 	// 云端录制会订阅频道内除指定 UID 外所有 UID 的音频流。数组长度不得超过 32，不推荐使用空数组。该字段和 SubscribeAudioUIDs 只能设一个。
-	UnsubscribeAudioUIDs []string `json:"unsubscribeAudioUids,omitempty"`
+	UnsubscribeAudioUIDs []string `json:"unSubscribeAudioUids,omitempty"`
 
 	// SubscribeVideoUIDs 指定订阅哪几个 UID 的视频流。
 	//
@@ -213,7 +213,7 @@ type RecordingConfig struct {
 	// UnsubscribeVideoUIDs 指定不订阅哪几个 UID 的视频流。
 	//
 	// 云端录制会订阅频道内除指定 UID 外所有 UID 的视频流。数组长度不得超过 32，不推荐使用空数组。该字段和 subscribeVideoUids 只能设一个。
-	UnsubscribeVideoUIDs []string `json:"unsubscribeVideoUids,omitempty"`
+	UnsubscribeVideoUIDs []string `json:"unSubscribeVideoUids,omitempty"`
 
 	// SubscribeUidGroup 预估的订阅人数峰值。
 	//
