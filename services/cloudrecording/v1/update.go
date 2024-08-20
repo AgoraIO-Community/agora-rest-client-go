@@ -61,7 +61,7 @@ type UpdateAudioUIDList struct {
 	//
 	// 云端录制会订阅频道内除指定 UID 外所有 UID 的音频流。数组长度不得超过 32，不推荐使用空数组。该字段和 subscribeAudioUids 只能设一个。
 	//
-	UnsubscribeAudioUIDs []string `json:"unsubscribeAudioUids,omitempty"`
+	UnsubscribeAudioUIDs []string `json:"unSubscribeAudioUids,omitempty"`
 }
 
 // UpdateVideoUIDList 视频订阅名单
@@ -82,7 +82,7 @@ type UpdateVideoUIDList struct {
 	// UnsubscribeVideoUIDs 指定取消订阅哪几个 UID 的视频流
 	//
 	// 云端录制会订阅频道内除指定 UID 外所有 UID 的视频流。数组长度不得超过 32，不推荐使用空数组。该字段和 subscribeVideoUids 只能设一个。
-	UnsubscribeVideoUIDs []string `json:"unsubscribeVideoUids,omitempty"`
+	UnsubscribeVideoUIDs []string `json:"unSubscribeVideoUids,omitempty"`
 }
 
 // UpdateWebRecordingConfig 用于更新页面录制配置项。
