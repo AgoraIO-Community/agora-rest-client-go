@@ -36,7 +36,7 @@
 - password: 声网的Basic Auth认证的密码
 - cname: 频道名
 - uid: 用户 UID
-- 更多 clientRequest中的参数见[Acquire](https://doc.shengwang.cn/api-ref/cloud-recording/restful/cloud-recording/operations/post-v1-apps-appid-cloud_recording-acquire)接口文档
+- 更多 clientRequest中的参数见[Acquire](https://doc.shengwang.cn/doc/cloud-recording/restful/cloud-recording/operations/post-v1-apps-appid-cloud_recording-acquire)接口文档
 
 通过调用`Acquire().Do`方法来实现获取云端录制资源
 ```go
@@ -75,7 +75,7 @@
 - token：用户 UID 对应的token
 - resourceId: 云端录制资源ID
 - mode: 云端录制模式
-- 更多 clientRequest中的参数见[Start](https://doc.shengwang.cn/api-ref/cloud-recording/restful/cloud-recording/operations/post-v1-apps-appid-cloud_recording-resourceid-resourceid-mode-mode-start)接口文档
+- 更多 clientRequest中的参数见[Start](https://doc.shengwang.cn/doc/cloud-recording/restful/cloud-recording/operations/post-v1-apps-appid-cloud_recording-resourceid-resourceid-mode-mode-start)接口文档
 
 通过调用`Start().Do`方法来实现开始云端录制
 ```go
@@ -143,7 +143,7 @@
 - resourceId: 云端录制资源ID
 - sid: 会话ID
 - mode: 云端录制模式
-- 更多 clientRequest中的参数见[Stop](https://doc.shengwang.cn/api-ref/cloud-recording/restful/cloud-recording/operations/post-v1-apps-appid-cloud_recording-resourceid-resourceid-sid-sid-mode-mode-stop)接口文档
+- 更多 clientRequest中的参数见[Stop](https://doc.shengwang.cn/doc/cloud-recording/restful/cloud-recording/operations/post-v1-apps-appid-cloud_recording-resourceid-resourceid-sid-sid-mode-mode-stop)接口文档
 
 因为Stop 接口返回的不是一个固定的结构体，所以需要根据返回的serverResponseMode来判断具体的返回类型
 
@@ -198,7 +198,7 @@
 - resourceId: 云端录制资源ID
 - sid: 会话ID
 - mode: 云端录制模式
-- 更多 clientRequest中的参数见[Query](https://doc.shengwang.cn/api-ref/cloud-recording/restful/cloud-recording/operations/get-v1-apps-appid-cloud_recording-resourceid-resourceid-sid-sid-mode-mode-query)接口文档
+- 更多 clientRequest中的参数见[Query](https://doc.shengwang.cn/doc/cloud-recording/restful/cloud-recording/operations/get-v1-apps-appid-cloud_recording-resourceid-resourceid-sid-sid-mode-mode-query)接口文档
 
 因为 Query 接口返回的不是一个固定的结构体，所以需要根据返回的serverResponseMode来判断具体的返回类型
 
@@ -252,7 +252,7 @@
 - resourceId: 云端录制资源ID
 - sid: 会话ID
 - mode: 云端录制模式
-- 更多 clientRequest中的参数见[Update](https://doc.shengwang.cn/api-ref/cloud-recording/restful/cloud-recording/operations/post-v1-apps-appid-cloud_recording-resourceid-resourceid-sid-sid-mode-mode-update)接口文档
+- 更多 clientRequest中的参数见[Update](https://doc.shengwang.cn/doc/cloud-recording/restful/cloud-recording/operations/post-v1-apps-appid-cloud_recording-resourceid-resourceid-sid-sid-mode-mode-update)接口文档
 
 通过调用`Update().Do`方法来实现更新云端录制设置
 ```go
@@ -296,7 +296,7 @@
 - resourceId: 云端录制资源ID
 - sid: 会话ID
 - mode: 云端录制模式
-- 更多 clientRequest中的参数见[UpdateLayout](https://doc.shengwang.cn/api-ref/cloud-recording/restful/cloud-recording/operations/post-v1-apps-appid-cloud_recording-resourceid-resourceid-sid-sid-mode-mode-updateLayout)接口文档
+- 更多 clientRequest中的参数见[UpdateLayout](https://doc.shengwang.cn/doc/cloud-recording/restful/cloud-recording/operations/post-v1-apps-appid-cloud_recording-resourceid-resourceid-sid-sid-mode-mode-updateLayout)接口文档
 
 通过调用`UpdateLayout().Do`方法来实现更新云端录制合流布局
 ```go
@@ -340,4 +340,4 @@
 ```
 
 ## 错误码和响应状态码处理
-具体的业务响应码请参考[业务响应码](https://doc.shengwang.cn/api-ref/cloud-recording/restful/response-code)文档
+具体的业务响应码请参考[业务响应码](https://doc.shengwang.cn/doc/cloud-recording/restful/response-code)文档
