@@ -5,45 +5,48 @@ import (
 	"log"
 	"time"
 
-	"github.com/AgoraIO-Community/agora-rest-client-go/core"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora"
+	agoraLogger "github.com/AgoraIO-Community/agora-rest-client-go/agora/log"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/region"
+	"github.com/AgoraIO-Community/agora-rest-client-go/examples/cloudrecording/base"
 	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording"
-	v1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1"
+	cloudRecordingAPI "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/api"
+	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/scenario/mixrecording"
 )
 
 type Service struct {
-	region     core.RegionArea
-	appId      string
-	cname      string
-	uid        string
-	credential core.Credential
+	base.Service
 }
 
-func NewService(region core.RegionArea, appId, cname, uid string) *Service {
+func NewService(region region.Area, appId, cname, uid string) *Service {
 	return &Service{
-		region:     region,
-		appId:      appId,
-		cname:      cname,
-		uid:        uid,
-		credential: nil,
+		base.Service{
+			RegionArea: region,
+			AppId:      appId,
+			Cname:      cname,
+			Uid:        uid,
+			Credential: nil,
+		},
 	}
 }
 
-func (s *Service) SetCredential(username, password string) {
-	s.credential = core.NewBasicAuthCredential(username, password)
-}
-
-func (s *Service) RunHLS(token string, storageConfig *v1.StorageConfig) {
+func (s *Service) RunHLS(token string, storageConfig *cloudRecordingAPI.StorageConfig) {
 	ctx := context.Background()
-	c := core.NewClient(&core.Config{
-		AppID:      s.appId,
-		Credential: s.credential,
-		RegionCode: s.region,
-		Logger:     core.NewDefaultLogger(core.LogDebug),
-	})
+	config := &agora.Config{
+		AppID:      s.AppId,
+		Credential: s.Credential,
+		RegionCode: s.RegionArea,
+		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
+	}
 
-	impl := cloudrecording.NewAPI(c).V1().MixRecording()
+	cloudRecordingClient, err := cloudrecording.NewClient(config)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	// acquire
-	acquireResp, err := impl.Acquire().Do(ctx, s.cname, s.uid, &v1.AcquireMixRecodingClientRequest{})
+	acquireResp, err := cloudRecordingClient.MixRecording().
+		Acquire(ctx, s.Cname, s.Uid, &mixrecording.AcquireMixRecodingClientRequest{})
 	if err != nil {
 		log.Println(err)
 		return
@@ -57,14 +60,14 @@ func (s *Service) RunHLS(token string, storageConfig *v1.StorageConfig) {
 
 	resourceId := acquireResp.SuccessRes.ResourceId
 	// start
-	startResp, err := impl.Start().Do(ctx, resourceId, s.cname, s.uid, &v1.StartMixRecordingClientRequest{
+	startResp, err := cloudRecordingClient.MixRecording().Start(ctx, resourceId, s.Cname, s.Uid, &mixrecording.StartMixRecordingClientRequest{
 		Token: token,
-		RecordingConfig: &v1.RecordingConfig{
+		RecordingConfig: &cloudRecordingAPI.RecordingConfig{
 			ChannelType:  1,
 			StreamTypes:  2,
 			MaxIdleTime:  30,
 			AudioProfile: 2,
-			TranscodingConfig: &v1.TranscodingConfig{
+			TranscodingConfig: &cloudRecordingAPI.TranscodingConfig{
 				Width:            640,
 				Height:           640,
 				FPS:              15,
@@ -79,7 +82,7 @@ func (s *Service) RunHLS(token string, storageConfig *v1.StorageConfig) {
 				"#allstream#",
 			},
 		},
-		RecordingFileConfig: &v1.RecordingFileConfig{
+		RecordingFileConfig: &cloudRecordingAPI.RecordingFileConfig{
 			AvFileType: []string{
 				"hls",
 			},
@@ -100,7 +103,7 @@ func (s *Service) RunHLS(token string, storageConfig *v1.StorageConfig) {
 	sid := startResp.SuccessResponse.Sid
 	// stop
 	defer func() {
-		stopResp, err := impl.Stop().DoHLS(ctx, resourceId, sid, s.cname, s.uid, false)
+		stopResp, err := cloudRecordingClient.MixRecording().Stop(ctx, resourceId, sid, s.Cname, s.Uid, false)
 		if err != nil {
 			log.Println(err)
 			return
@@ -115,7 +118,7 @@ func (s *Service) RunHLS(token string, storageConfig *v1.StorageConfig) {
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().DoHLS(ctx, resourceId, sid)
+		queryResp, err := cloudRecordingClient.MixRecording().QueryHLS(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
@@ -130,14 +133,14 @@ func (s *Service) RunHLS(token string, storageConfig *v1.StorageConfig) {
 	}
 
 	// update
-	updateResp, err := impl.Update().Do(ctx, resourceId, sid, s.cname, s.uid, &v1.UpdateMixRecordingClientRequest{
-		StreamSubscribe: &v1.UpdateStreamSubscribe{
-			AudioUidList: &v1.UpdateAudioUIDList{
+	updateResp, err := cloudRecordingClient.MixRecording().Update(ctx, resourceId, sid, s.Cname, s.Uid, &mixrecording.UpdateMixRecordingClientRequest{
+		StreamSubscribe: &cloudRecordingAPI.UpdateStreamSubscribe{
+			AudioUidList: &cloudRecordingAPI.UpdateAudioUIDList{
 				SubscribeAudioUIDs: []string{
 					"#allstream#",
 				},
 			},
-			VideoUidList: &v1.UpdateVideoUIDList{
+			VideoUidList: &cloudRecordingAPI.UpdateVideoUIDList{
 				SubscribeVideoUIDs: []string{
 					"#allstream#",
 				},
@@ -156,7 +159,7 @@ func (s *Service) RunHLS(token string, storageConfig *v1.StorageConfig) {
 	}
 
 	// updateLayout
-	updateLayoutResp, err := impl.UpdateLayout().Do(ctx, resourceId, sid, s.cname, s.uid, &v1.UpdateLayoutUpdateMixRecordingClientRequest{
+	updateLayoutResp, err := cloudRecordingClient.MixRecording().UpdateLayout(ctx, resourceId, sid, s.Cname, s.Uid, &mixrecording.UpdateLayoutUpdateMixRecordingClientRequest{
 		MixedVideoLayout: 1,
 		BackgroundColor:  "#FF0000",
 	},
@@ -174,7 +177,7 @@ func (s *Service) RunHLS(token string, storageConfig *v1.StorageConfig) {
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().DoHLS(ctx, resourceId, sid)
+		queryResp, err := cloudRecordingClient.MixRecording().QueryHLS(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
@@ -189,18 +192,22 @@ func (s *Service) RunHLS(token string, storageConfig *v1.StorageConfig) {
 	}
 }
 
-func (s *Service) RunHLSAndMP4(token string, storageConfig *v1.StorageConfig) {
+func (s *Service) RunHLSAndMP4(token string, storageConfig *cloudRecordingAPI.StorageConfig) {
 	ctx := context.Background()
-	c := core.NewClient(&core.Config{
-		AppID:      s.appId,
-		Credential: s.credential,
-		RegionCode: s.region,
-		Logger:     core.NewDefaultLogger(core.LogDebug),
-	})
 
-	impl := cloudrecording.NewAPI(c).V1().MixRecording()
+	config := &agora.Config{
+		AppID:      s.AppId,
+		Credential: s.Credential,
+		RegionCode: s.RegionArea,
+		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
+	}
+	cloudRecordingClient, err := cloudrecording.NewClient(config)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	// acquire
-	acquireResp, err := impl.Acquire().Do(ctx, s.cname, s.uid, &v1.AcquireMixRecodingClientRequest{})
+	acquireResp, err := cloudRecordingClient.MixRecording().Acquire(ctx, s.Cname, s.Uid, &mixrecording.AcquireMixRecodingClientRequest{})
 	if err != nil {
 		log.Println(err)
 		return
@@ -214,14 +221,14 @@ func (s *Service) RunHLSAndMP4(token string, storageConfig *v1.StorageConfig) {
 
 	resourceId := acquireResp.SuccessRes.ResourceId
 	// start
-	startResp, err := impl.Start().Do(ctx, resourceId, s.cname, s.uid, &v1.StartMixRecordingClientRequest{
+	startResp, err := cloudRecordingClient.MixRecording().Start(ctx, resourceId, s.Cname, s.Uid, &mixrecording.StartMixRecordingClientRequest{
 		Token: token,
-		RecordingConfig: &v1.RecordingConfig{
+		RecordingConfig: &cloudRecordingAPI.RecordingConfig{
 			ChannelType:  1,
 			StreamTypes:  2,
 			MaxIdleTime:  30,
 			AudioProfile: 2,
-			TranscodingConfig: &v1.TranscodingConfig{
+			TranscodingConfig: &cloudRecordingAPI.TranscodingConfig{
 				Width:            640,
 				Height:           640,
 				FPS:              15,
@@ -236,7 +243,7 @@ func (s *Service) RunHLSAndMP4(token string, storageConfig *v1.StorageConfig) {
 				"#allstream#",
 			},
 		},
-		RecordingFileConfig: &v1.RecordingFileConfig{
+		RecordingFileConfig: &cloudRecordingAPI.RecordingFileConfig{
 			AvFileType: []string{
 				"hls",
 				"mp4",
@@ -258,7 +265,7 @@ func (s *Service) RunHLSAndMP4(token string, storageConfig *v1.StorageConfig) {
 	sid := startResp.SuccessResponse.Sid
 	// stop
 	defer func() {
-		stopResp, err := impl.Stop().DoHLSAndMP4(ctx, resourceId, sid, s.cname, s.uid, false)
+		stopResp, err := cloudRecordingClient.MixRecording().Stop(ctx, resourceId, sid, s.Cname, s.Uid, false)
 		if err != nil {
 			log.Println(err)
 			return
@@ -273,7 +280,7 @@ func (s *Service) RunHLSAndMP4(token string, storageConfig *v1.StorageConfig) {
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().DoHLSAndMP4(ctx, resourceId, sid)
+		queryResp, err := cloudRecordingClient.MixRecording().QueryHLSAndMP4(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
@@ -288,14 +295,14 @@ func (s *Service) RunHLSAndMP4(token string, storageConfig *v1.StorageConfig) {
 	}
 
 	// update
-	updateResp, err := impl.Update().Do(ctx, resourceId, sid, s.cname, s.uid, &v1.UpdateMixRecordingClientRequest{
-		StreamSubscribe: &v1.UpdateStreamSubscribe{
-			AudioUidList: &v1.UpdateAudioUIDList{
+	updateResp, err := cloudRecordingClient.MixRecording().Update(ctx, resourceId, sid, s.Cname, s.Uid, &mixrecording.UpdateMixRecordingClientRequest{
+		StreamSubscribe: &cloudRecordingAPI.UpdateStreamSubscribe{
+			AudioUidList: &cloudRecordingAPI.UpdateAudioUIDList{
 				SubscribeAudioUIDs: []string{
 					"#allstream#",
 				},
 			},
-			VideoUidList: &v1.UpdateVideoUIDList{
+			VideoUidList: &cloudRecordingAPI.UpdateVideoUIDList{
 				SubscribeVideoUIDs: []string{
 					"#allstream#",
 				},
@@ -314,7 +321,7 @@ func (s *Service) RunHLSAndMP4(token string, storageConfig *v1.StorageConfig) {
 	}
 
 	// updateLayout
-	updateLayoutResp, err := impl.UpdateLayout().Do(ctx, resourceId, sid, s.cname, s.uid, &v1.UpdateLayoutUpdateMixRecordingClientRequest{
+	updateLayoutResp, err := cloudRecordingClient.MixRecording().UpdateLayout(ctx, resourceId, sid, s.Cname, s.Uid, &mixrecording.UpdateLayoutUpdateMixRecordingClientRequest{
 		MixedVideoLayout: 1,
 		BackgroundColor:  "#FF0000",
 	},
@@ -332,7 +339,7 @@ func (s *Service) RunHLSAndMP4(token string, storageConfig *v1.StorageConfig) {
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().DoHLSAndMP4(ctx, resourceId, sid)
+		queryResp, err := cloudRecordingClient.MixRecording().QueryHLSAndMP4(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return

@@ -7,18 +7,21 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/AgoraIO-Community/agora-rest-client-go/core"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/auth"
+	agoraLogger "github.com/AgoraIO-Community/agora-rest-client-go/agora/log"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/region"
 	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudtranscoder"
-	v1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudtranscoder/v1"
+	cloudTranscoderAPI "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudtranscoder/api"
 )
 
 type Service struct {
-	region     core.RegionArea
+	region     region.Area
 	appId      string
-	credential core.Credential
+	credential auth.Credential
 }
 
-func New(region core.RegionArea, appId string) *Service {
+func New(region region.Area, appId string) *Service {
 	return &Service{
 		region:     region,
 		appId:      appId,
@@ -27,11 +30,11 @@ func New(region core.RegionArea, appId string) *Service {
 }
 
 func (s *Service) SetCredential(username string, password string) {
-	s.credential = core.NewBasicAuthCredential(username, password)
+	s.credential = auth.NewBasicAuthCredential(username, password)
 }
 
-func (s *Service) acquireResource(ctx context.Context, v1Impl *v1.BaseCollection, instanceId string, createBody *v1.CreateReqServices) string {
-	acquireResp, err := v1Impl.Acquire().Do(ctx, &v1.AcquireReqBody{
+func (s *Service) acquireResource(ctx context.Context, client *cloudtranscoder.Client, instanceId string, createBody *cloudTranscoderAPI.CreateReqServices) string {
+	acquireResp, err := client.Acquire(ctx, &cloudTranscoderAPI.AcquireReqBody{
 		InstanceId: instanceId,
 		Services:   createBody,
 	})
@@ -124,46 +127,49 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 	}
 
 	ctx := context.Background()
-	c := core.NewClient(&core.Config{
+	config := &agora.Config{
 		AppID:      s.appId,
 		Credential: s.credential,
 		RegionCode: s.region,
-		Logger:     core.NewDefaultLogger(core.LogDebug),
-	})
+		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
+	}
 
-	v1Impl := cloudtranscoder.NewAPI(c).V1()
+	cloudTranscoderClient, err := cloudtranscoder.NewClient(config)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-	createBody := &v1.CreateReqBody{
-		Services: &v1.CreateReqServices{
-			CloudTranscoder: &v1.CloudTranscoderPayload{
+	createBody := &cloudTranscoderAPI.CreateReqBody{
+		Services: &cloudTranscoderAPI.CreateReqServices{
+			CloudTranscoder: &cloudTranscoderAPI.CloudTranscoderPayload{
 				ServiceType: "cloudTranscoderV2",
-				Config: &v1.CloudTranscoderConfig{
-					Transcoder: &v1.CloudTranscoderConfigPayload{
+				Config: &cloudTranscoderAPI.CloudTranscoderConfig{
+					Transcoder: &cloudTranscoderAPI.CloudTranscoderConfigPayload{
 						IdleTimeout: 100,
-						AudioInputs: []v1.CloudTranscoderAudioInput{
+						AudioInputs: []cloudTranscoderAPI.CloudTranscoderAudioInput{
 							{
-								Rtc: &v1.CloudTranscoderRtc{
+								Rtc: &cloudTranscoderAPI.CloudTranscoderRtc{
 									RtcChannel: inputChannelName,
 									RtcUID:     inputUID1Int,
 									RtcToken:   inputToken1,
 								},
 							},
 							{
-								Rtc: &v1.CloudTranscoderRtc{
+								Rtc: &cloudTranscoderAPI.CloudTranscoderRtc{
 									RtcChannel: inputChannelName,
 									RtcUID:     inputUID2Int,
 									RtcToken:   inputToken2,
 								},
 							},
 						},
-						VideoInputs: []v1.CloudTranscoderVideoInput{
+						VideoInputs: []cloudTranscoderAPI.CloudTranscoderVideoInput{
 							{
-								Rtc: &v1.CloudTranscoderRtc{
+								Rtc: &cloudTranscoderAPI.CloudTranscoderRtc{
 									RtcChannel: inputChannelName,
 									RtcUID:     inputUID1Int,
 									RtcToken:   inputToken1,
 								},
-								Region: &v1.CloudTranscoderRegion{
+								Region: &cloudTranscoderAPI.CloudTranscoderRegion{
 									X:      0,
 									Y:      0,
 									Width:  480,
@@ -172,12 +178,12 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 								},
 							},
 							{
-								Rtc: &v1.CloudTranscoderRtc{
+								Rtc: &cloudTranscoderAPI.CloudTranscoderRtc{
 									RtcChannel: inputChannelName,
 									RtcUID:     inputUID2Int,
 									RtcToken:   inputToken2,
 								},
-								Region: &v1.CloudTranscoderRegion{
+								Region: &cloudTranscoderAPI.CloudTranscoderRegion{
 									X:      0,
 									Y:      240,
 									Width:  480,
@@ -186,22 +192,22 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 								},
 							},
 						},
-						Canvas: &v1.CloudTranscoderCanvas{
+						Canvas: &cloudTranscoderAPI.CloudTranscoderCanvas{
 							Width:  1280,
 							Height: 720,
 							Color:  255,
 						},
-						Outputs: []v1.CloudTranscoderOutput{
+						Outputs: []cloudTranscoderAPI.CloudTranscoderOutput{
 							{
-								Rtc: &v1.CloudTranscoderRtc{
+								Rtc: &cloudTranscoderAPI.CloudTranscoderRtc{
 									RtcChannel: outputChannelName,
 									RtcUID:     outputUIDInt,
 									RtcToken:   outputToken,
 								},
-								AudioOption: &v1.CloudTranscoderOutputAudioOption{
+								AudioOption: &cloudTranscoderAPI.CloudTranscoderOutputAudioOption{
 									ProfileType: "AUDIO_PROFILE_MUSIC_STANDARD",
 								},
-								VideoOption: &v1.CloudTranscoderOutputVideoOption{
+								VideoOption: &cloudTranscoderAPI.CloudTranscoderOutputVideoOption{
 									FPS:     15,
 									Codec:   "H264",
 									Bitrate: 1500,
@@ -216,10 +222,10 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 		},
 	}
 
-	tokenName := s.acquireResource(ctx, v1Impl, instanceId, createBody.Services)
+	tokenName := s.acquireResource(ctx, cloudTranscoderClient, instanceId, createBody.Services)
 	log.Printf("tokenName:%s\n", tokenName)
 
-	createResp, err := v1Impl.Create().Do(context.Background(), tokenName, createBody)
+	createResp, err := cloudTranscoderClient.Create(context.Background(), tokenName, createBody)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -234,7 +240,7 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 	taskId := createResp.SuccessResp.TaskID
 
 	defer func() {
-		deleteResp, err := v1Impl.Delete().Do(ctx, taskId, tokenName)
+		deleteResp, err := cloudTranscoderClient.Delete(ctx, taskId, tokenName)
 		if err != nil {
 			log.Println(err)
 			return
@@ -248,7 +254,7 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 	}()
 
 	for i := 0; i < 3; i++ {
-		queryResp, err := v1Impl.Query().Do(ctx, taskId, tokenName)
+		queryResp, err := cloudTranscoderClient.Query(ctx, taskId, tokenName)
 		if err != nil {
 			log.Println(err)
 			return
@@ -263,44 +269,44 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 		time.Sleep(time.Second * 10)
 	}
 
-	updateResp, err := v1Impl.Update().Do(ctx, taskId, tokenName, 1, "services.cloudTranscoder.config", &v1.UpdateReqBody{
-		Services: &v1.CreateReqServices{
-			CloudTranscoder: &v1.CloudTranscoderPayload{
+	updateResp, err := cloudTranscoderClient.Update(ctx, taskId, tokenName, 1, "services.cloudTranscoder.config", &cloudTranscoderAPI.UpdateReqBody{
+		Services: &cloudTranscoderAPI.CreateReqServices{
+			CloudTranscoder: &cloudTranscoderAPI.CloudTranscoderPayload{
 				ServiceType: "cloudTranscoderV2",
-				Config: &v1.CloudTranscoderConfig{
-					Transcoder: &v1.CloudTranscoderConfigPayload{
+				Config: &cloudTranscoderAPI.CloudTranscoderConfig{
+					Transcoder: &cloudTranscoderAPI.CloudTranscoderConfigPayload{
 						IdleTimeout: 100,
-						AudioInputs: []v1.CloudTranscoderAudioInput{
+						AudioInputs: []cloudTranscoderAPI.CloudTranscoderAudioInput{
 							{
-								Rtc: &v1.CloudTranscoderRtc{
+								Rtc: &cloudTranscoderAPI.CloudTranscoderRtc{
 									RtcChannel: inputChannelName,
 									RtcUID:     inputUID1Int,
 									RtcToken:   inputToken1,
 								},
 							},
 							{
-								Rtc: &v1.CloudTranscoderRtc{
+								Rtc: &cloudTranscoderAPI.CloudTranscoderRtc{
 									RtcChannel: inputChannelName,
 									RtcUID:     inputUID2Int,
 									RtcToken:   inputToken2,
 								},
 							},
 							{
-								Rtc: &v1.CloudTranscoderRtc{
+								Rtc: &cloudTranscoderAPI.CloudTranscoderRtc{
 									RtcChannel: inputChannelName,
 									RtcUID:     updateInputUID3Int,
 									RtcToken:   updateInputToken3,
 								},
 							},
 						},
-						VideoInputs: []v1.CloudTranscoderVideoInput{
+						VideoInputs: []cloudTranscoderAPI.CloudTranscoderVideoInput{
 							{
-								Rtc: &v1.CloudTranscoderRtc{
+								Rtc: &cloudTranscoderAPI.CloudTranscoderRtc{
 									RtcChannel: inputChannelName,
 									RtcUID:     inputUID1Int,
 									RtcToken:   inputToken1,
 								},
-								Region: &v1.CloudTranscoderRegion{
+								Region: &cloudTranscoderAPI.CloudTranscoderRegion{
 									X:      0,
 									Y:      0,
 									Width:  480,
@@ -309,12 +315,12 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 								},
 							},
 							{
-								Rtc: &v1.CloudTranscoderRtc{
+								Rtc: &cloudTranscoderAPI.CloudTranscoderRtc{
 									RtcChannel: inputChannelName,
 									RtcUID:     inputUID2Int,
 									RtcToken:   inputToken2,
 								},
-								Region: &v1.CloudTranscoderRegion{
+								Region: &cloudTranscoderAPI.CloudTranscoderRegion{
 									X:      0,
 									Y:      240,
 									Width:  480,
@@ -323,12 +329,12 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 								},
 							},
 							{
-								Rtc: &v1.CloudTranscoderRtc{
+								Rtc: &cloudTranscoderAPI.CloudTranscoderRtc{
 									RtcChannel: inputChannelName,
 									RtcUID:     updateInputUID3Int,
 									RtcToken:   updateInputToken3,
 								},
-								Region: &v1.CloudTranscoderRegion{
+								Region: &cloudTranscoderAPI.CloudTranscoderRegion{
 									X:      240,
 									Y:      240,
 									Width:  240,
@@ -337,22 +343,22 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 								},
 							},
 						},
-						Canvas: &v1.CloudTranscoderCanvas{
+						Canvas: &cloudTranscoderAPI.CloudTranscoderCanvas{
 							Width:  1280,
 							Height: 720,
 							Color:  255,
 						},
-						Outputs: []v1.CloudTranscoderOutput{
+						Outputs: []cloudTranscoderAPI.CloudTranscoderOutput{
 							{
-								Rtc: &v1.CloudTranscoderRtc{
+								Rtc: &cloudTranscoderAPI.CloudTranscoderRtc{
 									RtcChannel: outputChannelName,
 									RtcUID:     outputUIDInt,
 									RtcToken:   outputToken,
 								},
-								AudioOption: &v1.CloudTranscoderOutputAudioOption{
+								AudioOption: &cloudTranscoderAPI.CloudTranscoderOutputAudioOption{
 									ProfileType: "AUDIO_PROFILE_MUSIC_STANDARD",
 								},
-								VideoOption: &v1.CloudTranscoderOutputVideoOption{
+								VideoOption: &cloudTranscoderAPI.CloudTranscoderOutputVideoOption{
 									FPS:     15,
 									Codec:   "H264",
 									Bitrate: 1500,
@@ -379,7 +385,7 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 	}
 
 	for i := 0; i < 3; i++ {
-		queryResp, err := v1Impl.Query().Do(ctx, taskId, tokenName)
+		queryResp, err := cloudTranscoderClient.Query(ctx, taskId, tokenName)
 		if err != nil {
 			log.Println(err)
 			return
@@ -437,39 +443,42 @@ func (s *Service) RunSingleChannelRtcPullFullChannelAudioMixerRtcPush(instanceId
 	}
 
 	ctx := context.Background()
-	c := core.NewClient(&core.Config{
+	config := &agora.Config{
 		AppID:      s.appId,
 		Credential: s.credential,
 		RegionCode: s.region,
-		Logger:     core.NewDefaultLogger(core.LogDebug),
-	})
+		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
+	}
 
-	v1Impl := cloudtranscoder.NewAPI(c).V1()
+	cloudTranscoderClient, err := cloudtranscoder.NewClient(config)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-	createBody := &v1.CreateReqBody{
-		Services: &v1.CreateReqServices{
-			CloudTranscoder: &v1.CloudTranscoderPayload{
+	createBody := &cloudTranscoderAPI.CreateReqBody{
+		Services: &cloudTranscoderAPI.CreateReqServices{
+			CloudTranscoder: &cloudTranscoderAPI.CloudTranscoderPayload{
 				ServiceType: "cloudTranscoderV2",
-				Config: &v1.CloudTranscoderConfig{
-					Transcoder: &v1.CloudTranscoderConfigPayload{
+				Config: &cloudTranscoderAPI.CloudTranscoderConfig{
+					Transcoder: &cloudTranscoderAPI.CloudTranscoderConfigPayload{
 						IdleTimeout: 300,
-						AudioInputs: []v1.CloudTranscoderAudioInput{
+						AudioInputs: []cloudTranscoderAPI.CloudTranscoderAudioInput{
 							{
-								Rtc: &v1.CloudTranscoderRtc{
+								Rtc: &cloudTranscoderAPI.CloudTranscoderRtc{
 									RtcChannel: inputChannelName,
 									RtcUID:     inputUID1Int,
 									RtcToken:   inputToken1,
 								},
 							},
 						},
-						Outputs: []v1.CloudTranscoderOutput{
+						Outputs: []cloudTranscoderAPI.CloudTranscoderOutput{
 							{
-								Rtc: &v1.CloudTranscoderRtc{
+								Rtc: &cloudTranscoderAPI.CloudTranscoderRtc{
 									RtcChannel: outputChannelName,
 									RtcUID:     outputUIDInt,
 									RtcToken:   outputToken,
 								},
-								AudioOption: &v1.CloudTranscoderOutputAudioOption{
+								AudioOption: &cloudTranscoderAPI.CloudTranscoderOutputAudioOption{
 									ProfileType: "AUDIO_PROFILE_MUSIC_STANDARD",
 								},
 							},
@@ -480,10 +489,10 @@ func (s *Service) RunSingleChannelRtcPullFullChannelAudioMixerRtcPush(instanceId
 		},
 	}
 
-	tokenName := s.acquireResource(ctx, v1Impl, instanceId, createBody.Services)
+	tokenName := s.acquireResource(ctx, cloudTranscoderClient, instanceId, createBody.Services)
 	log.Printf("tokenName:%s\n", tokenName)
 
-	createResp, err := v1Impl.Create().Do(ctx, tokenName, createBody)
+	createResp, err := cloudTranscoderClient.Create(ctx, tokenName, createBody)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -498,7 +507,7 @@ func (s *Service) RunSingleChannelRtcPullFullChannelAudioMixerRtcPush(instanceId
 	taskId := createResp.SuccessResp.TaskID
 
 	defer func() {
-		deleteResp, err := v1Impl.Delete().Do(ctx, taskId, tokenName)
+		deleteResp, err := cloudTranscoderClient.Delete(ctx, taskId, tokenName)
 		if err != nil {
 			log.Println(err)
 			return
@@ -512,7 +521,7 @@ func (s *Service) RunSingleChannelRtcPullFullChannelAudioMixerRtcPush(instanceId
 	}()
 
 	for i := 0; i < 3; i++ {
-		queryResp, err := v1Impl.Query().Do(ctx, taskId, tokenName)
+		queryResp, err := cloudTranscoderClient.Query(ctx, taskId, tokenName)
 		if err != nil {
 			log.Println(err)
 			return
@@ -527,30 +536,30 @@ func (s *Service) RunSingleChannelRtcPullFullChannelAudioMixerRtcPush(instanceId
 		time.Sleep(time.Second * 10)
 	}
 
-	updateResp, err := v1Impl.Update().Do(ctx, taskId, tokenName, 1, "services.cloudTranscoder.config", &v1.UpdateReqBody{
-		Services: &v1.CreateReqServices{
-			CloudTranscoder: &v1.CloudTranscoderPayload{
+	updateResp, err := cloudTranscoderClient.Update(ctx, taskId, tokenName, 1, "services.cloudTranscoder.config", &cloudTranscoderAPI.UpdateReqBody{
+		Services: &cloudTranscoderAPI.CreateReqServices{
+			CloudTranscoder: &cloudTranscoderAPI.CloudTranscoderPayload{
 				ServiceType: "cloudTranscoderV2",
-				Config: &v1.CloudTranscoderConfig{
-					Transcoder: &v1.CloudTranscoderConfigPayload{
+				Config: &cloudTranscoderAPI.CloudTranscoderConfig{
+					Transcoder: &cloudTranscoderAPI.CloudTranscoderConfigPayload{
 						IdleTimeout: 300,
-						AudioInputs: []v1.CloudTranscoderAudioInput{
+						AudioInputs: []cloudTranscoderAPI.CloudTranscoderAudioInput{
 							{
-								Rtc: &v1.CloudTranscoderRtc{
+								Rtc: &cloudTranscoderAPI.CloudTranscoderRtc{
 									RtcChannel: inputChannelName,
 									RtcUID:     inputUID1Int,
 									RtcToken:   inputToken1,
 								},
 							},
 						},
-						Outputs: []v1.CloudTranscoderOutput{
+						Outputs: []cloudTranscoderAPI.CloudTranscoderOutput{
 							{
-								Rtc: &v1.CloudTranscoderRtc{
+								Rtc: &cloudTranscoderAPI.CloudTranscoderRtc{
 									RtcChannel: outputChannelName,
 									RtcUID:     outputUIDInt,
 									RtcToken:   outputToken,
 								},
-								AudioOption: &v1.CloudTranscoderOutputAudioOption{
+								AudioOption: &cloudTranscoderAPI.CloudTranscoderOutputAudioOption{
 									ProfileType: "AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO",
 								},
 							},
@@ -573,7 +582,7 @@ func (s *Service) RunSingleChannelRtcPullFullChannelAudioMixerRtcPush(instanceId
 	}
 
 	for i := 0; i < 3; i++ {
-		queryResp, err := v1Impl.Query().Do(ctx, taskId, tokenName)
+		queryResp, err := cloudTranscoderClient.Query(ctx, taskId, tokenName)
 		if err != nil {
 			log.Println(err)
 			return

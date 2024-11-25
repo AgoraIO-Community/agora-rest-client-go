@@ -6,9 +6,8 @@ import (
 	"os"
 
 	"github.com/google/uuid"
-	"github.com/joho/godotenv"
 
-	"github.com/AgoraIO-Community/agora-rest-client-go/core"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/region"
 	"github.com/AgoraIO-Community/agora-rest-client-go/examples/cloudtranscoder/service"
 )
 
@@ -17,19 +16,15 @@ var (
 	username string
 	password string
 	// 选择你的区域，目前支持的区域有：
-	// USRegionArea: 北美
-	// EURegionArea: 欧洲
-	// CNRegionArea: 中国大陆
-	// APRegionArea: 亚太
-	region core.RegionArea = core.CNRegionArea
+	// USArea: 北美
+	// EUArea: 欧洲
+	// CNArea: 中国大陆
+	// APArea: 亚太
+	regionArea = region.CNArea
 )
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	appId = os.Getenv("APP_ID")
 	if appId == "" {
@@ -50,7 +45,7 @@ func main() {
 	instanceId := flag.String("instanceId", uuid.NewString(), "instanceId for cloudTransCoder service")
 	flag.Parse()
 
-	s := service.New(region, appId)
+	s := service.New(regionArea, appId)
 	s.SetCredential(username, password)
 
 	switch *scene {
