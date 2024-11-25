@@ -6,13 +6,11 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/joho/godotenv"
-
-	"github.com/AgoraIO-Community/agora-rest-client-go/core"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/region"
 	"github.com/AgoraIO-Community/agora-rest-client-go/examples/cloudrecording/individualrecording"
 	"github.com/AgoraIO-Community/agora-rest-client-go/examples/cloudrecording/mixrecording"
 	"github.com/AgoraIO-Community/agora-rest-client-go/examples/cloudrecording/webrecording"
-	v1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1"
+	v1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/api"
 )
 
 var (
@@ -23,11 +21,11 @@ var (
 	password string
 	token    string
 	// 选择你的区域，目前支持的区域有：
-	// USRegionArea: 北美
-	// EURegionArea: 欧洲
-	// CNRegionArea: 中国大陆
-	// APRegionArea: 亚太
-	region core.RegionArea = core.CNRegionArea
+	// USArea: 北美
+	// EUArea: 欧洲
+	// CNArea: 中国大陆
+	// APArea: 亚太
+	regionArea = region.CNArea
 )
 
 // 选择你的存储配置 第三方云存储地区说明详情见 https://doc.shengwang.cn/api-ref/cloud-recording/restful/region-vendor
@@ -45,10 +43,6 @@ var storageConfig = &v1.StorageConfig{
 
 func main() {
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	appId = os.Getenv("APP_ID")
 	if appId == "" {
@@ -60,9 +54,9 @@ func main() {
 		panic("CNAME is required")
 	}
 
-	uid = os.Getenv("UID")
+	uid = os.Getenv("USER_ID")
 	if uid == "" {
-		panic("UID is required")
+		panic("USER_ID is required")
 	}
 
 	username = os.Getenv("BASIC_AUTH_USERNAME")
@@ -114,7 +108,7 @@ func main() {
 
 	switch *mode {
 	case "mix":
-		service := mixrecording.NewService(region, appId, cname, uid)
+		service := mixrecording.NewService(regionArea, appId, cname, uid)
 		service.SetCredential(username, password)
 
 		switch *mix_scene {
@@ -126,7 +120,7 @@ func main() {
 			panic("invalid mix_scene")
 		}
 	case "individual":
-		service := individualrecording.NewService(region, appId, cname, uid)
+		service := individualrecording.NewService(regionArea, appId, cname, uid)
 		service.SetCredential(username, password)
 
 		switch *individual_scene {
@@ -144,7 +138,7 @@ func main() {
 			panic("invalid individual_scene")
 		}
 	case "web":
-		service := webrecording.NewService(region, appId, cname, uid)
+		service := webrecording.NewService(regionArea, appId, cname, uid)
 		service.SetCredential(username, password)
 
 		switch *web_scene {
