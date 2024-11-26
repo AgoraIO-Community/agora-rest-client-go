@@ -37,6 +37,7 @@ go get -u github.com/AgoraIO-Community/agora-rest-client-go
 ```
 ## 使用示例
 以调用云录制服务为例：
+
 ```go
 package main
 
@@ -45,9 +46,13 @@ import (
 	"log"
 	"time"
 
-	"github.com/AgoraIO-Community/agora-rest-client-go/core"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/auth"
+	agoraLogger "github.com/AgoraIO-Community/agora-rest-client-go/agora/log"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/region"
 	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording"
-	v1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1"
+	cloudRecordingAPI "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/api"
+	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/scenario/mixrecording"
 )
 
 const (
@@ -59,7 +64,7 @@ const (
 	token    = "<your token>"
 )
 
-var storageConfig = &v1.StorageConfig{
+var storageConfig = &cloudRecordingAPI.StorageConfig{
 	Vendor:    0,
 	Region:    0,
 	Bucket:    "",
@@ -71,72 +76,78 @@ var storageConfig = &v1.StorageConfig{
 }
 
 func main() {
-	// 初始化Agora REST API客户端
-	client := core.NewClient(&core.Config{
+	// Initialize Agora Config
+	config := &agora.Config{
 		AppID:      appId,
-		Credential: core.NewBasicAuthCredential(username, password),
-		// 指定服务器所在的区域，可选值有CN, NA, EU, AP,client 将会根据配置的区域自动切换使用最佳的域名
-		RegionCode: core.CNRegionArea,
-		// 指定日志输出的级别，可选值有LogDebug, LogInfo, LogWarn, LogError
-		// 如果要关闭日志输出，可将 logger 设置为 DiscardLogger
-		Logger: core.NewDefaultLogger(core.LogDebug),
-	})
+		Credential: auth.NewBasicAuthCredential(username, password),
+		// Specify the region where the server is located. Options include CNArea, EUArea, APArea, USArea.
+		// The client will automatically switch to use the best domain based on the configured region.
+		RegionCode: region.CNArea,
+		// Specify the log output level. Options include DebugLevel, InfoLevel, WarningLevel, ErrLevel.
+		// To disable log output, set logger to DiscardLogger.
+		Logger: agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
+	}
 
-	// 初始化云端录制服务 API
-	impl := cloudrecording.NewAPI(client).V1().MixRecording()
-
-	// 调用云端录制服务 API 的 Acquire 接口
-	acquireResp, err := impl.Acquire().Do(context.TODO(), cname, uid, &v1.AcquireMixRecodingClientRequest{})
-	// 处理非业务错误
+	// Initialize the cloud recording service client
+	cloudRecordingClient, err := cloudrecording.NewClient(config)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// 处理业务响应
+	// Call the Acquire API of the cloud recording service client
+	acquireResp, err := cloudRecordingClient.MixRecording().
+		Acquire(context.TODO(), cname, uid, &mixrecording.AcquireMixRecodingClientRequest{})
+	// Handle non-business errors
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Handle business response
 	if acquireResp.IsSuccess() {
 		log.Printf("acquire success:%+v\n", acquireResp)
 	} else {
 		log.Fatalf("acquire failed:%+v\n", acquireResp)
 	}
 
-	// 调用云端录制服务 API 的 Start 接口
+	// Call the Start API of the cloud recording service client
 	resourceId := acquireResp.SuccessRes.ResourceId
-	startResp, err := impl.Start().Do(context.TODO(), resourceId, cname, uid, &v1.StartMixRecordingClientRequest{
-		Token: token,
-		RecordingConfig: &v1.RecordingConfig{
-			ChannelType:  1,
-			StreamTypes:  2,
-			MaxIdleTime:  30,
-			AudioProfile: 2,
-			TranscodingConfig: &v1.TranscodingConfig{
-				Width:            640,
-				Height:           640,
-				FPS:              15,
-				BitRate:          800,
-				MixedVideoLayout: 0,
-				BackgroundColor:  "#000000",
+	startResp, err := cloudRecordingClient.MixRecording().
+		Start(context.TODO(), resourceId, cname, uid, &mixrecording.StartMixRecordingClientRequest{
+			Token: token,
+			RecordingConfig: &cloudRecordingAPI.RecordingConfig{
+				ChannelType:  1,
+				StreamTypes:  2,
+				MaxIdleTime:  30,
+				AudioProfile: 2,
+				TranscodingConfig: &cloudRecordingAPI.TranscodingConfig{
+					Width:            640,
+					Height:           640,
+					FPS:              15,
+					BitRate:          800,
+					MixedVideoLayout: 0,
+					BackgroundColor:  "#000000",
+				},
+				SubscribeAudioUIDs: []string{
+					"#allstream#",
+				},
+				SubscribeVideoUIDs: []string{
+					"#allstream#",
+				},
 			},
-			SubscribeAudioUIDs: []string{
-				"#allstream#",
+			RecordingFileConfig: &cloudRecordingAPI.RecordingFileConfig{
+				AvFileType: []string{
+					"hls",
+					"mp4",
+				},
 			},
-			SubscribeVideoUIDs: []string{
-				"#allstream#",
-			},
-		},
-		RecordingFileConfig: &v1.RecordingFileConfig{
-			AvFileType: []string{
-				"hls",
-				"mp4",
-			},
-		},
-		StorageConfig: storageConfig,
-	})
-	// 处理非业务错误
+			StorageConfig: storageConfig,
+		})
+	// Handle non-business errors
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// 处理业务响应
+	// Handle business response
 	if startResp.IsSuccess() {
 		log.Printf("start success:%+v\n", startResp)
 	} else {
@@ -144,15 +155,16 @@ func main() {
 	}
 
 	sid := startResp.SuccessResponse.Sid
-	// query
+	// Query
 	for i := 0; i < 6; i++ {
-		queryResp, err := impl.Query().DoHLSAndMP4(context.TODO(), resourceId, sid)
-		// 处理非业务错误
+		queryResp, err := cloudRecordingClient.MixRecording().
+			QueryHLSAndMP4(context.TODO(), resourceId, sid)
+		// Handle non-business errors
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		// 处理业务响应
+		// Handle business response
 		if queryResp.IsSuccess() {
 			log.Printf("query success:%+v\n", queryResp)
 		} else {
@@ -161,20 +173,23 @@ func main() {
 		time.Sleep(time.Second * 10)
 	}
 
-	// 调用云端录制服务 API 的 Stop 接口
-	stopResp, err := impl.Stop().DoHLSAndMP4(context.TODO(), resourceId, sid, cname, uid, false)
-	// 处理非业务错误
+	// Call the Stop API of the cloud recording service client
+	stopResp, err := cloudRecordingClient.MixRecording().
+		Stop(context.TODO(), resourceId, sid, cname, uid, true)
+	// Handle non-business errors
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// 处理业务响应
+	// Handle business response
 	if stopResp.IsSuccess() {
 		log.Printf("stop success:%+v\n", stopResp)
 	} else {
 		log.Printf("stop failed:%+v\n", stopResp)
 	}
 }
+
+
 ```
 更多的示例可在[Example](./examples) 查看
 

@@ -6,20 +6,20 @@
 
 ### 前提条件
 
-在当前目录创建一个 `.env` 文件，填入以下内容：
+配置环境变量，环境变量包括以下参数内容：
 
 ```bash
-APP_ID=<Your App ID>
-CNAME=<Your Channel Name>
-UID=<Your UID>
-BASIC_AUTH_USERNAME=<Your Basic Auth Username>
-BASIC_AUTH_PASSWORD=<Your Basic Auth Password>
-TOKEN=<Your Token>
-STORAGE_CONFIG_VENDOR=<Your Storage Vendor>
-STORAGE_CONFIG_REGION=<Your Storage Region>
-STORAGE_CONFIG_BUCKET=<Your Storage Bucket>
-STORAGE_CONFIG_ACCESS_KEY=<Your Storage Access Key>
-STORAGE_CONFIG_SECRET_KEY=<Your Storage Secret Key>
+export APP_ID=<Your App ID>
+export CNAME=<Your Channel Name>
+export USER_ID=<Your User ID>
+export BASIC_AUTH_USERNAME=<Your Basic Auth Username>
+export BASIC_AUTH_PASSWORD=<Your Basic Auth Password>
+export TOKEN=<Your Token>
+export STORAGE_CONFIG_VENDOR=<Your Storage Vendor>
+export STORAGE_CONFIG_REGION=<Your Storage Region>
+export STORAGE_CONFIG_BUCKET=<Your Storage Bucket>
+export STORAGE_CONFIG_ACCESS_KEY=<Your Storage Access Key>
+export STORAGE_CONFIG_SECRET_KEY=<Your Storage Secret Key>
 ```
 
 相关的参数可以通过可在 [CloudRecording 服务说明](../../services/cloudrecording/README.md) 查看

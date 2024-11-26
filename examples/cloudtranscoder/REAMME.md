@@ -6,22 +6,22 @@
 
 ### 前提条件
 
-在当前目录创建一个 `.env` 文件，填入以下内容：
+配置环境变量，环境变量包括以下参数内容：
 
 ```bash
-APP_ID=<Your App ID>
-BASIC_AUTH_USERNAME=<Your Basic Auth Username>
-BASIC_AUTH_PASSWORD=<Your Basic Auth Password>
-INPUT_UID_1=<Your First Input UID>
-INPUT_UID_2=<Your Second Input UID>
-INPUT_CHANNEL_NAME=<Input Channel Name>
-INPUT_TOKEN_1=<Your First Input Token>
-INPUT_TOKEN_2=<Your Second Input Token>
-UPDATE_INPUT_UID_3=<Your Third Update  UID>
-UPDATE_INPUT_TOKEN_3=<Your Third Update Token>
-OUTPUT_UID=<Your Output UID>
-OUTPUT_TOKEN=<Your Output Token>
-OUTPUT_CHANNEL_NAME=<Your Output Channel Name>
+export APP_ID=<Your App ID>
+export BASIC_AUTH_USERNAME=<Your Basic Auth Username>
+export BASIC_AUTH_PASSWORD=<Your Basic Auth Password>
+export INPUT_UID_1=<Your First Input UID>
+export INPUT_UID_2=<Your Second Input UID>
+export INPUT_CHANNEL_NAME=<Input Channel Name>
+export INPUT_TOKEN_1=<Your First Input Token>
+export INPUT_TOKEN_2=<Your Second Input Token>
+export UPDATE_INPUT_UID_3=<Your Third Update  UID>
+export UPDATE_INPUT_TOKEN_3=<Your Third Update Token>
+export OUTPUT_UID=<Your Output UID>
+export OUTPUT_TOKEN=<Your Output Token>
+export OUTPUT_CHANNEL_NAME=<Your Output Channel Name>
 ```
 
 相关的参数可以通过可在 [CloudTranscoder 服务说明](../../services/cloudtranscoder/README.md) 查看

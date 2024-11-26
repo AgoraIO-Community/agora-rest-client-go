@@ -26,7 +26,7 @@
 - 开启云端转码服务
 请联系[声网技术支持](https://docportal.shengwang.cn/cn/Agora%20Platform/ticket?platform=Android&_gl=1%2a19d2qxx%2a_gcl_au%2aMTg0ODkxMDM3My4xNzIwNTExNDM3%2a_ga%2aMTI2ODMxNDY2OC4xNjg0MjkxODI0%2a_ga_BFVGG7E02W%2aMTcyMDUxMTIyMC4zMDIuMS4xNzIwNTExNjA0LjAuMC4w)
 
-## API V1 接口调用示例
+## API 接口调用示例
 
 ### 获取云端转码资源
 >
@@ -39,31 +39,33 @@
 - password: 声网的Basic Auth认证的密码
 - instanceId: 用户指定的实例 ID
 
-通过调用`Acquire().Do`方法来实现获取云端转码资源
+通过调用`Acquire`方法来实现获取云端转码资源
 
 ```go
+	ctx := context.Background()
+	config := &agora.Config{
+		AppID:      s.appId,
+		Credential: s.credential,
+		RegionCode: s.region,
+		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
+	}
 
- ctx := context.Background()
- c := core.NewClient(&core.Config{
-  AppID:      appId,
-  Credential: core.NewBasicAuthCredential(username, password),
-  RegionCode: core.CN,
-  Logger:     core.NewDefaultLogger(core.LogDebug),
- })
-
- v1Impl := cloudtranscoder.NewAPI(c).V1()
+	cloudTranscoderClient, err := cloudtranscoder.NewClient(config)
+	if err != nil {
+		log.Fatalln(err)
+	}
     
- acquireResp, err := v1Impl.Acquire().Do(ctx, &v1.AcquireReqBody{
-  InstanceId: instanceId,
- })
- if err != nil {
-  log.Fatalln(err)
- }
- if acquireResp.IsSuccess() {
-  log.Printf("acquire success:%+v\n", acquireResp)
- } else {
-  log.Fatalf("acquire failed:%+v\n", acquireResp)
- }
+    acquireResp, err := cloudTranscoderClient.Acquire(ctx, &cloudTranscoderAPI.AcquireReqBody{
+        InstanceId: instanceId,
+    })
+    if err != nil {
+        log.Fatalln(err)
+    }
+	if acquireResp.IsSuccess() {
+        log.Printf("acquire success:%+v\n", acquireResp)
+	} else {
+        log.Fatalf("acquire failed:%+v\n", acquireResp)
+    }
 ```
 
 ### 开启云端转码
@@ -75,33 +77,33 @@
 - builderToken： 通过 acquire 方法获取的 tokenName
 - 更多 Body中的参数见[Create](https://doc.shengwang.cn/doc/cloud-transcoder/restful/cloud-transcoder/operations/post-v1-projects-appId-rtsc-cloud-transcoder-tasks)接口文档
 
-通过调用`Create().Do`方法来实现创建云端转码
+通过调用`Create`方法来实现创建云端转码
 
 ```go
- createResp, err := v1Impl.Create().Do(ctx, tokenName, &v1.CreateReqBody{
-  Services: &v1.CreateReqServices{
-   CloudTranscoder: &v1.CloudTranscoderPayload{
+ createResp, err := cloudTranscoderClient.Create(ctx, tokenName, &cloudTranscoderAPI.CreateReqBody{
+  Services: &cloudTranscoderAPI.CreateReqServices{
+   CloudTranscoder: &cloudTranscoderAPI.CloudTranscoderPayload{
     ServiceType: "cloudTranscoderV2",
-    Config: &v1.CloudTranscoderConfig{
-     Transcoder: &v1.CloudTranscoderConfigPayload{
+    Config: &cloudTranscoderAPI.CloudTranscoderConfig{
+     Transcoder: &cloudTranscoderAPI.CloudTranscoderConfigPayload{
       IdleTimeout: 300,
-      AudioInputs: []v1.CloudTranscoderAudioInput{
+      AudioInputs: []cloudTranscoderAPI.CloudTranscoderAudioInput{
        {
-        Rtc: &v1.CloudTranscoderRtc{
+        Rtc: &cloudTranscoderAPI.CloudTranscoderRtc{
          RtcChannel: "test-abc",
          RtcUID:     123,
          RtcToken:   "xxxxxx",
         },
        },
       },
-      Outputs: []v1.CloudTranscoderOutput{
+      Outputs: []cloudTranscoderAPI.CloudTranscoderOutput{
        {
-        Rtc: &v1.CloudTranscoderRtc{
+        Rtc: &cloudTranscoderAPI.CloudTranscoderRtc{
          RtcChannel: "test-efg",
          RtcUID:     456,
          RtcToken:   "xxxxx",
         },
-        AudioOption: &v1.CloudTranscoderOutputAudioOption{
+        AudioOption: &cloudTranscoderAPI.CloudTranscoderOutputAudioOption{
          ProfileType: "AUDIO_PROFILE_MUSIC_STANDARD",
         },
        },
@@ -132,10 +134,10 @@
 - taskId: 从 Create 方法获取到的 taskId
 - builderToken： 通过 acquire 方法获取的 tokenName
 
-通过调用`Query().Do`方法来实现查询云端转码状态：
+通过调用`Query`方法来实现查询云端转码状态：
 
 ```go
-  queryResp, err := v1Impl.Query().Do(ctx, taskId, tokenName)
+  queryResp, err := cloudTranscoderClient.Query(ctx, taskId, tokenName)
   if err != nil {
    log.Println(err)
    return
@@ -161,33 +163,33 @@
 
 - 更多 Body中的参数见[Update](https://doc.shengwang.cn/doc/cloud-transcoder/restful/cloud-transcoder/operations/patch-v1-projects-appId-rtsc-cloud-transcoder-tasks-taskId)接口文档
 
-通过调用`Update().Do`方法来实现更新云端转码
+通过调用`Update`方法来实现更新云端转码
 
 ```go
- updateResp, err := v1Impl.Update().Do(ctx, taskId, tokenName, 1, &v1.UpdateReqBody{
-  Services: &v1.CreateReqServices{
-   CloudTranscoder: &v1.CloudTranscoderPayload{
+ updateResp, err := cloudTranscoderClient.Update(ctx, taskId, tokenName, 1, &cloudTranscoderAPI.UpdateReqBody{
+  Services: &cloudTranscoderAPI.CreateReqServices{
+   CloudTranscoder: &cloudTranscoderAPI.CloudTranscoderPayload{
     ServiceType: "cloudTranscoderV2",
-    Config: &v1.CloudTranscoderConfig{
-     Transcoder: &v1.CloudTranscoderConfigPayload{
+    Config: &cloudTranscoderAPI.CloudTranscoderConfig{
+     Transcoder: &cloudTranscoderAPI.CloudTranscoderConfigPayload{
       IdleTimeout: 300,
-      AudioInputs: []v1.CloudTranscoderAudioInput{
+      AudioInputs: []cloudTranscoderAPI.CloudTranscoderAudioInput{
        {
-        Rtc: &v1.CloudTranscoderRtc{
+        Rtc: &cloudTranscoderAPI.CloudTranscoderRtc{
          RtcChannel: "test-abc",
          RtcUID:     123,
          RtcToken:   "xxxxxx",
         },
        },
       },
-      Outputs: []v1.CloudTranscoderOutput{
+      Outputs: []cloudTranscoderAPI.CloudTranscoderOutput{
        {
-        Rtc: &v1.CloudTranscoderRtc{
+        Rtc: &cloudTranscoderAPI.CloudTranscoderRtc{
          RtcChannel: "test-efg",
          RtcUID:     456,
          RtcToken:   "xxxxx",
         },
-        AudioOption: &v1.CloudTranscoderOutputAudioOption{
+        AudioOption: &cloudTranscoderAPI.CloudTranscoderOutputAudioOption{
          ProfileType: "AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO",
         },
        },
@@ -219,10 +221,10 @@
 - taskId: 从 Create 方法获取到的 taskId
 - builderToken： 通过 acquire 方法获取的 tokenName
 
-通过调用`Delete().Do`方法来实现停止云端转码
+通过调用`Delete`方法来实现停止云端转码
 
 ```go
-  deleteResp, err := v1Impl.Delete().Do(ctx, taskId, tokenName)
+  deleteResp, err := cloudTranscoderClient.Delete(ctx, taskId, tokenName)
   if err != nil {
    log.Println(err)
    return
