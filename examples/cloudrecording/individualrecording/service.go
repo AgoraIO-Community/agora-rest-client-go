@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/domain"
 	agoraLogger "github.com/AgoraIO-Community/agora-rest-client-go/agora/log"
-	"github.com/AgoraIO-Community/agora-rest-client-go/agora/region"
 	"github.com/AgoraIO-Community/agora-rest-client-go/examples/cloudrecording/base"
 	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording"
 	cloudRecordingAPI "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/api"
@@ -18,10 +18,10 @@ type Service struct {
 	base.Service
 }
 
-func NewService(region region.Area, appId, cname, uid string) *Service {
+func NewService(region domain.Area, appId, cname, uid string) *Service {
 	return &Service{
 		base.Service{
-			RegionArea: region,
+			DomainArea: region,
 			AppId:      appId,
 			Cname:      cname,
 			Uid:        uid,
@@ -35,7 +35,7 @@ func (s *Service) RunRecording(token string, storageConfig *cloudRecordingAPI.St
 	config := &agora.Config{
 		AppID:      s.AppId,
 		Credential: s.Credential,
-		RegionCode: s.RegionArea,
+		DomainArea: s.DomainArea,
 		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
 	}
 
@@ -172,7 +172,7 @@ func (s *Service) RunSnapshot(token string, storageConfig *cloudRecordingAPI.Sto
 	config := &agora.Config{
 		AppID:      s.AppId,
 		Credential: s.Credential,
-		RegionCode: s.RegionArea,
+		DomainArea: s.DomainArea,
 		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
 	}
 	cloudRecordingClient, err := cloudrecording.NewClient(config)
@@ -306,7 +306,7 @@ func (s *Service) RunRecordingAndSnapshot(token string, storageConfig *cloudReco
 	c := &agora.Config{
 		AppID:      s.AppId,
 		Credential: s.Credential,
-		RegionCode: s.RegionArea,
+		DomainArea: s.DomainArea,
 		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
 	}
 	cloudRecordingClient, err := cloudrecording.NewClient(c)
@@ -444,7 +444,7 @@ func (s *Service) RunRecordingAndPostponeTranscoding(token string, storageConfig
 	config := &agora.Config{
 		AppID:      s.AppId,
 		Credential: s.Credential,
-		RegionCode: s.RegionArea,
+		DomainArea: s.DomainArea,
 		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
 	}
 
@@ -591,7 +591,7 @@ func (s *Service) RunRecordingAndAudioMix(token string, storageConfig *cloudReco
 	config := &agora.Config{
 		AppID:      s.AppId,
 		Credential: s.Credential,
-		RegionCode: s.RegionArea,
+		DomainArea: s.DomainArea,
 		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
 	}
 

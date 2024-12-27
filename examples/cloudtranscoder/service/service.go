@@ -9,21 +9,21 @@ import (
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora"
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/auth"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/domain"
 	agoraLogger "github.com/AgoraIO-Community/agora-rest-client-go/agora/log"
-	"github.com/AgoraIO-Community/agora-rest-client-go/agora/region"
 	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudtranscoder"
 	cloudTranscoderAPI "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudtranscoder/api"
 )
 
 type Service struct {
-	region     region.Area
+	domainArea domain.Area
 	appId      string
 	credential auth.Credential
 }
 
-func New(region region.Area, appId string) *Service {
+func New(region domain.Area, appId string) *Service {
 	return &Service{
-		region:     region,
+		domainArea: region,
 		appId:      appId,
 		credential: nil,
 	}
@@ -130,7 +130,7 @@ func (s *Service) RunSingleChannelRtcPullMixerRtcPush(instanceId string) {
 	config := &agora.Config{
 		AppID:      s.appId,
 		Credential: s.credential,
-		RegionCode: s.region,
+		DomainArea: s.domainArea,
 		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
 	}
 
@@ -446,7 +446,7 @@ func (s *Service) RunSingleChannelRtcPullFullChannelAudioMixerRtcPush(instanceId
 	config := &agora.Config{
 		AppID:      s.appId,
 		Credential: s.credential,
-		RegionCode: s.region,
+		DomainArea: s.domainArea,
 		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
 	}
 

@@ -43,12 +43,16 @@
 
 ```go
 	ctx := context.Background()
-	config := &agora.Config{
-		AppID:      s.appId,
-		Credential: s.credential,
-		RegionCode: s.region,
-		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
-	}
+    appId := "xxxx"
+    username := "xxxx"
+    password := "xxxx"
+    credential := auth.NewBasicAuthCredential(username, password)
+    config := &agora.Config{
+        AppID:      appId,
+        Credential: credential,
+        DomainArea: domain.CN,
+        Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
+}
 
 	cloudTranscoderClient, err := cloudtranscoder.NewClient(config)
 	if err != nil {

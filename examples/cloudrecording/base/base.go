@@ -2,11 +2,11 @@ package base
 
 import (
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/auth"
-	"github.com/AgoraIO-Community/agora-rest-client-go/agora/region"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/domain"
 )
 
 type Service struct {
-	RegionArea region.Area
+	DomainArea domain.Area
 	AppId      string
 	Cname      string
 	Uid        string

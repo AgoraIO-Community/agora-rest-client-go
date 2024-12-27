@@ -13,6 +13,7 @@ import (
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/domain"
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/log"
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/retry"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/utils"
 )
 
 type Client interface {
@@ -51,7 +52,7 @@ func New(config *agora.Config) (*Impl, error) {
 		config.Logger = log.DefaultLogger
 	}
 
-	domainPool, err := domain.NewPool(config.RegionCode, config.Logger)
+	domainPool, err := domain.NewPool(config.DomainArea, config.Logger)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +69,7 @@ func New(config *agora.Config) (*Impl, error) {
 }
 
 func (c *Impl) marshalBody(body interface{}) (io.Reader, error) {
-	if agora.IsNil(body) {
+	if utils.IsNil(body) {
 		return nil, nil
 	}
 

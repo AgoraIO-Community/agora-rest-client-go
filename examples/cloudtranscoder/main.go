@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/AgoraIO-Community/agora-rest-client-go/agora/region"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/domain"
 	"github.com/AgoraIO-Community/agora-rest-client-go/examples/cloudtranscoder/service"
 )
 
@@ -16,11 +16,11 @@ var (
 	username string
 	password string
 	// 选择你的区域，目前支持的区域有：
-	// USArea: 北美
-	// EUArea: 欧洲
-	// CNArea: 中国大陆
-	// APArea: 亚太
-	regionArea = region.CNArea
+	// US: 北美
+	// EU: 欧洲
+	// CN: 中国大陆
+	// AP: 亚太
+	domainArea = domain.CN
 )
 
 func main() {
@@ -45,7 +45,7 @@ func main() {
 	instanceId := flag.String("instanceId", uuid.NewString(), "instanceId for cloudTransCoder service")
 	flag.Parse()
 
-	s := service.New(regionArea, appId)
+	s := service.New(domainArea, appId)
 	s.SetCredential(username, password)
 
 	switch *scene {

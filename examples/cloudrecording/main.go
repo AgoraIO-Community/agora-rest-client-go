@@ -6,7 +6,7 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/AgoraIO-Community/agora-rest-client-go/agora/region"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/domain"
 	"github.com/AgoraIO-Community/agora-rest-client-go/examples/cloudrecording/individualrecording"
 	"github.com/AgoraIO-Community/agora-rest-client-go/examples/cloudrecording/mixrecording"
 	"github.com/AgoraIO-Community/agora-rest-client-go/examples/cloudrecording/webrecording"
@@ -21,11 +21,11 @@ var (
 	password string
 	token    string
 	// 选择你的区域，目前支持的区域有：
-	// USArea: 北美
-	// EUArea: 欧洲
-	// CNArea: 中国大陆
-	// APArea: 亚太
-	regionArea = region.CNArea
+	// US: 北美
+	// EU: 欧洲
+	// CN: 中国大陆
+	// AP: 亚太
+	domainArea = domain.CN
 )
 
 // 选择你的存储配置 第三方云存储地区说明详情见 https://doc.shengwang.cn/api-ref/cloud-recording/restful/region-vendor
@@ -108,7 +108,7 @@ func main() {
 
 	switch *mode {
 	case "mix":
-		service := mixrecording.NewService(regionArea, appId, cname, uid)
+		service := mixrecording.NewService(domainArea, appId, cname, uid)
 		service.SetCredential(username, password)
 
 		switch *mix_scene {
@@ -120,7 +120,7 @@ func main() {
 			panic("invalid mix_scene")
 		}
 	case "individual":
-		service := individualrecording.NewService(regionArea, appId, cname, uid)
+		service := individualrecording.NewService(domainArea, appId, cname, uid)
 		service.SetCredential(username, password)
 
 		switch *individual_scene {
@@ -138,7 +138,7 @@ func main() {
 			panic("invalid individual_scene")
 		}
 	case "web":
-		service := webrecording.NewService(regionArea, appId, cname, uid)
+		service := webrecording.NewService(domainArea, appId, cname, uid)
 		service.SetCredential(username, password)
 
 		switch *web_scene {

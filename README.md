@@ -2,7 +2,8 @@
 <p>
 <img alt="GitHub License" src="https://img.shields.io/github/license/AgoraIO-Community/agora-rest-client-go">
 <a href="https://pkg.go.dev/github.com/AgoraIO-Community/agora-rest-client-go"><img src="https://pkg.go.dev/badge/github.com/AgoraIO-Community/agora-rest-client-go.svg" alt="Go Reference"></a>
-<a href="https://github.com/seymourtang/agora-rest-client-go/actions/workflows/go.yml"><img src="https://github.com/AgoraIO-Community/agora-rest-client-go/actions/workflows/go.yml/badge.svg" alt="Go Actions"></a>
+<a href="https://github.com/AgoraIO-Community/agora-rest-client-go/actions/workflows/go.yml"><img src="https://github.com/AgoraIO-Community/agora-rest-client-go/actions/workflows/go.yml/badge.svg" alt="Go Actions"></a>
+<a href="https://github.com/AgoraIO-Community/agora-rest-client-go/actions/workflows/gitee-sync.yml"><img alt="gitee-sync" src="https://github.com/AgoraIO-Community/agora-rest-client-go/actions/workflows/gitee-sync.yml/badge.svg?branch=main"></a>
 <img alt="GitHub go.mod Go version" src="https://img.shields.io/github/go-mod/go-version/AgoraIO-Community/agora-rest-client-go">
 <img alt="GitHub" src="https://img.shields.io/github/v/release/AgoraIO-Community/agora-rest-client-go">
 <img alt="GitHub Issues or Pull Requests" src="https://img.shields.io/github/issues-pr/AgoraIO-Community/agora-rest-client-go">
@@ -48,6 +49,7 @@ import (
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora"
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/auth"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/domain"
 	agoraLogger "github.com/AgoraIO-Community/agora-rest-client-go/agora/log"
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/region"
 	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording"
@@ -80,9 +82,9 @@ func main() {
 	config := &agora.Config{
 		AppID:      appId,
 		Credential: auth.NewBasicAuthCredential(username, password),
-		// Specify the region where the server is located. Options include CNArea, EUArea, APArea, USArea.
+		// Specify the region where the server is located. Options include CN, EU, AP, US.
 		// The client will automatically switch to use the best domain based on the configured region.
-		RegionCode: region.CNArea,
+		DomainArea: domain.CN,
 		// Specify the log output level. Options include DebugLevel, InfoLevel, WarningLevel, ErrLevel.
 		// To disable log output, set logger to DiscardLogger.
 		Logger: agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),

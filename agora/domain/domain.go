@@ -7,9 +7,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/AgoraIO-Community/agora-rest-client-go/agora"
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/log"
-	"github.com/AgoraIO-Community/agora-rest-client-go/agora/region"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/utils"
 )
 
 const (
@@ -44,8 +43,8 @@ type Domain struct {
 	MajorDomainSuffixes  []string
 }
 
-var RegionDomain = map[region.Area]Domain{
-	region.USArea: {
+var RegionDomain = map[Area]Domain{
+	US: {
 		RegionDomainPrefixes: []string{
 			USWestRegionDomainPrefix,
 			USEastRegionDomainPrefix,
@@ -55,7 +54,7 @@ var RegionDomain = map[region.Area]Domain{
 			ChinaMainlandMajorDomain,
 		},
 	},
-	region.EUArea: {
+	EU: {
 		RegionDomainPrefixes: []string{
 			EUWestRegionDomainPrefix,
 			EUCentralRegionDomainPrefix,
@@ -65,7 +64,7 @@ var RegionDomain = map[region.Area]Domain{
 			ChinaMainlandMajorDomain,
 		},
 	},
-	region.APArea: {
+	AP: {
 		RegionDomainPrefixes: []string{
 			APSoutheastRegionDomainPrefix,
 			APNortheastRegionDomainPrefix,
@@ -75,7 +74,7 @@ var RegionDomain = map[region.Area]Domain{
 			ChinaMainlandMajorDomain,
 		},
 	},
-	region.CNArea: {
+	CN: {
 		RegionDomainPrefixes: []string{
 			CNEastRegionDomainPrefix,
 			CNNorthRegionDomainPrefix,
@@ -88,7 +87,7 @@ var RegionDomain = map[region.Area]Domain{
 }
 
 type Pool struct {
-	domainArea            region.Area
+	domainArea            Area
 	domainSuffixes        []string
 	currentDomain         string
 	regionPrefixes        []string
@@ -101,7 +100,7 @@ type Pool struct {
 	module     string
 }
 
-func NewPool(domainArea region.Area, logger log.Logger) (*Pool, error) {
+func NewPool(domainArea Area, logger log.Logger) (*Pool, error) {
 	if _, ok := RegionDomain[domainArea]; !ok {
 		return nil, errors.New("invalid domain area")
 	}
@@ -159,7 +158,7 @@ func (d *Pool) NextRegion() {
 }
 
 func (d *Pool) selectDomain(domain string) {
-	if agora.Contains(d.domainSuffixes, domain) {
+	if utils.Contains(d.domainSuffixes, domain) {
 		d.currentDomain = domain
 		d.lastUpdate = time.Now()
 	}

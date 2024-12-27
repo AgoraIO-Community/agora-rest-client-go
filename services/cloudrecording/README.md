@@ -40,10 +40,14 @@
 
 通过调用`Acquire`方法来实现获取云端录制资源
 ```go
+    appId := "xxxx"
+    username := "xxxx"
+    password := "xxxx"
+    credential := auth.NewBasicAuthCredential(username, password)
 	config := &agora.Config{
-		AppID:      s.AppId,
-		Credential: s.Credential,
-		RegionCode: s.RegionArea,
+		AppID:      appId,
+		Credential: credential,
+        DomainArea: domain.CN,
 		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
 	}
 
