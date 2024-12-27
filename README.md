@@ -51,7 +51,6 @@ import (
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/auth"
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/domain"
 	agoraLogger "github.com/AgoraIO-Community/agora-rest-client-go/agora/log"
-	"github.com/AgoraIO-Community/agora-rest-client-go/agora/region"
 	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording"
 	cloudRecordingAPI "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/api"
 	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/scenario/mixrecording"
@@ -190,7 +189,6 @@ func main() {
 		log.Printf("stop failed:%+v\n", stopResp)
 	}
 }
-
 
 ```
 更多的示例可在[Example](./examples) 查看
