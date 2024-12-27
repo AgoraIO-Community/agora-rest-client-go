@@ -5,45 +5,48 @@ import (
 	"log"
 	"time"
 
-	"github.com/AgoraIO-Community/agora-rest-client-go/core"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/domain"
+	agoraLogger "github.com/AgoraIO-Community/agora-rest-client-go/agora/log"
+	"github.com/AgoraIO-Community/agora-rest-client-go/examples/cloudrecording/base"
 	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording"
-	v1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1"
+	cloudRecordingAPI "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/api"
+	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/scenario/individualrecording"
 )
 
 type Service struct {
-	region     core.RegionArea
-	appId      string
-	cname      string
-	uid        string
-	credential core.Credential
+	base.Service
 }
 
-func NewService(region core.RegionArea, appId, cname, uid string) *Service {
+func NewService(region domain.Area, appId, cname, uid string) *Service {
 	return &Service{
-		region:     region,
-		appId:      appId,
-		cname:      cname,
-		uid:        uid,
-		credential: nil,
+		base.Service{
+			DomainArea: region,
+			AppId:      appId,
+			Cname:      cname,
+			Uid:        uid,
+			Credential: nil,
+		},
 	}
 }
 
-func (s *Service) SetCredential(username, password string) {
-	s.credential = core.NewBasicAuthCredential(username, password)
-}
-
-func (s *Service) RunRecording(token string, storageConfig *v1.StorageConfig) {
+func (s *Service) RunRecording(token string, storageConfig *cloudRecordingAPI.StorageConfig) {
 	ctx := context.Background()
-	c := core.NewClient(&core.Config{
-		AppID:      s.appId,
-		Credential: s.credential,
-		RegionCode: s.region,
-		Logger:     core.NewDefaultLogger(core.LogDebug),
-	})
+	config := &agora.Config{
+		AppID:      s.AppId,
+		Credential: s.Credential,
+		DomainArea: s.DomainArea,
+		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
+	}
 
-	impl := cloudrecording.NewAPI(c).V1().IndividualRecording()
+	cloudRecordingClient, err := cloudrecording.NewClient(config)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+
 	// acquire
-	acquireResp, err := impl.Acquire().Do(ctx, s.cname, s.uid, false, &v1.AcquireIndividualRecodingClientRequest{})
+	acquireResp, err := cloudRecordingClient.IndividualRecording().Acquire(ctx, s.Cname, s.Uid, false, &individualrecording.AcquireIndividualRecodingClientRequest{})
 	if err != nil {
 		log.Println(err)
 		return
@@ -57,9 +60,9 @@ func (s *Service) RunRecording(token string, storageConfig *v1.StorageConfig) {
 
 	resourceId := acquireResp.SuccessRes.ResourceId
 	// start
-	startResp, err := impl.Start().Do(ctx, resourceId, s.cname, s.uid, &v1.StartIndividualRecordingClientRequest{
+	startResp, err := cloudRecordingClient.IndividualRecording().Start(ctx, resourceId, s.Cname, s.Uid, &individualrecording.StartIndividualRecordingClientRequest{
 		Token: token,
-		RecordingConfig: &v1.RecordingConfig{
+		RecordingConfig: &cloudRecordingAPI.RecordingConfig{
 			ChannelType: 1,
 			StreamTypes: 2,
 			MaxIdleTime: 30,
@@ -71,7 +74,7 @@ func (s *Service) RunRecording(token string, storageConfig *v1.StorageConfig) {
 			},
 			SubscribeUidGroup: 0,
 		},
-		RecordingFileConfig: &v1.RecordingFileConfig{
+		RecordingFileConfig: &cloudRecordingAPI.RecordingFileConfig{
 			AvFileType: []string{
 				"hls",
 			},
@@ -92,7 +95,7 @@ func (s *Service) RunRecording(token string, storageConfig *v1.StorageConfig) {
 	sid := startResp.SuccessResponse.Sid
 	// stop
 	defer func() {
-		stopResp, err := impl.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)
+		stopResp, err := cloudRecordingClient.IndividualRecording().Stop(ctx, resourceId, sid, s.Cname, s.Uid, false)
 		if err != nil {
 			log.Println(err)
 			return
@@ -107,7 +110,7 @@ func (s *Service) RunRecording(token string, storageConfig *v1.StorageConfig) {
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
+		queryResp, err := cloudRecordingClient.IndividualRecording().Query(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
@@ -122,14 +125,14 @@ func (s *Service) RunRecording(token string, storageConfig *v1.StorageConfig) {
 	}
 
 	// update
-	updateResp, err := impl.Update().Do(ctx, resourceId, sid, s.cname, s.uid, &v1.UpdateIndividualRecordingClientRequest{
-		StreamSubscribe: &v1.UpdateStreamSubscribe{
-			AudioUidList: &v1.UpdateAudioUIDList{
+	updateResp, err := cloudRecordingClient.IndividualRecording().Update(ctx, resourceId, sid, s.Cname, s.Uid, &individualrecording.UpdateIndividualRecordingClientRequest{
+		StreamSubscribe: &cloudRecordingAPI.UpdateStreamSubscribe{
+			AudioUidList: &cloudRecordingAPI.UpdateAudioUIDList{
 				SubscribeAudioUIDs: []string{
 					"#allstream#",
 				},
 			},
-			VideoUidList: &v1.UpdateVideoUIDList{
+			VideoUidList: &cloudRecordingAPI.UpdateVideoUIDList{
 				SubscribeVideoUIDs: []string{
 					"#allstream#",
 				},
@@ -149,7 +152,7 @@ func (s *Service) RunRecording(token string, storageConfig *v1.StorageConfig) {
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
+		queryResp, err := cloudRecordingClient.IndividualRecording().Query(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
@@ -164,18 +167,21 @@ func (s *Service) RunRecording(token string, storageConfig *v1.StorageConfig) {
 	}
 }
 
-func (s *Service) RunSnapshot(token string, storageConfig *v1.StorageConfig) {
+func (s *Service) RunSnapshot(token string, storageConfig *cloudRecordingAPI.StorageConfig) {
 	ctx := context.Background()
-	c := core.NewClient(&core.Config{
-		AppID:      s.appId,
-		Credential: s.credential,
-		RegionCode: s.region,
-		Logger:     core.NewDefaultLogger(core.LogDebug),
-	})
+	config := &agora.Config{
+		AppID:      s.AppId,
+		Credential: s.Credential,
+		DomainArea: s.DomainArea,
+		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
+	}
+	cloudRecordingClient, err := cloudrecording.NewClient(config)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-	impl := cloudrecording.NewAPI(c).V1().IndividualRecording()
 	// acquire
-	acquireResp, err := impl.Acquire().Do(ctx, s.cname, s.uid, false, &v1.AcquireIndividualRecodingClientRequest{})
+	acquireResp, err := cloudRecordingClient.IndividualRecording().Acquire(ctx, s.Cname, s.Uid, false, &individualrecording.AcquireIndividualRecodingClientRequest{})
 	if err != nil {
 		log.Println(err)
 		return
@@ -189,9 +195,9 @@ func (s *Service) RunSnapshot(token string, storageConfig *v1.StorageConfig) {
 
 	resourceId := acquireResp.SuccessRes.ResourceId
 	// start
-	startResp, err := impl.Start().Do(ctx, resourceId, s.cname, s.uid, &v1.StartIndividualRecordingClientRequest{
+	startResp, err := cloudRecordingClient.IndividualRecording().Start(ctx, resourceId, s.Cname, s.Uid, &individualrecording.StartIndividualRecordingClientRequest{
 		Token: token,
-		RecordingConfig: &v1.RecordingConfig{
+		RecordingConfig: &cloudRecordingAPI.RecordingConfig{
 			ChannelType: 1,
 			StreamTypes: 2,
 			MaxIdleTime: 30,
@@ -203,7 +209,7 @@ func (s *Service) RunSnapshot(token string, storageConfig *v1.StorageConfig) {
 			},
 			SubscribeUidGroup: 0,
 		},
-		SnapshotConfig: &v1.SnapshotConfig{
+		SnapshotConfig: &cloudRecordingAPI.SnapshotConfig{
 			CaptureInterval: 5,
 			FileType:        []string{"jpg"},
 		},
@@ -223,7 +229,7 @@ func (s *Service) RunSnapshot(token string, storageConfig *v1.StorageConfig) {
 	sid := startResp.SuccessResponse.Sid
 	// stop
 	defer func() {
-		stopResp, err := impl.Stop().DoVideoScreenshot(ctx, resourceId, sid, s.cname, s.uid, false)
+		stopResp, err := cloudRecordingClient.IndividualRecording().Stop(ctx, resourceId, sid, s.Cname, s.Uid, false)
 		if err != nil {
 			log.Println(err)
 			return
@@ -238,7 +244,7 @@ func (s *Service) RunSnapshot(token string, storageConfig *v1.StorageConfig) {
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().DoVideoScreenshot(ctx, resourceId, sid)
+		queryResp, err := cloudRecordingClient.IndividualRecording().QueryVideoScreenshot(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
@@ -253,14 +259,14 @@ func (s *Service) RunSnapshot(token string, storageConfig *v1.StorageConfig) {
 	}
 
 	// update
-	updateResp, err := impl.Update().Do(ctx, resourceId, sid, s.cname, s.uid, &v1.UpdateIndividualRecordingClientRequest{
-		StreamSubscribe: &v1.UpdateStreamSubscribe{
-			AudioUidList: &v1.UpdateAudioUIDList{
+	updateResp, err := cloudRecordingClient.IndividualRecording().Update(ctx, resourceId, sid, s.Cname, s.Uid, &individualrecording.UpdateIndividualRecordingClientRequest{
+		StreamSubscribe: &cloudRecordingAPI.UpdateStreamSubscribe{
+			AudioUidList: &cloudRecordingAPI.UpdateAudioUIDList{
 				SubscribeAudioUIDs: []string{
 					"#allstream#",
 				},
 			},
-			VideoUidList: &v1.UpdateVideoUIDList{
+			VideoUidList: &cloudRecordingAPI.UpdateVideoUIDList{
 				SubscribeVideoUIDs: []string{
 					"#allstream#",
 				},
@@ -280,7 +286,7 @@ func (s *Service) RunSnapshot(token string, storageConfig *v1.StorageConfig) {
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().DoVideoScreenshot(ctx, resourceId, sid)
+		queryResp, err := cloudRecordingClient.IndividualRecording().QueryVideoScreenshot(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
@@ -295,18 +301,20 @@ func (s *Service) RunSnapshot(token string, storageConfig *v1.StorageConfig) {
 	}
 }
 
-func (s *Service) RunRecordingAndSnapshot(token string, storageConfig *v1.StorageConfig) {
+func (s *Service) RunRecordingAndSnapshot(token string, storageConfig *cloudRecordingAPI.StorageConfig) {
 	ctx := context.Background()
-	c := core.NewClient(&core.Config{
-		AppID:      s.appId,
-		Credential: s.credential,
-		RegionCode: s.region,
-		Logger:     core.NewDefaultLogger(core.LogDebug),
-	})
-
-	impl := cloudrecording.NewAPI(c).V1().IndividualRecording()
+	c := &agora.Config{
+		AppID:      s.AppId,
+		Credential: s.Credential,
+		DomainArea: s.DomainArea,
+		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
+	}
+	cloudRecordingClient, err := cloudrecording.NewClient(c)
+	if err != nil {
+		log.Fatalln(err)
+	}
 	// acquire
-	acquireResp, err := impl.Acquire().Do(ctx, s.cname, s.uid, false, &v1.AcquireIndividualRecodingClientRequest{})
+	acquireResp, err := cloudRecordingClient.IndividualRecording().Acquire(ctx, s.Cname, s.Uid, false, &individualrecording.AcquireIndividualRecodingClientRequest{})
 	if err != nil {
 		log.Println(err)
 		return
@@ -320,9 +328,9 @@ func (s *Service) RunRecordingAndSnapshot(token string, storageConfig *v1.Storag
 
 	resourceId := acquireResp.SuccessRes.ResourceId
 	// start
-	startResp, err := impl.Start().Do(ctx, resourceId, s.cname, s.uid, &v1.StartIndividualRecordingClientRequest{
+	startResp, err := cloudRecordingClient.IndividualRecording().Start(ctx, resourceId, s.Cname, s.Uid, &individualrecording.StartIndividualRecordingClientRequest{
 		Token: token,
-		RecordingConfig: &v1.RecordingConfig{
+		RecordingConfig: &cloudRecordingAPI.RecordingConfig{
 			ChannelType: 1,
 			StreamTypes: 2,
 			MaxIdleTime: 30,
@@ -334,12 +342,12 @@ func (s *Service) RunRecordingAndSnapshot(token string, storageConfig *v1.Storag
 			},
 			SubscribeUidGroup: 0,
 		},
-		RecordingFileConfig: &v1.RecordingFileConfig{
+		RecordingFileConfig: &cloudRecordingAPI.RecordingFileConfig{
 			AvFileType: []string{
 				"hls",
 			},
 		},
-		SnapshotConfig: &v1.SnapshotConfig{
+		SnapshotConfig: &cloudRecordingAPI.SnapshotConfig{
 			CaptureInterval: 5,
 			FileType:        []string{"jpg"},
 		},
@@ -359,7 +367,7 @@ func (s *Service) RunRecordingAndSnapshot(token string, storageConfig *v1.Storag
 	sid := startResp.SuccessResponse.Sid
 	// stop
 	defer func() {
-		stopResp, err := impl.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)
+		stopResp, err := cloudRecordingClient.IndividualRecording().Stop(ctx, resourceId, sid, s.Cname, s.Uid, false)
 		if err != nil {
 			log.Println(err)
 			return
@@ -374,7 +382,7 @@ func (s *Service) RunRecordingAndSnapshot(token string, storageConfig *v1.Storag
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
+		queryResp, err := cloudRecordingClient.IndividualRecording().Query(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
@@ -389,14 +397,14 @@ func (s *Service) RunRecordingAndSnapshot(token string, storageConfig *v1.Storag
 	}
 
 	// update
-	updateResp, err := impl.Update().Do(ctx, resourceId, sid, s.cname, s.uid, &v1.UpdateIndividualRecordingClientRequest{
-		StreamSubscribe: &v1.UpdateStreamSubscribe{
-			AudioUidList: &v1.UpdateAudioUIDList{
+	updateResp, err := cloudRecordingClient.IndividualRecording().Update(ctx, resourceId, sid, s.Cname, s.Uid, &individualrecording.UpdateIndividualRecordingClientRequest{
+		StreamSubscribe: &cloudRecordingAPI.UpdateStreamSubscribe{
+			AudioUidList: &cloudRecordingAPI.UpdateAudioUIDList{
 				SubscribeAudioUIDs: []string{
 					"#allstream#",
 				},
 			},
-			VideoUidList: &v1.UpdateVideoUIDList{
+			VideoUidList: &cloudRecordingAPI.UpdateVideoUIDList{
 				SubscribeVideoUIDs: []string{
 					"#allstream#",
 				},
@@ -416,7 +424,7 @@ func (s *Service) RunRecordingAndSnapshot(token string, storageConfig *v1.Storag
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
+		queryResp, err := cloudRecordingClient.IndividualRecording().Query(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
@@ -431,18 +439,22 @@ func (s *Service) RunRecordingAndSnapshot(token string, storageConfig *v1.Storag
 	}
 }
 
-func (s *Service) RunRecordingAndPostponeTranscoding(token string, storageConfig *v1.StorageConfig) {
+func (s *Service) RunRecordingAndPostponeTranscoding(token string, storageConfig *cloudRecordingAPI.StorageConfig) {
 	ctx := context.Background()
-	c := core.NewClient(&core.Config{
-		AppID:      s.appId,
-		Credential: s.credential,
-		RegionCode: s.region,
-		Logger:     core.NewDefaultLogger(core.LogDebug),
-	})
+	config := &agora.Config{
+		AppID:      s.AppId,
+		Credential: s.Credential,
+		DomainArea: s.DomainArea,
+		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
+	}
 
-	impl := cloudrecording.NewAPI(c).V1().IndividualRecording()
+	cloudRecordingClient, err := cloudrecording.NewClient(config)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	// acquire
-	acquireResp, err := impl.Acquire().Do(ctx, s.cname, s.uid, true, &v1.AcquireIndividualRecodingClientRequest{})
+	acquireResp, err := cloudRecordingClient.IndividualRecording().Acquire(ctx, s.Cname, s.Uid, true, &individualrecording.AcquireIndividualRecodingClientRequest{})
 	if err != nil {
 		log.Println(err)
 		return
@@ -456,9 +468,9 @@ func (s *Service) RunRecordingAndPostponeTranscoding(token string, storageConfig
 
 	resourceId := acquireResp.SuccessRes.ResourceId
 	// start
-	startResp, err := impl.Start().Do(ctx, resourceId, s.cname, s.uid, &v1.StartIndividualRecordingClientRequest{
+	startResp, err := cloudRecordingClient.IndividualRecording().Start(ctx, resourceId, s.Cname, s.Uid, &individualrecording.StartIndividualRecordingClientRequest{
 		Token: token,
-		RecordingConfig: &v1.RecordingConfig{
+		RecordingConfig: &cloudRecordingAPI.RecordingConfig{
 			ChannelType: 1,
 			StreamTypes: 2,
 			MaxIdleTime: 30,
@@ -470,20 +482,20 @@ func (s *Service) RunRecordingAndPostponeTranscoding(token string, storageConfig
 			},
 			SubscribeUidGroup: 0,
 		},
-		RecordingFileConfig: &v1.RecordingFileConfig{
+		RecordingFileConfig: &cloudRecordingAPI.RecordingFileConfig{
 			AvFileType: []string{
 				"hls",
 			},
 		},
 		StorageConfig: storageConfig,
-		AppsCollection: &v1.AppsCollection{
+		AppsCollection: &cloudRecordingAPI.AppsCollection{
 			CombinationPolicy: "postpone_transcoding",
 		},
-		TranscodeOptions: &v1.TranscodeOptions{
-			Container: &v1.Container{
+		TranscodeOptions: &cloudRecordingAPI.TranscodeOptions{
+			Container: &cloudRecordingAPI.Container{
 				Format: "mp4",
 			},
-			TransConfig: &v1.TransConfig{
+			TransConfig: &cloudRecordingAPI.TransConfig{
 				TransMode: "postponeTranscoding",
 			},
 		},
@@ -502,7 +514,7 @@ func (s *Service) RunRecordingAndPostponeTranscoding(token string, storageConfig
 	sid := startResp.SuccessResponse.Sid
 	// stop
 	defer func() {
-		stopResp, err := impl.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)
+		stopResp, err := cloudRecordingClient.IndividualRecording().Stop(ctx, resourceId, sid, s.Cname, s.Uid, false)
 		if err != nil {
 			log.Println(err)
 			return
@@ -517,7 +529,7 @@ func (s *Service) RunRecordingAndPostponeTranscoding(token string, storageConfig
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
+		queryResp, err := cloudRecordingClient.IndividualRecording().Query(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
@@ -532,14 +544,14 @@ func (s *Service) RunRecordingAndPostponeTranscoding(token string, storageConfig
 	}
 
 	// update
-	updateResp, err := impl.Update().Do(ctx, resourceId, sid, s.cname, s.uid, &v1.UpdateIndividualRecordingClientRequest{
-		StreamSubscribe: &v1.UpdateStreamSubscribe{
-			AudioUidList: &v1.UpdateAudioUIDList{
+	updateResp, err := cloudRecordingClient.IndividualRecording().Update(ctx, resourceId, sid, s.Cname, s.Uid, &individualrecording.UpdateIndividualRecordingClientRequest{
+		StreamSubscribe: &cloudRecordingAPI.UpdateStreamSubscribe{
+			AudioUidList: &cloudRecordingAPI.UpdateAudioUIDList{
 				SubscribeAudioUIDs: []string{
 					"#allstream#",
 				},
 			},
-			VideoUidList: &v1.UpdateVideoUIDList{
+			VideoUidList: &cloudRecordingAPI.UpdateVideoUIDList{
 				SubscribeVideoUIDs: []string{
 					"#allstream#",
 				},
@@ -559,7 +571,7 @@ func (s *Service) RunRecordingAndPostponeTranscoding(token string, storageConfig
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
+		queryResp, err := cloudRecordingClient.IndividualRecording().Query(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
@@ -574,18 +586,22 @@ func (s *Service) RunRecordingAndPostponeTranscoding(token string, storageConfig
 	}
 }
 
-func (s *Service) RunRecordingAndAudioMix(token string, storageConfig *v1.StorageConfig) {
+func (s *Service) RunRecordingAndAudioMix(token string, storageConfig *cloudRecordingAPI.StorageConfig) {
 	ctx := context.Background()
-	c := core.NewClient(&core.Config{
-		AppID:      s.appId,
-		Credential: s.credential,
-		RegionCode: s.region,
-		Logger:     core.NewDefaultLogger(core.LogDebug),
-	})
+	config := &agora.Config{
+		AppID:      s.AppId,
+		Credential: s.Credential,
+		DomainArea: s.DomainArea,
+		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
+	}
 
-	impl := cloudrecording.NewAPI(c).V1().IndividualRecording()
+	cloudRecordingClient, err := cloudrecording.NewClient(config)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	// acquire
-	acquireResp, err := impl.Acquire().Do(ctx, s.cname, s.uid, true, &v1.AcquireIndividualRecodingClientRequest{})
+	acquireResp, err := cloudRecordingClient.IndividualRecording().Acquire(ctx, s.Cname, s.Uid, true, &individualrecording.AcquireIndividualRecodingClientRequest{})
 	if err != nil {
 		log.Println(err)
 		return
@@ -599,9 +615,9 @@ func (s *Service) RunRecordingAndAudioMix(token string, storageConfig *v1.Storag
 
 	resourceId := acquireResp.SuccessRes.ResourceId
 	// start
-	startResp, err := impl.Start().Do(ctx, resourceId, s.cname, s.uid, &v1.StartIndividualRecordingClientRequest{
+	startResp, err := cloudRecordingClient.IndividualRecording().Start(ctx, resourceId, s.Cname, s.Uid, &individualrecording.StartIndividualRecordingClientRequest{
 		Token: token,
-		RecordingConfig: &v1.RecordingConfig{
+		RecordingConfig: &cloudRecordingAPI.RecordingConfig{
 			ChannelType: 1,
 			StreamTypes: 0,
 			StreamMode:  "original",
@@ -611,23 +627,23 @@ func (s *Service) RunRecordingAndAudioMix(token string, storageConfig *v1.Storag
 			},
 			SubscribeUidGroup: 0,
 		},
-		RecordingFileConfig: &v1.RecordingFileConfig{
+		RecordingFileConfig: &cloudRecordingAPI.RecordingFileConfig{
 			AvFileType: []string{
 				"hls",
 			},
 		},
 		StorageConfig: storageConfig,
-		AppsCollection: &v1.AppsCollection{
+		AppsCollection: &cloudRecordingAPI.AppsCollection{
 			CombinationPolicy: "postpone_transcoding",
 		},
-		TranscodeOptions: &v1.TranscodeOptions{
-			Container: &v1.Container{
+		TranscodeOptions: &cloudRecordingAPI.TranscodeOptions{
+			Container: &cloudRecordingAPI.Container{
 				Format: "mp3",
 			},
-			TransConfig: &v1.TransConfig{
+			TransConfig: &cloudRecordingAPI.TransConfig{
 				TransMode: "audioMix",
 			},
-			Audio: &v1.Audio{
+			Audio: &cloudRecordingAPI.Audio{
 				SampleRate: "48000",
 				BitRate:    "48000",
 				Channels:   "2",
@@ -648,7 +664,7 @@ func (s *Service) RunRecordingAndAudioMix(token string, storageConfig *v1.Storag
 	sid := startResp.SuccessResponse.Sid
 	// stop
 	defer func() {
-		stopResp, err := impl.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)
+		stopResp, err := cloudRecordingClient.IndividualRecording().Stop(ctx, resourceId, sid, s.Cname, s.Uid, false)
 		if err != nil {
 			log.Println(err)
 			return
@@ -663,7 +679,7 @@ func (s *Service) RunRecordingAndAudioMix(token string, storageConfig *v1.Storag
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
+		queryResp, err := cloudRecordingClient.IndividualRecording().Query(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
@@ -678,9 +694,9 @@ func (s *Service) RunRecordingAndAudioMix(token string, storageConfig *v1.Storag
 	}
 
 	// update
-	updateResp, err := impl.Update().Do(ctx, resourceId, sid, s.cname, s.uid, &v1.UpdateIndividualRecordingClientRequest{
-		StreamSubscribe: &v1.UpdateStreamSubscribe{
-			AudioUidList: &v1.UpdateAudioUIDList{
+	updateResp, err := cloudRecordingClient.IndividualRecording().Update(ctx, resourceId, sid, s.Cname, s.Uid, &individualrecording.UpdateIndividualRecordingClientRequest{
+		StreamSubscribe: &cloudRecordingAPI.UpdateStreamSubscribe{
+			AudioUidList: &cloudRecordingAPI.UpdateAudioUIDList{
 				SubscribeAudioUIDs: []string{
 					"#allstream#",
 				},
@@ -700,7 +716,7 @@ func (s *Service) RunRecordingAndAudioMix(token string, storageConfig *v1.Storag
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
+		queryResp, err := cloudRecordingClient.IndividualRecording().Query(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return

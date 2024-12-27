@@ -26,7 +26,7 @@
   > ![](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/rtm_config2.jpg)  
   > ![](https://fullapp.oss-cn-beijing.aliyuncs.com/agora-rest-client/go/open_cloud_recording.png)
 
-## API V1 接口调用示例
+## API 接口调用示例
 ### 获取云端录制资源
 > 在开始云端录制之前，你需要调用 acquire 方法获取一个 Resource ID。一个 Resource ID 只能用于一次云端录制服务。
 
@@ -38,21 +38,29 @@
 - uid: 用户 UID
 - 更多 clientRequest中的参数见[Acquire](https://doc.shengwang.cn/doc/cloud-recording/restful/cloud-recording/operations/post-v1-apps-appid-cloud_recording-acquire)接口文档
 
-通过调用`Acquire().Do`方法来实现获取云端录制资源
+通过调用`Acquire`方法来实现获取云端录制资源
 ```go
-	client := core.NewClient(&core.Config{
+    appId := "xxxx"
+    username := "xxxx"
+    password := "xxxx"
+    credential := auth.NewBasicAuthCredential(username, password)
+	config := &agora.Config{
 		AppID:      appId,
-		Credential: core.NewBasicAuthCredential(username, password),
-		RegionCode: core.CN,
-		Logger:     core.NewDefaultLogger(core.LogDebug),
-	})
+		Credential: credential,
+        DomainArea: domain.CN,
+		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
+	}
 
-	cloudRecordingAPI := cloudrecording.NewAPI(client)
+	cloudRecordingClient, err := cloudrecording.NewClient(config)
+	if err != nil {
+		log.Println(err)
+		return
+	}
 
-	resp, err := cloudRecordingAPI.V1().Acquire().Do(context.TODO(), &v1.AcquireReqBody{
+	resp, err := cloudRecordingClient.Acquire(context.TODO(), &cloudRecordingAPI.AcquireReqBody{
 		Cname: "12321",
 		Uid:   "43434",
-		ClientRequest: &v1.AcquireClientRequest{
+		ClientRequest: &cloudRecordingAPI.AcquireClientRequest{
 			Scene:               0,
 		},
 	})
@@ -77,19 +85,19 @@
 - mode: 云端录制模式
 - 更多 clientRequest中的参数见[Start](https://doc.shengwang.cn/doc/cloud-recording/restful/cloud-recording/operations/post-v1-apps-appid-cloud_recording-resourceid-resourceid-mode-mode-start)接口文档
 
-通过调用`Start().Do`方法来实现开始云端录制
+通过调用`Start`方法来实现开始云端录制
 ```go
-	startResp, err := cloudRecordingAPI.V1().Start().Do(ctx, resp.SuccessRes.ResourceId, mode, &v1.StartReqBody{
+	startResp, err := cloudRecordingClient.Start(ctx, resp.SuccessRes.ResourceId, mode, &cloudRecordingAPI.StartReqBody{
 		Cname: cname,
 		Uid:   uid,
-		ClientRequest: &v1.StartClientRequest{
+		ClientRequest: &cloudRecordingAPI.StartClientRequest{
 			Token: token,
-			RecordingConfig: &v1.RecordingConfig{
+			RecordingConfig: &cloudRecordingAPI.RecordingConfig{
 				ChannelType:  1,
 				StreamTypes:  2,
 				AudioProfile: 2,
 				MaxIdleTime:  30,
-				TranscodingConfig: &v1.TranscodingConfig{
+				TranscodingConfig: &cloudRecordingAPI.TranscodingConfig{
 					Width:            640,
 					Height:           260,
 					FPS:              15,
@@ -106,12 +114,12 @@
 					"456",
 				},
 			},
-			RecordingFileConfig: &v1.RecordingFileConfig{
+			RecordingFileConfig: &cloudRecordingAPI.RecordingFileConfig{
 				AvFileType: []string{
 					"hls",
 				},
 			},
-			StorageConfig: &v1.StorageConfig{
+			StorageConfig: &cloudRecordingAPI.StorageConfig{
 				Vendor:    2,
 				Region:    3,
 				Bucket:    "xxx",
@@ -147,12 +155,12 @@
 
 因为Stop 接口返回的不是一个固定的结构体，所以需要根据返回的serverResponseMode来判断具体的返回类型
 
-通过调用`Stop().Do`方法来实现停止云端录制
+通过调用`Stop`方法来实现停止云端录制
 ```go
-    stopResp, err := cloudRecordingAPI.V1().Stop().Do(ctx, resourceId, sid, mode, &v1.StopReqBody{
+    stopResp, err := cloudRecordingClient.Stop(ctx, resourceId, sid, mode, &cloudRecordingAPI.cloudRecordingAPI{
 		Cname: cname,
 		Uid:   uid,
-		ClientRequest: &v1.StopClientRequest{
+		ClientRequest: &cloudRecordingAPI.StopClientRequest{
 			AsyncStop: true,
 		},
 	})
@@ -164,29 +172,6 @@
 	} else {
 		log.Fatalf("stop failed:%+v", &stopResp.ErrResponse)
 	}
-	stopSuccess := stopResp.SuccessResponse
-	var stopServerResponse interface{}
-	switch stopSuccess.GetServerResponseMode() {
-	case v1.StopServerResponseUnknownMode:
-		log.Fatalln("unknown mode")
-	case v1.StopIndividualRecordingServerResponseMode:
-		log.Printf("serverResponseMode:%d", v1.StopIndividualRecordingServerResponseMode)
-		stopServerResponse = stopSuccess.GetIndividualRecordingServerResponse()
-	case v1.StopIndividualVideoScreenshotServerResponseMode:
-		log.Printf("serverResponseMode:%d", v1.StopIndividualVideoScreenshotServerResponseMode)
-		stopServerResponse = stopSuccess.GetIndividualVideoScreenshotServerResponse()
-	case v1.StopMixRecordingHlsServerResponseMode:
-		log.Printf("serverResponseMode:%d", v1.StopMixRecordingHlsServerResponseMode)
-		stopServerResponse = stopSuccess.GetMixRecordingHLSServerResponse()
-	case v1.StopMixRecordingHlsAndMp4ServerResponseMode:
-		log.Printf("serverResponseMode:%d", v1.StopMixRecordingHlsAndMp4ServerResponseMode)
-		stopServerResponse = stopSuccess.GetMixRecordingHLSAndMP4ServerResponse()
-	case v1.StopWebRecordingServerResponseMode:
-		log.Printf("serverResponseMode:%d", v1.StopWebRecordingServerResponseMode)
-		stopServerResponse = stopSuccess.GetWebRecordingServerResponse()
-	}
-	log.Printf("stopServerResponse:%+v", stopServerResponse)
-
 ```
 
 ### 查询云端录制状态
@@ -202,9 +187,9 @@
 
 因为 Query 接口返回的不是一个固定的结构体，所以需要根据返回的serverResponseMode来判断具体的返回类型
 
-通过调用`Query().Do`方法来实现查询云端录制状态
+通过调用`Query`方法来实现查询云端录制状态
 ```go
-	queryResp, err := cloudRecordingAPI.V1().Query().Do(ctx, resourceId, sid, mode)
+	queryResp, err := cloudRecordingClient.Query(ctx, resourceId, sid, mode)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -219,22 +204,22 @@
 
 	querySuccess := queryResp.SuccessResponse
 	switch querySuccess.GetServerResponseMode() {
-	case v1.QueryServerResponseUnknownMode:
+	case cloudRecordingAPI.QueryServerResponseUnknownMode:
 		log.Fatalln("unknown mode")
-	case v1.QueryIndividualRecordingServerResponseMode:
-		log.Printf("serverResponseMode:%d", v1.QueryIndividualRecordingServerResponseMode)
+	case cloudRecordingAPI.QueryIndividualRecordingServerResponseMode:
+		log.Printf("serverResponseMode:%d", cloudRecordingAPI.QueryIndividualRecordingServerResponseMode)
 		queryServerResponse = querySuccess.GetIndividualRecordingServerResponse()
-	case v1.QueryIndividualVideoScreenshotServerResponseMode:
-		log.Printf("serverResponseMode:%d", v1.QueryIndividualVideoScreenshotServerResponseMode)
+	case cloudRecordingAPI.QueryIndividualVideoScreenshotServerResponseMode:
+		log.Printf("serverResponseMode:%d", cloudRecordingAPI.QueryIndividualVideoScreenshotServerResponseMode)
 		queryServerResponse = querySuccess.GetIndividualVideoScreenshotServerResponse()
-	case v1.QueryMixRecordingHlsServerResponseMode:
-		log.Printf("serverResponseMode:%d", v1.QueryMixRecordingHlsServerResponseMode)
+	case cloudRecordingAPI.QueryMixRecordingHlsServerResponseMode:
+		log.Printf("serverResponseMode:%d", cloudRecordingAPI.QueryMixRecordingHlsServerResponseMode)
 		queryServerResponse = querySuccess.GetMixRecordingHLSServerResponse()
-	case v1.QueryMixRecordingHlsAndMp4ServerResponseMode:
-		log.Printf("serverResponseMode:%d", v1.QueryMixRecordingHlsAndMp4ServerResponseMode)
+	case cloudRecordingAPI.QueryMixRecordingHlsAndMp4ServerResponseMode:
+		log.Printf("serverResponseMode:%d", cloudRecordingAPI.QueryMixRecordingHlsAndMp4ServerResponseMode)
 		queryServerResponse = querySuccess.GetMixRecordingHLSAndMP4ServerResponse()
-	case v1.QueryWebRecordingServerResponseMode:
-		log.Printf("serverResponseMode:%d", v1.QueryWebRecordingServerResponseMode)
+	case cloudRecordingAPI.QueryWebRecordingServerResponseMode:
+		log.Printf("serverResponseMode:%d", cloudRecordingAPI.QueryWebRecordingServerResponseMode)
 		queryServerResponse = querySuccess.GetWebRecording2CDNServerResponse()
 	}
 
@@ -254,19 +239,19 @@
 - mode: 云端录制模式
 - 更多 clientRequest中的参数见[Update](https://doc.shengwang.cn/doc/cloud-recording/restful/cloud-recording/operations/post-v1-apps-appid-cloud_recording-resourceid-resourceid-sid-sid-mode-mode-update)接口文档
 
-通过调用`Update().Do`方法来实现更新云端录制设置
+通过调用`Update`方法来实现更新云端录制设置
 ```go
-	updateResp, err := cloudRecordingAPI.V1().Update().Do(ctx, resourceId, sid, mode, &v1.UpdateReqBody{
+	updateResp, err := cloudRecordingClient.Update(ctx, resourceId, sid, mode, &cloudRecordingAPI.UpdateReqBody{
 		Cname: cname,
 		Uid:   uid,
-		ClientRequest: &v1.UpdateClientRequest{
-			StreamSubscribe: &v1.UpdateStreamSubscribe{
-				AudioUidList: &v1.UpdateAudioUIDList{
+		ClientRequest: &cloudRecordingAPI.UpdateClientRequest{
+			StreamSubscribe: &cloudRecordingAPI.UpdateStreamSubscribe{
+				AudioUidList: &cloudRecordingAPI.UpdateAudioUIDList{
 					SubscribeAudioUIDs: []string{
 						"999",
 					},
 				},
-				VideoUidList: &v1.UpdateVideoUIDList{
+				VideoUidList: &cloudRecordingAPI.UpdateVideoUIDList{
 					SubscribeVideoUIDs: []string{
 						"999",
 					},
@@ -298,15 +283,15 @@
 - mode: 云端录制模式
 - 更多 clientRequest中的参数见[UpdateLayout](https://doc.shengwang.cn/doc/cloud-recording/restful/cloud-recording/operations/post-v1-apps-appid-cloud_recording-resourceid-resourceid-sid-sid-mode-mode-updateLayout)接口文档
 
-通过调用`UpdateLayout().Do`方法来实现更新云端录制合流布局
+通过调用`UpdateLayout`方法来实现更新云端录制合流布局
 ```go
-	updateLayoutResp, err := cloudRecordingAPI.V1().UpdateLayout().Do(ctx, resourceId, sid, mode, &v1.UpdateLayoutReqBody{
+	updateLayoutResp, err := cloudRecordingClient.UpdateLayout(ctx, resourceId, sid, mode, &cloudRecordingAPI.UpdateLayoutReqBody{
 		Cname: cname,
 		Uid:   uid,
-		ClientRequest: &v1.UpdateLayoutClientRequest{
+		ClientRequest: &cloudRecordingAPI.UpdateLayoutClientRequest{
 			MixedVideoLayout: 3,
 			BackgroundColor:  "#FF0000",
-			LayoutConfig: []v1.UpdateLayoutConfig{
+			LayoutConfig: []cloudRecordingAPI.UpdateLayoutConfig{
 				{
 					UID:        "22",
 					XAxis:      0.1,

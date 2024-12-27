@@ -5,45 +5,47 @@ import (
 	"log"
 	"time"
 
-	"github.com/AgoraIO-Community/agora-rest-client-go/core"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/domain"
+	agoraLogger "github.com/AgoraIO-Community/agora-rest-client-go/agora/log"
+	"github.com/AgoraIO-Community/agora-rest-client-go/examples/cloudrecording/base"
 	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording"
-	v1 "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/v1"
+	cloudRecordingAPI "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/api"
+	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/scenario/webrecording"
 )
 
 type Service struct {
-	region     core.RegionArea
-	appId      string
-	cname      string
-	uid        string
-	credential core.Credential
+	base.Service
 }
 
-func NewService(region core.RegionArea, appId, cname, uid string) *Service {
+func NewService(region domain.Area, appId, cname, uid string) *Service {
 	return &Service{
-		region:     region,
-		appId:      appId,
-		cname:      cname,
-		uid:        uid,
-		credential: nil,
+		base.Service{
+			DomainArea: region,
+			AppId:      appId,
+			Cname:      cname,
+			Uid:        uid,
+			Credential: nil,
+		},
 	}
 }
 
-func (s *Service) SetCredential(username, password string) {
-	s.credential = core.NewBasicAuthCredential(username, password)
-}
-
-func (s *Service) RunWebRecorder(storageConfig *v1.StorageConfig) {
+func (s *Service) RunWebRecorder(storageConfig *cloudRecordingAPI.StorageConfig) {
 	ctx := context.Background()
-	c := core.NewClient(&core.Config{
-		AppID:      s.appId,
-		Credential: s.credential,
-		RegionCode: s.region,
-		Logger:     core.NewDefaultLogger(core.LogDebug),
-	})
+	config := &agora.Config{
+		AppID:      s.AppId,
+		Credential: s.Credential,
+		DomainArea: s.DomainArea,
+		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
+	}
 
-	impl := cloudrecording.NewAPI(c).V1().WebRecording()
+	cloudRecordingClient, err := cloudrecording.NewClient(config)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	// acquire
-	acquireResp, err := impl.Acquire().Do(ctx, s.cname, s.uid, &v1.AcquireWebRecodingClientRequest{})
+	acquireResp, err := cloudRecordingClient.WebRecording().Acquire(ctx, s.Cname, s.Uid, &webrecording.AcquireWebRecodingClientRequest{})
 	if err != nil {
 		log.Println(err)
 		return
@@ -57,21 +59,21 @@ func (s *Service) RunWebRecorder(storageConfig *v1.StorageConfig) {
 
 	resourceId := acquireResp.SuccessRes.ResourceId
 	// start
-	startResp, err := impl.Start().Do(ctx, resourceId, s.cname, s.uid, &v1.StartWebRecordingClientRequest{
-		RecordingFileConfig: &v1.RecordingFileConfig{
+	startResp, err := cloudRecordingClient.WebRecording().Start(ctx, resourceId, s.Cname, s.Uid, &webrecording.StartWebRecordingClientRequest{
+		RecordingFileConfig: &cloudRecordingAPI.RecordingFileConfig{
 			AvFileType: []string{
 				"hls",
 				"mp4",
 			},
 		},
 		StorageConfig: storageConfig,
-		ExtensionServiceConfig: &v1.ExtensionServiceConfig{
+		ExtensionServiceConfig: &cloudRecordingAPI.ExtensionServiceConfig{
 			ErrorHandlePolicy: "error_abort",
-			ExtensionServices: []v1.ExtensionService{
+			ExtensionServices: []cloudRecordingAPI.ExtensionService{
 				{
 					ServiceName:       "web_recorder_service",
 					ErrorHandlePolicy: "error_abort",
-					ServiceParam: &v1.WebRecordingServiceParam{
+					ServiceParam: &cloudRecordingAPI.WebRecordingServiceParam{
 						URL:              "https://live.bilibili.com/",
 						AudioProfile:     2,
 						VideoWidth:       1280,
@@ -96,7 +98,7 @@ func (s *Service) RunWebRecorder(storageConfig *v1.StorageConfig) {
 	sid := startResp.SuccessResponse.Sid
 	// stop
 	defer func() {
-		stopResp, err := impl.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)
+		stopResp, err := cloudRecordingClient.WebRecording().Stop(ctx, resourceId, sid, s.Cname, s.Uid, true)
 		if err != nil {
 			log.Println(err)
 			return
@@ -111,7 +113,7 @@ func (s *Service) RunWebRecorder(storageConfig *v1.StorageConfig) {
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
+		queryResp, err := cloudRecordingClient.WebRecording().Query(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
@@ -126,8 +128,8 @@ func (s *Service) RunWebRecorder(storageConfig *v1.StorageConfig) {
 	}
 
 	// update
-	updateResp, err := impl.Update().Do(ctx, resourceId, sid, s.cname, s.uid, &v1.UpdateWebRecordingClientRequest{
-		WebRecordingConfig: &v1.UpdateWebRecordingConfig{
+	updateResp, err := cloudRecordingClient.WebRecording().Update(ctx, resourceId, sid, s.Cname, s.Uid, &webrecording.UpdateWebRecordingClientRequest{
+		WebRecordingConfig: &cloudRecordingAPI.UpdateWebRecordingConfig{
 			Onhold: false,
 		},
 	})
@@ -144,7 +146,7 @@ func (s *Service) RunWebRecorder(storageConfig *v1.StorageConfig) {
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
+		queryResp, err := cloudRecordingClient.WebRecording().Query(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
@@ -159,18 +161,21 @@ func (s *Service) RunWebRecorder(storageConfig *v1.StorageConfig) {
 	}
 }
 
-func (s *Service) RunWebRecorderAndRtmpPublish(storageConfig *v1.StorageConfig) {
+func (s *Service) RunWebRecorderAndRtmpPublish(storageConfig *cloudRecordingAPI.StorageConfig) {
 	ctx := context.Background()
-	c := core.NewClient(&core.Config{
-		AppID:      s.appId,
-		Credential: s.credential,
-		RegionCode: s.region,
-		Logger:     core.NewDefaultLogger(core.LogDebug),
-	})
+	config := &agora.Config{
+		AppID:      s.AppId,
+		Credential: s.Credential,
+		DomainArea: s.DomainArea,
+		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
+	}
 
-	impl := cloudrecording.NewAPI(c).V1().WebRecording()
+	cloudRecordingClient, err := cloudrecording.NewClient(config)
+	if err != nil {
+		log.Fatalln(err)
+	}
 	// acquire
-	acquireResp, err := impl.Acquire().Do(ctx, s.cname, s.uid, &v1.AcquireWebRecodingClientRequest{})
+	acquireResp, err := cloudRecordingClient.WebRecording().Acquire(ctx, s.Cname, s.Uid, &webrecording.AcquireWebRecodingClientRequest{})
 	if err != nil {
 		log.Println(err)
 		return
@@ -184,21 +189,21 @@ func (s *Service) RunWebRecorderAndRtmpPublish(storageConfig *v1.StorageConfig) 
 
 	resourceId := acquireResp.SuccessRes.ResourceId
 	// start
-	startResp, err := impl.Start().Do(ctx, resourceId, s.cname, s.uid, &v1.StartWebRecordingClientRequest{
-		RecordingFileConfig: &v1.RecordingFileConfig{
+	startResp, err := cloudRecordingClient.WebRecording().Start(ctx, resourceId, s.Cname, s.Uid, &webrecording.StartWebRecordingClientRequest{
+		RecordingFileConfig: &cloudRecordingAPI.RecordingFileConfig{
 			AvFileType: []string{
 				"hls",
 				"mp4",
 			},
 		},
 		StorageConfig: storageConfig,
-		ExtensionServiceConfig: &v1.ExtensionServiceConfig{
+		ExtensionServiceConfig: &cloudRecordingAPI.ExtensionServiceConfig{
 			ErrorHandlePolicy: "error_abort",
-			ExtensionServices: []v1.ExtensionService{
+			ExtensionServices: []cloudRecordingAPI.ExtensionService{
 				{
 					ServiceName:       "web_recorder_service",
 					ErrorHandlePolicy: "error_abort",
-					ServiceParam: &v1.WebRecordingServiceParam{
+					ServiceParam: &cloudRecordingAPI.WebRecordingServiceParam{
 						URL:              "https://live.bilibili.com/",
 						AudioProfile:     2,
 						VideoWidth:       1280,
@@ -209,8 +214,8 @@ func (s *Service) RunWebRecorderAndRtmpPublish(storageConfig *v1.StorageConfig) 
 				{
 					ServiceName:       "rtmp_publish_service",
 					ErrorHandlePolicy: "error_ignore",
-					ServiceParam: &v1.RtmpPublishServiceParam{
-						Outputs: []v1.Outputs{
+					ServiceParam: &cloudRecordingAPI.RtmpPublishServiceParam{
+						Outputs: []cloudRecordingAPI.Outputs{
 							{
 								RtmpURL: "rtmp://xxx.xxx.xxx.xxx:1935/live/test",
 							},
@@ -234,7 +239,7 @@ func (s *Service) RunWebRecorderAndRtmpPublish(storageConfig *v1.StorageConfig) 
 	sid := startResp.SuccessResponse.Sid
 	// stop
 	defer func() {
-		stopResp, err := impl.Stop().Do(ctx, resourceId, sid, s.cname, s.uid, false)
+		stopResp, err := cloudRecordingClient.WebRecording().Stop(ctx, resourceId, sid, s.Cname, s.Uid, true)
 		if err != nil {
 			log.Println(err)
 			return
@@ -249,7 +254,7 @@ func (s *Service) RunWebRecorderAndRtmpPublish(storageConfig *v1.StorageConfig) 
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
+		queryResp, err := cloudRecordingClient.WebRecording().Query(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
@@ -264,12 +269,12 @@ func (s *Service) RunWebRecorderAndRtmpPublish(storageConfig *v1.StorageConfig) 
 	}
 
 	// update
-	updateResp, err := impl.Update().Do(ctx, resourceId, sid, s.cname, s.uid, &v1.UpdateWebRecordingClientRequest{
-		WebRecordingConfig: &v1.UpdateWebRecordingConfig{
+	updateResp, err := cloudRecordingClient.WebRecording().Update(ctx, resourceId, sid, s.Cname, s.Uid, &webrecording.UpdateWebRecordingClientRequest{
+		WebRecordingConfig: &cloudRecordingAPI.UpdateWebRecordingConfig{
 			Onhold: false,
 		},
-		RtmpPublishConfig: &v1.UpdateRtmpPublishConfig{
-			Outputs: []v1.UpdateOutput{
+		RtmpPublishConfig: &cloudRecordingAPI.UpdateRtmpPublishConfig{
+			Outputs: []cloudRecordingAPI.UpdateOutput{
 				{
 					RtmpURL: "rtmp://yyy.yyy.yyy.yyy:1935/live/test",
 				},
@@ -289,7 +294,7 @@ func (s *Service) RunWebRecorderAndRtmpPublish(storageConfig *v1.StorageConfig) 
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := impl.Query().Do(ctx, resourceId, sid)
+		queryResp, err := cloudRecordingClient.WebRecording().Query(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
