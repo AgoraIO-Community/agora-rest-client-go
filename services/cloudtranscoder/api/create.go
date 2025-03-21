@@ -17,7 +17,7 @@ type Create struct {
 	module     string
 	logger     log.Logger
 	client     client.Client
-	prefixPath string
+	prefixPath string // /v1/projects/{appid}/rtsc/cloud-transcoder
 }
 
 func NewCreate(module string, logger log.Logger, client client.Client, prefixPath string) *Create {
