@@ -9,9 +9,15 @@ type ResponseInterface interface {
 	IsSuccess() bool
 }
 
+// @brief HTTP response
+//
+// @since v0.7.0
 type BaseResponse struct {
-	RawResponse    *http.Response
-	RawBody        []byte
+	// HTTP Raw response
+	RawResponse *http.Response
+	// Raw body of the response
+	RawBody []byte
+	// HTTP status code
 	HttpStatusCode int
 }
 
@@ -25,6 +31,9 @@ func (r *BaseResponse) UnmarshalToTarget(target interface{}) error {
 	return nil
 }
 
+// @brief Get the request ID from the response
+//
+// @since v0.7.0
 func (r *BaseResponse) GetRequestID() string {
 	if r.RawResponse != nil {
 		return r.RawResponse.Header.Get("X-Request-Id")

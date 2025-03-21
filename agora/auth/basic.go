@@ -12,6 +12,17 @@ type BasicAuthCredential struct {
 // Ensure BasicAuthCredential implements Credential
 var _ Credential = (*BasicAuthCredential)(nil)
 
+// @brief Create a new BasicAuthCredential instance
+//
+// @note Customer ID and customer secret obtained from the Agora console, used for HTTP basic authentication
+//
+// @param username Customer ID obtained from the Agora console
+//
+// @param password Customer secret obtained from the Agora console
+//
+// @return Returns the BasicAuthCredential instance
+//
+// @since v0.7.0
 func NewBasicAuthCredential(username string, password string) *BasicAuthCredential {
 	return &BasicAuthCredential{
 		username: username,

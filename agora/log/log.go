@@ -7,16 +7,25 @@ import (
 	"os"
 )
 
+// @brief Level of the log message
+//
+// @since v0.7.0
 type Level int
 
 const (
+	// DebugLevel is the lowest log level. It is used for debugging purposes.
 	DebugLevel Level = iota
+	// InfoLevel is used for informational messages.
 	InfoLevel
+	// WarningLevel is used for warning messages.
 	WarningLevel
+	// ErrLevel is used for error messages.
 	ErrLevel
-	UnknownLevel
 )
 
+// @brief Logger interface,implement this interface to output logs to your logging component
+//
+// @since v0.7.0
 type Logger interface {
 	Debug(ctx context.Context, module string, v ...interface{})
 	Debugf(ctx context.Context, module string, format string, v ...interface{})
@@ -55,7 +64,7 @@ func (d *discardLogger) Warn(ctx context.Context, module string, v ...interface{
 func (d *discardLogger) Warnf(ctx context.Context, module string, format string, v ...interface{}) {}
 
 func (d *discardLogger) Level() Level {
-	return UnknownLevel
+	return DebugLevel
 }
 
 func (d *discardLogger) SetLevel(level Level) {}
@@ -77,6 +86,11 @@ const (
 
 var DefaultLogger = NewDefaultLogger(defaultLogLevel)
 
+// @brief Creates a default logger with the specified log level
+//
+// @param level Log level. See Level for details.
+//
+// @since v0.7.0
 func NewDefaultLogger(level Level) *sampleLogger {
 	return &sampleLogger{
 		DEBUG: log.New(os.Stdout, fmt.Sprintf("DEBUG %s ", defaultLogPrefix), defaultLogFlag),

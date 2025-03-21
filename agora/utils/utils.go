@@ -19,3 +19,7 @@ func IsNil(v interface{}) bool {
 	rv := reflect.ValueOf(v)
 	return rv.Kind() == reflect.Ptr && rv.IsNil()
 }
+
+func Ptr[T any](v T) *T {
+	return &v
+}

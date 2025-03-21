@@ -17,7 +17,7 @@ type Delete struct {
 	module     string
 	logger     log.Logger
 	client     client.Client
-	prefixPath string // /v1/apps/{appid}/cloud_recording
+	prefixPath string // /v1/projects/{appid}/rtsc/cloud-transcoder
 }
 
 func NewDelete(module string, logger log.Logger, client client.Client, prefixPath string) *Delete {
