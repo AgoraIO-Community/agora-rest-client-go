@@ -12,8 +12,8 @@ import (
 )
 
 const (
-	ChinaMainlandMajorDomain = "sd-rtn.com"
-	OverseaMajorDomain       = "agora.io"
+	ChineseMainlandMajorDomain = "sd-rtn.com"
+	OverseaMajorDomain         = "agora.io"
 )
 
 const GlobalDomainPrefix = "api"
@@ -51,7 +51,7 @@ var RegionDomain = map[Area]Domain{
 		},
 		MajorDomainSuffixes: []string{
 			OverseaMajorDomain,
-			ChinaMainlandMajorDomain,
+			ChineseMainlandMajorDomain,
 		},
 	},
 	EU: {
@@ -61,7 +61,7 @@ var RegionDomain = map[Area]Domain{
 		},
 		MajorDomainSuffixes: []string{
 			OverseaMajorDomain,
-			ChinaMainlandMajorDomain,
+			ChineseMainlandMajorDomain,
 		},
 	},
 	AP: {
@@ -71,7 +71,7 @@ var RegionDomain = map[Area]Domain{
 		},
 		MajorDomainSuffixes: []string{
 			OverseaMajorDomain,
-			ChinaMainlandMajorDomain,
+			ChineseMainlandMajorDomain,
 		},
 	},
 	CN: {
@@ -80,7 +80,7 @@ var RegionDomain = map[Area]Domain{
 			CNNorthRegionDomainPrefix,
 		},
 		MajorDomainSuffixes: []string{
-			ChinaMainlandMajorDomain,
+			ChineseMainlandMajorDomain,
 			OverseaMajorDomain,
 		},
 	},
