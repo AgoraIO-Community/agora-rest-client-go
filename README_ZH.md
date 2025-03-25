@@ -25,7 +25,7 @@
 ## 支持的服务
 * [云端录制 Cloud Recording](./services/cloudrecording/README.md)
 * [云端转码 Cloud Transcoder](./services/cloudtranscoder/README.md)
-* [对话式 AI 引擎 Conversationsal AI Engine](./services/convoai/README_ZH.md)
+* [对话式 AI 引擎 Conversational AI Engine](./services/convoai/README_ZH.md)
 
 ## 环境准备
 * [Go 1.18 或以上版本](https://go.dev/)
