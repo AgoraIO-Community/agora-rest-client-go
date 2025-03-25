@@ -41,6 +41,10 @@ func WithLimit(limit int) ListOption {
 //
 //   - STOPPED (4): Intelligent agent has completed exit
 //
+//   - RECOVERING (5): The agent is recovering.
+//
+//   - FAILED (6): The agent has failed.
+//
 // @return Returns the ListOption function
 //
 // @since v0.7.0
