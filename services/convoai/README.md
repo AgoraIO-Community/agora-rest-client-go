@@ -29,7 +29,7 @@ Agora's Conversational AI Engine redefines human-computer interaction, breaking 
 
 ## API Definition
 
-For more api details, please refer to the [API Documentation](https://doc.shengwang.cn//api-ref/convoai/go/go-api/overview)
+For more api details, please refer to the [API Documentation](https://doc.shengwang.cn/api-ref/convoai/go/go-api/overview)
 
 ## API Call Examples
 

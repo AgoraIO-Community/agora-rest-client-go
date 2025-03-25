@@ -29,7 +29,7 @@
 
 ## API定义
 
-更多API详情，请参考 [API文档](https://doc.shengwang.cn//api-ref/convoai/go/go-api/overview)
+更多API详情，请参考 [API文档](https://doc.shengwang.cn/api-ref/convoai/go/go-api/overview)
 
 ## API调用示例
 
