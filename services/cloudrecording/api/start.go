@@ -512,6 +512,8 @@ type ExtensionParams struct {
 	// Tag 标签内容
 	// 设置该字段后，第三方云存储服务会按照该标签内容将已上传的录制文件进行打标签操作。该字段仅适用于阿里云和 Amazon S3
 	Tag string `json:"tag"`
+
+	Endpoint string `json:"endpoint"`
 }
 
 // ExtensionServiceConfig 扩展服务配置项
