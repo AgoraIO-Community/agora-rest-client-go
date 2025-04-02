@@ -8,28 +8,30 @@ Agora's Conversational AI Engine redefines human-computer interaction, breaking 
 
 ## Environment Setup
 
-- Obtain Agora App ID -------- [Agora - Documentation Center - How to Get App ID](https://docs.agora.io/en/Agora%20Platform/get_appid_token?platform=All%20Platforms#get-app-id)
+- Obtain Agora App ID -------- [Agora Console](https://console.agora.io/v2)
 
-  > - Click to create an application
+  > - Click Create Application
   >
-  >   ![](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_1.jpg)
+  >   ![](../../assets/imges/EN/create_app_1.png)
   >
   > - Select the type of application you want to create
   >
-  >   ![](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_2.jpg)
+  >   ![](../../assets/imges/EN/create_app_2.png)
 
-- Obtain App Certificate ----- [Agora - Documentation Center - Get App Certificate](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
+- Obtain App Certificate ----- [Agora Console](https://console.agora.io/v2)
 
-  > In the project management page of the Agora console, find your project and click configure.
-  > ![](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/1641871111769.png)
-  > Click the copy icon under the primary certificate to get the project's App Certificate.
-  > ![](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/1637637672988.png)
+  > In the project management page of the Agora Console, find your project and click Configure.
+  > ![](../../assets/imges/EN/config_app.png)
+  > Click the copy icon under Primary Certificate to obtain the App Certificate for your project.
+  > ![](../../assets/imges/EN/copy_app_cert.png)
 
 - Enable Conversational AI Engine Service ----- [Enable Service](https://doc.shengwang.cn/doc/convoai/restful/get-started/enable-service)
+  > ![](../../assets/imges/EN/open_convo_ai.png)
+
 
 ## API Definition
 
-For more api details, please refer to the [API Documentation](https://doc.shengwang.cn/api-ref/convoai/go/go-api/overview)
+For more api details, please refer to the [API Documentation](https://docs.agora.io/en/conversational-ai/get-started/manage-agora-account)
 
 ## API Call Examples
 

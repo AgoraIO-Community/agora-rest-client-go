@@ -12,20 +12,21 @@
 
   > - 点击创建应用
   >
-  >   ![](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_1.jpg)
+  >   ![](../../assets/imges/CN/create_app_1.png)
   >
   > - 选择你要创建的应用类型
   >
-  >   ![](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_2.jpg)
+  >   ![](../../assets/imges/CN/create_app_2.png)
 
 - 获取App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
 
   > 在声网控制台的项目管理页面，找到你的项目，点击配置。
-  > ![](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/1641871111769.png)
+  > ![](../../assets/imges/CN/config_app.png)
   > 点击主要证书下面的复制图标，即可获取项目的 App 证书。
-  > ![](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/1637637672988.png)
+  > ![](../../assets/imges/CN/copy_app_cert.png)
 
 - 启用会话式AI引擎服务 ----- [启用服务](https://doc.shengwang.cn/doc/convoai/restful/get-started/enable-service)
+  > ![](../../assets/imges/CN/open_convo_ai.png)
 
 ## API定义
 

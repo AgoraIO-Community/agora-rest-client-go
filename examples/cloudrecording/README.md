@@ -1,12 +1,14 @@
 # CloudRecording Example
 
-> 这是 Agora Cloud Recording 的一个示例项目，使用了 Agora Cloud Recording RESTful API，实现了频道录制的功能。本示例支持合流录制、单流录制和页面录制三种模式。
+English | [简体中文](./README_ZH.md)
 
-## 运行示例项目
+> This is a sample project for Agora Cloud Recording that utilizes the Agora Cloud Recording RESTful API to implement channel recording functionality. This example supports three recording modes: composite recording, individual recording, and web recording.
 
-### 前提条件
+## Run
 
-配置环境变量，环境变量包括以下参数内容：
+### Prerequisites
+
+Configure the environment variables with the following parameters:
 
 ```bash
 export APP_ID=<Your App ID>
@@ -22,11 +24,11 @@ export STORAGE_CONFIG_ACCESS_KEY=<Your Storage Access Key>
 export STORAGE_CONFIG_SECRET_KEY=<Your Storage Secret Key>
 ```
 
-相关的参数可以通过可在 [CloudRecording 服务说明](../../services/cloudrecording/README.md) 查看
+Relevant parameters can be found in the [CloudRecording Service Documentation](../../services/cloudrecording/README.md)
 
-### 执行
+### Execution
 
-通过下面的命令来运行示例项目：
+Run the example project using the following commands:
 
 ```bash
 go run main.go -mode=mix -mix_scene=<scene>
@@ -34,26 +36,26 @@ go run main.go -mode=individual -individual_scene=<scene>
 go run main.go -mode=web -web_scene=<scene>
 ```
 
-其中 `mode` 表示云录制模式：
+Where `mode` indicates the cloud recording mode:
 
-* mix: 合流录制
-* individual: 单流录制
-* web: 页面录制
+* mix: Composite recording
+* individual: Individual recording
+* web: Web recording
 
-其中 `mix_scene` 表示合流录制场景：
+Where `mix_scene` indicates the composite recording scenario:
 
-* hls: 录制hls格式
-* hls_and_mp4: 录制hls和mp4格式
+* hls: Recording in HLS format
+* hls_and_mp4: Recording in both HLS and MP4 formats
 
-其中 `individual_scene` 表示单流录制场景：
+Where `individual_scene` indicates the individual recording scenario:
 
-* recording: 仅录制
-* snapshot: 仅截图
-* recording_and_snapshot: 录制+截图
-* recording_and_postpone_transcoding: 录制+延时转码
-* recording_and_audio_mix: 录制+延时混音
+* recording: Recording only
+* snapshot: Screenshot only
+* recording_and_snapshot: Recording + Screenshot
+* recording_and_postpone_transcoding: Recording + Delayed transcoding
+* recording_and_audio_mix: Recording + Delayed audio mixing
 
-其中 `web_scene` 表示页面录制场景：
+Where `web_scene` indicates the web recording scenario:
 
-* web_recorder: 页面录制
-* web_recorder_and_rtmp_publish: 页面录制+转推到CDN
+* web_recorder: Web recording
+* web_recorder_and_rtmp_publish: Web recording + RTMP streaming to CDN

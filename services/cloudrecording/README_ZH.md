@@ -1,45 +1,47 @@
-# Cloud Recording Service
+# 云端录制服务
 
-English | [简体中文](./README_ZH.md)
+[English](./README.md) | 简体中文
 
-## Service Introduction
-Cloud Recording is a recording component developed by Agora for audio and video calls and live broadcasts. It provides RESTful APIs for developers to implement recording functionality and store recording files in third-party cloud storage. Cloud Recording offers advantages such as stability, reliability, ease of use, cost control, flexible solutions, and support for private deployment, making it an ideal recording solution for online education, video conferences, financial supervision, and customer service scenarios.
+## 服务简介
+云端录制是声网为音视频通话和直播研发的录制组件，提供 RESTful API 供开发者实现录制功能，并将录制文件存至第三方云存储。云端录制有稳定可靠、简单易用、成本可控、方案灵活、支持私有化部署等优势，是在线教育、视频会议、金融监管、客户服务场景的理想录制方案。
 
-## Environment Preparation
+## 环境准备
 
-- Obtain Agora App ID -------- [Agora Console](https://console.agora.io/v2)
+- 获取声网App ID -------- [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
 
-  > - Click Create Application
+  > - 点击创建应用
   >
-  >   ![](../../assets/imges/EN/create_app_1.png)
+  >   ![](../../assets/imges/CN/create_app_1.png)
   >
-  > - Select the type of application you want to create
+  > - 选择你要创建的应用类型
   >
-  >   ![](../../assets/imges/EN/create_app_2.png)
+  >   ![](../../assets/imges/CN/create_app_2.png)
 
-- Obtain App Certificate ----- [Agora Console](https://console.agora.io/v2)
+- 获取App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
 
-  > In the project management page of the Agora Console, find your project and click Configure.
-  > ![](../../assets/imges/EN/config_app.png)
-  > Click the copy icon under Primary Certificate to obtain the App Certificate for your project.
-  > ![](../../assets/imges/EN/copy_app_cert.png)
+  > 在声网控制台的项目管理页面，找到你的项目，点击配置。
+  > ![](../../assets/imges/CN/config_app.png)
+  > 点击主要证书下面的复制图标，即可获取项目的 App 证书。
+  > ![](../../assets/imges/CN/copy_app_cert.png)
 
-- Check the status of the recording service
-  > ![](../../assets/imges/EN/open_cloud_recording.png)
+- 开启云录制服务
+  > ![](../../assets/imges/CN/config_app.png)
+  > ![](../../assets/imges/CN/config_service.png)  
+  > ![](../../assets/imges/CN/open_cloud_recording.png)
 
-## API Call Examples
-### Acquire Cloud Recording Resources
-> Before starting cloud recording, you need to call the acquire method to obtain a Resource ID. A Resource ID can only be used for one cloud recording service.
+## API 接口调用示例
+### 获取云端录制资源
+> 在开始云端录制之前，你需要调用 acquire 方法获取一个 Resource ID。一个 Resource ID 只能用于一次云端录制服务。
 
-Parameters that need to be set:
-- appId: Agora project AppID
-- username: Agora Basic Auth authentication username
-- password: Agora Basic Auth authentication password
-- cname: Channel name
-- uid: User UID
-- For more parameters in clientRequest, see the [Acquire](https://docs.agora.io/en/cloud-recording/reference/restful-api#acquire) API documentation
+需要设置的参数有：
+- appId: 声网的项目 AppID
+- username: 声网的Basic Auth认证的用户名
+- password: 声网的Basic Auth认证的密码
+- cname: 频道名
+- uid: 用户 UID
+- 更多 clientRequest中的参数见[Acquire](https://doc.shengwang.cn/doc/cloud-recording/restful/cloud-recording/operations/post-v1-apps-appid-cloud_recording-acquire)接口文档
 
-Implement acquiring cloud recording resources by calling the `Acquire` method
+通过调用`Acquire`方法来实现获取云端录制资源
 ```go
     appId := "xxxx"
     username := "xxxx"
@@ -75,18 +77,18 @@ Implement acquiring cloud recording resources by calling the `Acquire` method
 	}
 ```
 
-### Start Cloud Recording
-> After acquiring cloud recording resources through the acquire method, call the start method to begin cloud recording.
+### 开始云端录制
+> 通过 acquire 方法获取云端录制资源后，调用 start 方法开始云端录制。
 
-Parameters that need to be set:
-- cname: Channel name
-- uid: User UID
-- token: Token corresponding to the user UID
-- resourceId: Cloud recording resource ID
-- mode: Cloud recording mode
-- For more parameters in clientRequest, see the [Start](https://docs.agora.io/en/cloud-recording/reference/restful-api#start) API documentation
+需要设置的参数有：
+- cname: 频道名
+- uid: 用户 UID
+- token：用户 UID 对应的token
+- resourceId: 云端录制资源ID
+- mode: 云端录制模式
+- 更多 clientRequest中的参数见[Start](https://doc.shengwang.cn/doc/cloud-recording/restful/cloud-recording/operations/post-v1-apps-appid-cloud_recording-resourceid-resourceid-mode-mode-start)接口文档
 
-Implement starting cloud recording by calling the `Start` method
+通过调用`Start`方法来实现开始云端录制
 ```go
 	startResp, err := cloudRecordingClient.Start(ctx, resp.SuccessRes.ResourceId, mode, &cloudRecordingAPI.StartReqBody{
 		Cname: cname,
@@ -143,20 +145,20 @@ Implement starting cloud recording by calling the `Start` method
 	}
 ```
 
-### Stop Cloud Recording
-> After starting recording, you can call the stop method to leave the channel and stop recording. If you need to record again after stopping, you must call the acquire method again to request a new Resource ID.
+### 停止云端录制
+> 开始录制后，你可以调用 stop 方法离开频道，停止录制。录制停止后如需再次录制，必须再调用 acquire 方法请求一个新的 Resource ID。
 
-Parameters that need to be set:
-- cname: Channel name
-- uid: User ID
-- resourceId: Cloud recording resource ID
-- sid: Session ID
-- mode: Cloud recording mode
-- For more parameters in clientRequest, see the [Stop](https://docs.agora.io/en/cloud-recording/reference/restful-api#stop) API documentation
+需要设置的参数有：
+- cname: 频道名
+- uid: 用户ID
+- resourceId: 云端录制资源ID
+- sid: 会话ID
+- mode: 云端录制模式
+- 更多 clientRequest中的参数见[Stop](https://doc.shengwang.cn/doc/cloud-recording/restful/cloud-recording/operations/post-v1-apps-appid-cloud_recording-resourceid-resourceid-sid-sid-mode-mode-stop)接口文档
 
-Since the Stop interface does not return a fixed structure, you need to determine the specific return type based on the serverResponseMode returned
+因为Stop 接口返回的不是一个固定的结构体，所以需要根据返回的serverResponseMode来判断具体的返回类型
 
-Implement stopping cloud recording by calling the `Stop` method
+通过调用`Stop`方法来实现停止云端录制
 ```go
     stopResp, err := cloudRecordingClient.Stop(ctx, resourceId, sid, mode, &cloudRecordingAPI.cloudRecordingAPI{
 		Cname: cname,
@@ -175,20 +177,20 @@ Implement stopping cloud recording by calling the `Stop` method
 	}
 ```
 
-### Query Cloud Recording Status
-> After starting recording, you can call the query method to check the recording status.
+### 查询云端录制状态
+> 开始录制后，你可以调用 query 方法查询录制状态。
 
-Parameters that need to be set:
-- cname: Channel name
-- uid: User ID
-- resourceId: Cloud recording resource ID
-- sid: Session ID
-- mode: Cloud recording mode
-- For more parameters in clientRequest, see the [Query](https://docs.agora.io/en/cloud-recording/reference/restful-api#query) API documentation
+需要设置的参数有：
+- cname: 频道名
+- uid: 用户ID
+- resourceId: 云端录制资源ID
+- sid: 会话ID
+- mode: 云端录制模式
+- 更多 clientRequest中的参数见[Query](https://doc.shengwang.cn/doc/cloud-recording/restful/cloud-recording/operations/get-v1-apps-appid-cloud_recording-resourceid-resourceid-sid-sid-mode-mode-query)接口文档
 
-Since the Query interface does not return a fixed structure, you need to determine the specific return type based on the serverResponseMode returned
+因为 Query 接口返回的不是一个固定的结构体，所以需要根据返回的serverResponseMode来判断具体的返回类型
 
-Implement querying cloud recording status by calling the `Query` method
+通过调用`Query`方法来实现查询云端录制状态
 ```go
 	queryResp, err := cloudRecordingClient.Query(ctx, resourceId, sid, mode)
 	if err != nil {
@@ -227,20 +229,20 @@ Implement querying cloud recording status by calling the `Query` method
 	log.Printf("queryServerResponse:%+v", queryServerResponse)
 ```
 
-### Update Cloud Recording Settings
-> After starting recording, you can call the update method to update the following recording configurations:
-> * For individual recording and composite recording, update the subscription list.
-> * For web recording, set pause/resume web recording, or update the streaming URL for pushing web recording to CDN.
+### 更新云端录制设置
+> 开始录制后，你可以调用 update 方法更新如下录制配置：
+> * 对单流录制和合流录制，更新订阅名单。
+> * 对页面录制，设置暂停/恢复页面录制，或更新页面录制转推到 CDN 的推流地址（URL）。
 
-Parameters that need to be set:
-- cname: Channel name
-- uid: User UID
-- resourceId: Cloud recording resource ID
-- sid: Session ID
-- mode: Cloud recording mode
-- For more parameters in clientRequest, see the [Update](https://docs.agora.io/en/cloud-recording/reference/restful-api#update) API documentation
+需要设置的参数有：
+- cname: 频道名
+- uid: 用户 UID
+- resourceId: 云端录制资源ID
+- sid: 会话ID
+- mode: 云端录制模式
+- 更多 clientRequest中的参数见[Update](https://doc.shengwang.cn/doc/cloud-recording/restful/cloud-recording/operations/post-v1-apps-appid-cloud_recording-resourceid-resourceid-sid-sid-mode-mode-update)接口文档
 
-Implement updating cloud recording settings by calling the `Update` method
+通过调用`Update`方法来实现更新云端录制设置
 ```go
 	updateResp, err := cloudRecordingClient.Update(ctx, resourceId, sid, mode, &cloudRecordingAPI.UpdateReqBody{
 		Cname: cname,
@@ -272,19 +274,19 @@ Implement updating cloud recording settings by calling the `Update` method
 	}
 ```
 
-### Update Cloud Recording Composite Layout
-> After starting recording, you can call the updateLayout method to update the composite layout.
-> Each call to this method will overwrite the previous layout settings. For example, if you set backgroundColor to "#FF0000" (red) when starting recording, if you call the updateLayout method to update the composite layout without setting the backgroundColor field again, the background color will change to black (default value).
+### 更新云端录制合流布局
+> 开始录制后，你可以调用 updateLayout 方法更新合流布局。
+> 每次调用该方法都会覆盖原来的布局设置。例如，在开始录制时设置了 backgroundColor 为 "#FF0000"（红色），如果调用 updateLayout 方法更新合流布局时如果不再设置 backgroundColor 字段，背景色就会变为黑色（默认值）。
 
-Parameters that need to be set:
-- cname: Channel name
-- uid: User UID
-- resourceId: Cloud recording resource ID
-- sid: Session ID
-- mode: Cloud recording mode
-- For more parameters in clientRequest, see the [UpdateLayout](https://docs.agora.io/en/cloud-recording/reference/restful-api#updatelayout) API documentation
+需要设置的参数有：
+- cname: 频道名
+- uid: 用户 UID
+- resourceId: 云端录制资源ID
+- sid: 会话ID
+- mode: 云端录制模式
+- 更多 clientRequest中的参数见[UpdateLayout](https://doc.shengwang.cn/doc/cloud-recording/restful/cloud-recording/operations/post-v1-apps-appid-cloud_recording-resourceid-resourceid-sid-sid-mode-mode-updateLayout)接口文档
 
-Implement updating cloud recording composite layout by calling the `UpdateLayout` method
+通过调用`UpdateLayout`方法来实现更新云端录制合流布局
 ```go
 	updateLayoutResp, err := cloudRecordingClient.UpdateLayout(ctx, resourceId, sid, mode, &cloudRecordingAPI.UpdateLayoutReqBody{
 		Cname: cname,
@@ -325,5 +327,5 @@ Implement updating cloud recording composite layout by calling the `UpdateLayout
 	}
 ```
 
-## Error Codes and Response Status Codes
-For specific business response codes, please refer to the [Business Response Codes](https://docs.agora.io/en/cloud-recording/reference/common-errors) documentation
+## 错误码和响应状态码处理
+具体的业务响应码请参考[业务响应码](https://doc.shengwang.cn/doc/cloud-recording/restful/response-code)文档
