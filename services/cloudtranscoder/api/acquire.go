@@ -31,17 +31,12 @@ func (a *Acquire) buildPath() string {
 }
 
 type AcquireReqBody struct {
-	// 用户指定的实例 ID。长度必须在 64 个字符以内，支持的字符集范围为：
-	//
-	//   - 所有小写英文字母（a-z）
-	//
-	//   - 所有大写英文字母（A-Z）
-	//
-	//   - 数字 0-9
-	//
+	// User-specified instance ID. Must be within 64 characters, supporting:
+	//   - All lowercase letters (a-z)
+	//   - All uppercase letters (A-Z)
+	//   - Numbers 0-9
 	//   - "-", "_"
-	//
-	// 注意：一个 instanceId 可以生成多个 builderToken，但在一个任务中只能使用一个 builderToken 发起请求。
+	// Note: One instanceId can generate multiple builderTokens, but only one can be used per task.
 	InstanceId string             `json:"instanceId,omitempty"`
 	Services   *CreateReqServices `json:"services,omitempty"`
 }
@@ -52,11 +47,11 @@ type AcquireResp struct {
 }
 
 type AcquireSuccessResp struct {
-	// 生成 builderToken 时的 Unix 时间戳（秒）
+	// Unix timestamp (seconds) when the builderToken was generated
 	CreateTs int64 `json:"createTs"`
-	// 请求时设置的 instanceId
+	// The instanceId set in the request
 	InstanceId string `json:"instanceId"`
-	// 代表 builderToken 的值，在后续调用其他方法时需要传入该值
+	// The value of the builderToken, required for subsequent method calls
 	TokenName string `json:"tokenName"`
 }
 

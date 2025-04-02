@@ -36,32 +36,34 @@ type QueryResp struct {
 }
 
 type QuerySuccessResp struct {
-	// 转码任务 ID，为 UUID，用于标识本次请求操作的 cloud transcoder
+	// Transcoding task ID, a UUID used to identify the cloud transcoder for this request operation
 	TaskID string `json:"taskId"`
-	// 转码任务创建时的 Unix 时间戳（秒）
+	
+	// Unix timestamp (seconds) when the transcoding task was created
 	CreateTs int64 `json:"createTs"`
-	// 转码任务的运行状态：
-	//  - "IDLE": 任务未开始。
+	
+	// Running status of the transcoding task:
+	//  - "IDLE": Task has not started.
 	//
-	//  - "PREPARED": 任务已收到开启请求。
+	//  - "PREPARED": Task has received a start request.
 	//
-	//  - "STARTING": 任务正在开启。
+	//  - "STARTING": Task is starting.
 	//
-	//  - "CREATED": 任务初始化完成。
+	//  - "CREATED": Task initialization complete.
 	//
-	//  - "STARTED": 任务已经启动。
+	//  - "STARTED": Task has started.
 	//
-	//  - "IN_PROGRESS": 任务正在进行。
+	//  - "IN_PROGRESS": Task is in progress.
 	//
-	//  - "STOPPING": 任务正在停止。
+	//  - "STOPPING": Task is stopping.
 	//
-	//  - "STOPPED": 任务已经停止。
+	//  - "STOPPED": Task has stopped.
 	//
-	//  - "EXIT": 任务正常退出。
+	//  - "EXIT": Task exited normally.
 	//
-	//  - "FAILURE_STOP": 任务异常退出。
+	//  - "FAILURE_STOP": Task exited abnormally.
 	//
-	// 注意：你可以用该字段监听任务的状态。
+	// Note: You can use this field to monitor the task status.
 	Status string `json:"status"`
 }
 

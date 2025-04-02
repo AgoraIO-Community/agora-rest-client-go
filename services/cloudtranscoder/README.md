@@ -1,45 +1,47 @@
-# 云端转码服务
+# Cloud Transcoding Service
 
-## 服务简介
+English | [简体中文](./README_ZH.md)
 
-声网的云端转码服务是专为实时互动产品中的直播场景而开发。云端转码服务允许你在服务器端获取 RTC 频道中主播的音视频源流，并对其进行转码、混音、合图等音视频处理，最后将处理后的音视频流发布到声网的 RTC 频道，供观众端订阅。通过使用云端转码服务，观众无需订阅多个主播的音视频流，从而减轻了下行带宽压力和客户端设备的性能消耗。
+## Service Introduction
 
-## 环境准备
+Agora's Cloud Transcoding Service is developed specifically for live streaming scenarios in real-time interactive products. This service allows you to retrieve the host's audio and video source streams from an RTC channel on the server side, process them through transcoding, audio mixing, compositing, and other audio-video operations, and finally publish the processed streams to Agora's RTC channels for audience subscription. By using the Cloud Transcoding Service, viewers do not need to subscribe to multiple hosts' audio and video streams, thereby reducing downlink bandwidth pressure and performance consumption on client devices.
 
-- 获取声网App ID -------- [声网Agora - 文档中心 - 如何获取 App ID](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-id)
+## Environment Preparation
 
-  > - 点击创建应用
+- Obtain Agora App ID -------- [Agora Console](https://console.agora.io/v2)
+
+  > - Click Create Application
   >
-  >   ![](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_1.jpg)
+  >   ![](../../assets/imges/EN/create_app_1.png)
   >
-  > - 选择你要创建的应用类型
+  > - Select the type of application you want to create
   >
-  >   ![](https://accktvpic.oss-cn-beijing.aliyuncs.com/pic/github_readme/create_app_2.jpg)
+  >   ![](../../assets/imges/EN/create_app_2.png)
 
-- 获取App 证书 ----- [声网Agora - 文档中心 - 获取 App 证书](https://docs.agora.io/cn/Agora%20Platform/get_appid_token?platform=All%20Platforms#%E8%8E%B7%E5%8F%96-app-%E8%AF%81%E4%B9%A6)
+- Obtain App Certificate ----- [Agora Console](https://console.agora.io/v2)
 
-  > 在声网控制台的项目管理页面，找到你的项目，点击配置。
-  > ![](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/1641871111769.png)
-  > 点击主要证书下面的复制图标，即可获取项目的 App 证书。
-  > ![](https://fullapp.oss-cn-beijing.aliyuncs.com/scenario_api/callapi/config/1637637672988.png)
+  > In the project management page of the Agora Console, find your project and click Configure.
+  > ![](../../assets/imges/EN/config_app.png)
+  > Click the copy icon under Primary Certificate to obtain the App Certificate for your project.
+  > ![](../../assets/imges/EN/copy_app_cert.png)
 
-- 开启云端转码服务
-请联系[声网技术支持](https://docportal.shengwang.cn/cn/Agora%20Platform/ticket?platform=Android&_gl=1%2a19d2qxx%2a_gcl_au%2aMTg0ODkxMDM3My4xNzIwNTExNDM3%2a_ga%2aMTI2ODMxNDY2OC4xNjg0MjkxODI0%2a_ga_BFVGG7E02W%2aMTcyMDUxMTIyMC4zMDIuMS4xNzIwNTExNjA0LjAuMC4w)
+- Enable Cloud Transcoding Service
+Please contact [Agora Technical Support](https://docportal.shengwang.cn/cn/Agora%20Platform/ticket?platform=Android&_gl=1%2a19d2qxx%2a_gcl_au%2aMTg0ODkxMDM3My4xNzIwNTExNDM3%2a_ga%2aMTI2ODMxNDY2OC4xNjg0MjkxODI0%2a_ga_BFVGG7E02W%2aMTcyMDUxMTIyMC4zMDIuMS4xNzIwNTExNjA0LjAuMC4w)
 
-## API 接口调用示例
+## API Call Examples
 
-### 获取云端转码资源
+### Acquire Cloud Transcoding Resources
 >
-> 在开始创建云端转码之前，你需要调用 acquire 方法获取一个 tokenName。一个 builderToken 仅可用于一次云端转码任务。
+> Before creating a cloud transcoding task, you need to call the acquire method to obtain a tokenName. A builderToken can only be used for one cloud transcoding task.
 
-需要设置的参数有：
+Parameters that need to be set:
 
-- appId: 声网的项目 AppID
-- username: 声网的Basic Auth认证的用户名
-- password: 声网的Basic Auth认证的密码
-- instanceId: 用户指定的实例 ID
+- appId: Agora project AppID
+- username: Agora Basic Auth authentication username
+- password: Agora Basic Auth authentication password
+- instanceId: User-specified instance ID
 
-通过调用`Acquire`方法来实现获取云端转码资源
+Implement acquiring cloud transcoding resources by calling the `Acquire` method
 
 ```go
 	ctx := context.Background()
@@ -72,16 +74,16 @@
     }
 ```
 
-### 开启云端转码
+### Start Cloud Transcoding
 >
-> 通过 acquire 方法获取云端转码资源后，调用 create 方法开始云端转码。
+> After acquiring cloud transcoding resources through the acquire method, call the create method to start cloud transcoding.
 
-需要设置的参数有：
+Parameters that need to be set:
 
-- builderToken： 通过 acquire 方法获取的 tokenName
-- 更多 Body中的参数见[Create](https://doc.shengwang.cn/doc/cloud-transcoder/restful/cloud-transcoder/operations/post-v1-projects-appId-rtsc-cloud-transcoder-tasks)接口文档
+- builderToken: The tokenName obtained through the acquire method
+- For more parameters in the request body, see the [Create](https://doc.shengwang.cn/doc/cloud-transcoder/restful/cloud-transcoder/operations/post-v1-projects-appId-rtsc-cloud-transcoder-tasks) API documentation
 
-通过调用`Create`方法来实现创建云端转码
+Implement creating cloud transcoding by calling the `Create` method
 
 ```go
  createResp, err := cloudTranscoderClient.Create(ctx, tokenName, &cloudTranscoderAPI.CreateReqBody{
@@ -129,16 +131,16 @@
  }
 ```
 
-### 查询云端转码
+### Query Cloud Transcoding
 >
-> 开始云端转码后，你可以调用 query 方法查询云端转码状态。
+> After starting cloud transcoding, you can call the query method to check the cloud transcoding status.
 
-需要设置的参数有：
+Parameters that need to be set:
 
-- taskId: 从 Create 方法获取到的 taskId
-- builderToken： 通过 acquire 方法获取的 tokenName
+- taskId: The taskId obtained from the Create method
+- builderToken: The tokenName obtained through the acquire method
 
-通过调用`Query`方法来实现查询云端转码状态：
+Implement querying cloud transcoding status by calling the `Query` method:
 
 ```go
   queryResp, err := cloudTranscoderClient.Query(ctx, taskId, tokenName)
@@ -155,19 +157,19 @@
   }
 ```
 
-### 更新云端转码
+### Update Cloud Transcoding
 >
-> 开始云端转码后，你可以调用 update 方法更新云端转码状态。
+> After starting cloud transcoding, you can call the update method to update the cloud transcoding status.
 
-需要设置的参数有：
+Parameters that need to be set:
 
-- taskId: 从 Create 方法获取到的 taskId
-- builderToken： 通过 acquire 方法获取的 tokenName
-- sequenceId: Update 请求的序列号。取值需要大于或等于 0。请确保后一次 Update 请求的序列号大于前一次 Update 请求的序列号。序列号可以确保声网服务器按照你指定的最新配置来更新 cloud transcoder。
+- taskId: The taskId obtained from the Create method
+- builderToken: The tokenName obtained through the acquire method
+- sequenceId: The sequence number of the Update request. The value must be greater than or equal to 0. Ensure that the sequence number of a subsequent Update request is greater than that of the previous Update request. The sequence number ensures that the Agora server updates the cloud transcoder according to your latest specified configuration.
 
-- 更多 Body中的参数见[Update](https://doc.shengwang.cn/doc/cloud-transcoder/restful/cloud-transcoder/operations/patch-v1-projects-appId-rtsc-cloud-transcoder-tasks-taskId)接口文档
+- For more parameters in the request body, see the [Update](https://doc.shengwang.cn/doc/cloud-transcoder/restful/cloud-transcoder/operations/patch-v1-projects-appId-rtsc-cloud-transcoder-tasks-taskId) API documentation
 
-通过调用`Update`方法来实现更新云端转码
+Implement updating cloud transcoding by calling the `Update` method
 
 ```go
  updateResp, err := cloudTranscoderClient.Update(ctx, taskId, tokenName, 1, &cloudTranscoderAPI.UpdateReqBody{
@@ -216,16 +218,16 @@
  }
 ```
 
-### 停止云端转码
+### Stop Cloud Transcoding
 >
-> 如果你不再需要云端转码，你可以发起 Delete 请求销毁。
+> If you no longer need cloud transcoding, you can initiate a Delete request to destroy it.
 
-需要设置的参数有：
+Parameters that need to be set:
 
-- taskId: 从 Create 方法获取到的 taskId
-- builderToken： 通过 acquire 方法获取的 tokenName
+- taskId: The taskId obtained from the Create method
+- builderToken: The tokenName obtained through the acquire method
 
-通过调用`Delete`方法来实现停止云端转码
+Implement stopping cloud transcoding by calling the `Delete` method
 
 ```go
   deleteResp, err := cloudTranscoderClient.Delete(ctx, taskId, tokenName)
@@ -241,6 +243,6 @@
   }
 ```
 
-## 错误码和响应状态码处理
+## Error Codes and Response Status Codes
 
-具体的业务响应码请参考[响应状态码](https://doc.shengwang.cn/doc/cloud-transcoder/restful/response-code)文档
+For specific business response codes, please refer to the [Response Status Codes](https://doc.shengwang.cn/doc/cloud-transcoder/restful/response-code) documentation

@@ -39,7 +39,7 @@ type CreateReqServices struct {
 }
 
 type CloudTranscoderPayload struct {
-	// 服务类型，此处为 "cloudTranscoderV2"
+	// Service type, here it is "cloudTranscoderV2"
 	ServiceType string                 `json:"serviceType,omitempty"`
 	Config      *CloudTranscoderConfig `json:"config,omitempty"`
 }
@@ -49,12 +49,13 @@ type CloudTranscoderConfig struct {
 }
 
 type CloudTranscoderConfigPayload struct {
-	// Cloud transcoder 处于空闲状态的最大时长（秒）。空闲指 cloud transcoder 处理的音视频流所对应的所有主播均已离开频道。
-	// 空闲状态超过设置的 idleTimeOut 后， cloud transcoder 会自动销毁。
+	// Maximum idle time (in seconds) for cloud transcoder. Idle means all broadcasters corresponding to the audio/video streams 
+	// processed by the cloud transcoder have left the channel.
+	// After being idle for the set idleTimeOut, the cloud transcoder will be automatically destroyed.
 	//
-	// 范围：[1,86400]
+	// Range: [1,86400]
 	//
-	// 默认值:300
+	// Default: 300
 	IdleTimeout uint                        `json:"idleTimeout"`
 	AudioInputs []CloudTranscoderAudioInput `json:"audioInputs,omitempty"`
 	VideoInputs []CloudTranscoderVideoInput `json:"videoInputs,omitempty"`
@@ -68,148 +69,167 @@ type CloudTranscoderAudioInput struct {
 }
 
 type CloudTranscoderRtc struct {
-	// 音视频输入源（或输出）所属的 RTC 频道名
+	// RTC channel name for the audio/video input source (or output)
 	//
-	// 目前仅支持订阅单个频道的音视频源，音频源和视频源所属频道必须相同。
+	// Currently only supports subscribing to audio/video sources from a single channel. 
+	// Audio and video sources must belong to the same channel.
 	RtcChannel string `json:"rtcChannel,omitempty"`
-	// 音视频输入源（或输出）所对应的 UID
+	
+	// UID corresponding to the audio/video input source (or output)
 	//
-	// RTC 频道内不允许存在相同的 UID，因此，请确保该值与频道内其他用户 UID 不同。
+	// Duplicate UIDs are not allowed in an RTC channel, so ensure this value differs from other users' UIDs in the channel.
 	//
-	// 注意：rtcUid 默认值为0，AudioInputs表示业务侧将会使用全频道混音
+	// Note: The default value of rtcUid is 0, indicating that AudioInputs will use full-channel audio mixing
 	RtcUID int `json:"rtcUid"`
-	// Cloud transcoder 在进入待转码视频源（或转码输出音视频流）所属 RTC 频道时所需设置的 Token。
+	
+	// Token required for the cloud transcoder to enter the RTC channel of the video source to be transcoded (or the transcoded output audio/video stream).
 	//
-	// 该值可用于确保频道安全，避免异常用户扰乱频道内其他用户。
+	// This value can be used to ensure channel security and prevent unauthorized users from disrupting other users in the channel.
 	//
-	// 注意：
-	//   - 当前配置输入流的时，Cloud transcoder 在待转码音视频源所属 RTC 频道内的 UID 为声网随机分配。因此，生成 Token 时，你使用的 uid 必须为 0。
-	//   - 当前配置输出流的时，Cloud transcoder 在转码输出音视频流所属 RTC 频道内的 UID 为你指定的 outputs.rtc.rtcUid，因此，生成 Token 时，你使用的 uid 必须和 outputs.rtc.rtcUid 一致
+	// Note:
+	//   - When configuring input streams, the UID of the cloud transcoder in the RTC channel is randomly assigned by Agora. 
+	//     Therefore, when generating the Token, you must use uid=0.
+	//   - When configuring output streams, the UID of the cloud transcoder in the RTC channel is the outputs.rtc.rtcUid you specified. 
+	//     Therefore, when generating the Token, you must use the same uid as outputs.rtc.rtcUid
 	RtcToken string `json:"rtcToken,omitempty"`
 }
 
 type CloudTranscoderVideoInput struct {
 	Rtc *CloudTranscoderRtc `json:"rtc,omitempty"`
-	// 用户离线时占位图片的 URL。
+	
+	// URL of the placeholder image when the user is offline.
 	//
-	// 必须为合法 URL，且包含 jpg 或 png 后缀。
+	// Must be a valid URL and include a jpg or png suffix.
 	PlaceholderImageURL string                 `json:"placeholderImageUrl,omitempty"`
 	Region              *CloudTranscoderRegion `json:"region,omitempty"`
 }
 
 type CloudTranscoderRegion struct {
-	// 画面在画布上的 x 坐标 (px)。
+	// X coordinate (px) of the image on the canvas.
 	//
-	// 以画布左上角为原点，x 坐标为画面左上角相对于原点的横向位移。
+	// With the top-left corner of the canvas as the origin, the x-coordinate is the horizontal displacement of the top-left corner of the image relative to the origin.
 	//
-	// 范围：[0,120]
+	// Range: [0,120]
 	X uint `json:"x"`
-	// 画面在画布上的 y 坐标 (px)。
+	
+	// Y coordinate (px) of the image on the canvas.
 	//
-	// 以画布左上角为原点，y 坐标为画面左上角相对于原点的纵向位移。
+	// With the top-left corner of the canvas as the origin, the y-coordinate is the vertical displacement of the top-left corner of the image relative to the origin.
 	//
-	// 范围：[0,3840]
+	// Range: [0,3840]
 	Y uint `json:"y"`
-	// 画面的宽度 (px)。
+	
+	// Width of the image (px).
 	//
-	// 范围：[120,3840]
+	// Range: [120,3840]
 	Width uint `json:"width,omitempty"`
-	// 画面的高度 (px)。
+	
+	// Height of the image (px).
 	//
-	// 范围：[120,3840]
+	// Range: [120,3840]
 	Height uint `json:"height,omitempty"`
-	// 画面的图层编号。
-	//  - 0 代表最下层的图层。
-	//  - 100 代表最上层的图层。
+	
+	// Layer number of the image.
+	//  - 0 represents the bottom layer.
+	//  - 100 represents the top layer.
 	//
-	// 范围：[0,100]
+	// Range: [0,100]
 	ZOrder uint `json:"zOrder"`
 }
 
 type CloudTranscoderCanvas struct {
-	// 画面的宽度 (px)。
+	// Width of the canvas (px).
 	//
-	// 范围：[120,3840]
+	// Range: [120,3840]
 	Width uint `json:"width,omitempty"`
-	// 画面的高度 (px)。
+	
+	// Height of the canvas (px).
 	//
-	// 范围：[120,3840]
+	// Range: [120,3840]
 	Height uint `json:"height,omitempty"`
-	// 画布的背景色。
+	
+	// Background color of the canvas.
 	//
-	// RGB 颜色值，以十进制数表示。
+	// RGB color value, expressed as a decimal number.
 	//
-	// 如 0 代表黑色，255 代表蓝色。
+	// For example, 0 represents black, 255 represents blue.
 	//
-	// 范围：[0,16777215]
+	// Range: [0,16777215]
 	Color uint `json:"color"`
-	// 画布背景图。
+	
+	// Background image of the canvas.
 	//
-	// 必须为合法 URL，且包含 jpg 或 png 后缀。
+	// Must be a valid URL and include a jpg or png suffix.
 	//
-	// 注意：如果不传值，则没有画布背景图。
+	// Note: If no value is provided, there will be no canvas background image.
 	BackgroundImage string `json:"backgroundImage,omitempty"`
-	// 画布背景图的填充模式：
+	
+	// Fill mode for the canvas background image:
 	//
-	//  - "FILL"：在保持长宽比的前提下，缩放画面，并居中剪裁。
-	//  - "FIT"：在保持长宽比的前提下，缩放画面，使其完整显示。
+	//  - "FILL": Scale the image while maintaining the aspect ratio, and crop it centered.
+	//  - "FIT": Scale the image while maintaining the aspect ratio, ensuring it is fully displayed.
 	//
-	// 默认值："FILL"
+	// Default: "FILL"
 	FillMode string `json:"fillMode,omitempty"`
 }
 
 type CloudTranscoderWaterMark struct {
-	// 水印图片的 URL。
+	// URL of the watermark image.
 	//
-	// 必须为合法 URL，且包含 jpg 或 png 后缀。
+	// Must be a valid URL and include a jpg or png suffix.
 	ImageURL string                 `json:"imageUrl,omitempty"`
 	Region   *CloudTranscoderRegion `json:"region,omitempty"`
-	// 画布背景图的填充模式：
+	
+	// Fill mode for the canvas background image:
 	//
-	//  - "FILL"：在保持长宽比的前提下，缩放画面，并居中剪裁。
-	//  - "FIT"：在保持长宽比的前提下，缩放画面，使其完整显示。
+	//  - "FILL": Scale the image while maintaining the aspect ratio, and crop it centered.
+	//  - "FIT": Scale the image while maintaining the aspect ratio, ensuring it is fully displayed.
 	//
-	// 默认值："FILL"
+	// Default: "FILL"
 	FillMode string `json:"fillMode,omitempty"`
 }
 
 type CloudTranscoderOutputAudioOption struct {
-	// 转码输出的音频属性：
-	//   - "AUDIO_PROFILE_DEFAULT"：48 kHz 采样率，音乐编码，单声道，编码码率最大值为 64 Kbps。
-	//   - "AUDIO_PROFILE_SPEECH_STANDARD"：32 kHz 采样率，语音编码，单声道，编码码率最大值为 18 Kbps。
-	//   - "AUDIO_PROFILE_MUSIC_STANDARD": 48 KHz 采样率，音乐编码，单声道，编码码率最大值为 64 Kbps。
-	//   - "AUDIO_PROFILE_MUSIC_STANDARD_STEREO"：48 KHz 采样率，音乐编码，双声道，编码码率最大值为 80 Kbps。
-	//   - "AUDIO_PROFILE_MUSIC_HIGH_QUALITY"：48 KHz 采样率，音乐编码，单声道，编码码率最大值为 96 Kbps。
-	// 	 - "AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO"：48 KHz 采样率，音乐编码，双声道，编码码率最大值为 128 Kbps。
+	// Audio properties for transcoding output:
+	//   - "AUDIO_PROFILE_DEFAULT": 48 kHz sampling rate, music encoding, mono, maximum encoding bitrate of 64 Kbps.
+	//   - "AUDIO_PROFILE_SPEECH_STANDARD": 32 kHz sampling rate, speech encoding, mono, maximum encoding bitrate of 18 Kbps.
+	//   - "AUDIO_PROFILE_MUSIC_STANDARD": 48 KHz sampling rate, music encoding, mono, maximum encoding bitrate of 64 Kbps.
+	//   - "AUDIO_PROFILE_MUSIC_STANDARD_STEREO": 48 KHz sampling rate, music encoding, stereo, maximum encoding bitrate of 80 Kbps.
+	//   - "AUDIO_PROFILE_MUSIC_HIGH_QUALITY": 48 KHz sampling rate, music encoding, mono, maximum encoding bitrate of 96 Kbps.
+	// 	 - "AUDIO_PROFILE_MUSIC_HIGH_QUALITY_STEREO": 48 KHz sampling rate, music encoding, stereo, maximum encoding bitrate of 128 Kbps.
 	//
-	// 默认值："AUDIO_PROFILE_DEFAULT"
+	// Default: "AUDIO_PROFILE_DEFAULT"
 	ProfileType string `json:"profileType,omitempty"`
 }
 
 type CloudTranscoderOutputVideoOption struct {
-	// 	转码输出视频的帧率 (fps)。
+	// Frame rate (fps) of the transcoded output video.
 	//
-	// 范围：[1,30]
+	// Range: [1,30]
 	//
-	// 默认值：15
+	// Default: 15
 	FPS uint `json:"fps,omitempty"`
-	// 转码输出视频的 codec。取值包括：
-	//  - "H264"：标准 H.264 编码。
-	//  - "VP8"：标准 VP8 编码。
+	
+	// Codec for the transcoded output video. Values include:
+	//  - "H264": Standard H.264 encoding.
+	//  - "VP8": Standard VP8 encoding.
 	Codec string `json:"codec,omitempty"`
-	// 	转码输出视频的码率。
+	
+	// Bitrate of the transcoded output video.
 	//
-	// 范围：[1,10000]
+	// Range: [1,10000]
 	//
-	// 注意：如果你不传值，声网会根据网络情况和其他视频属性自动设置视频码率。
+	// Note: If you do not provide a value, Agora will automatically set the video bitrate based on network conditions and other video properties.
 	Bitrate uint `json:"bitrate,omitempty"`
-	// 画面的宽度 (px)。
+	
+	// Width of the image (px).
 	//
-	// 范围：[120,3840]
+	// Range: [120,3840]
 	Width uint `json:"width,omitempty"`
-	// 画面的高度 (px)。
+	
+	// Height of the image (px).
 	//
-	// 范围：[120,3840]
+	// Range: [120,3840]
 	Height uint `json:"height,omitempty"`
 }
 
@@ -220,32 +240,34 @@ type CloudTranscoderOutput struct {
 }
 
 type CreateSuccessResp struct {
-	// 转码任务 ID，为 UUID，用于标识本次请求操作的 cloud transcoder
+	// Transcoding task ID, a UUID used to identify the cloud transcoder for this request operation
 	TaskID string `json:"taskId"`
-	// 转码任务创建时的 Unix 时间戳（秒）
+	
+	// Unix timestamp (seconds) when the transcoding task was created
 	CreateTs int64 `json:"createTs"`
-	// 转码任务的运行状态：
-	//  - "IDLE": 任务未开始。
+	
+	// Running status of the transcoding task:
+	//  - "IDLE": Task has not started.
 	//
-	//  - "PREPARED": 任务已收到开启请求。
+	//  - "PREPARED": Task has received a start request.
 	//
-	//  - "STARTING": 任务正在开启。
+	//  - "STARTING": Task is starting.
 	//
-	//  - "CREATED": 任务初始化完成。
+	//  - "CREATED": Task initialization complete.
 	//
-	//  - "STARTED": 任务已经启动。
+	//  - "STARTED": Task has started.
 	//
-	//  - "IN_PROGRESS": 任务正在进行。
+	//  - "IN_PROGRESS": Task is in progress.
 	//
-	//  - "STOPPING": 任务正在停止。
+	//  - "STOPPING": Task is stopping.
 	//
-	//  - "STOPPED": 任务已经停止。
+	//  - "STOPPED": Task has stopped.
 	//
-	//  - "EXIT": 任务正常退出。
+	//  - "EXIT": Task exited normally.
 	//
-	//  - "FAILURE_STOP": 任务异常退出。
+	//  - "FAILURE_STOP": Task exited abnormally.
 	//
-	// 注意：你可以用该字段监听任务的状态。
+	// Note: You can use this field to monitor the task status.
 	Status string `json:"status"`
 }
 
