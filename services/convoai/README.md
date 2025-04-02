@@ -31,7 +31,7 @@ Agora's Conversational AI Engine redefines human-computer interaction, breaking 
 
 ## API Definition
 
-For more api details, please refer to the [API Documentation](https://docs.agora.io/en/conversational-ai/get-started/manage-agora-account)
+For more api details, please refer to the [API Documentation](https://docs.agora.io/en/conversational-ai/rest-api/join)
 
 ## API Call Examples
 
@@ -234,4 +234,4 @@ Parameters to set:
 ```
 
 ## Error Codes and Response Status Codes Handling
-For specific business response codes, please refer to the [Business Response Codes](https://doc.shengwang.cn/doc/convoai/restful/api/response-code) documentation.
+For specific business response codes, please refer to the [Business Response Codes](https://docs.agora.io/en/conversational-ai/rest-api/reference) documentation.
