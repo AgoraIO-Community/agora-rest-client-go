@@ -29,9 +29,9 @@ This SDK has undergone some testing to ensure its basic functionality works corr
 
 ## Environment Setup
 * [Go 1.18 or later](https://go.dev/)
-* App ID and App Certificate obtained from the [Agora Console](https://console.shengwang.cn/)
-* Basic Auth credentials from the [Agora Console](https://console.shengwang.cn/)
-* Enable the relevant service capabilities on the [Agora Console](https://console.shengwang.cn/)
+* App ID and App Certificate obtained from the [Agora Console](https://console.agora.io/v2)
+* Basic Auth credentials from the [Agora Console](https://console.agora.io/v2)
+* Enable the relevant service capabilities on the [Agora Console](https://console.agora.io/v2)
 
 ## Installation
 Install the dependency from GitHub using the following command:
@@ -195,21 +195,12 @@ func main() {
 ```
 For more examples, see [Example](./examples).
 
-## How to Contact Agora for Assistance if You Encounter Difficulties
-
-> Option 1: If you are already using Agora services or are in the process of integration, you can directly contact your sales or service representative.
->
-> Option 2: Send an email to [support@agora.io](mailto:support@agora.io) for consultation.
->
-> Option 3: Scan the QR code to join our WeChat group for questions.
->
-> <img src="https://download.agora.io/demo/release/SDHY_QA.jpg" width="360" height="360">
----
-
 ## Contribution
+
 This project welcomes and accepts contributions. If you encounter any issues or have suggestions for improvements, please open an issue or submit a Pull Request.
 
 # SemVer Versioning
+
 This project uses Semantic Versioning (SemVer) to manage versions. The format is MAJOR.MINOR.PATCH.
 
 * MAJOR version indicates incompatible changes.
@@ -218,7 +209,7 @@ This project uses Semantic Versioning (SemVer) to manage versions. The format is
 For more details, please refer to the [Semantic Versioning](https://semver.org) specification.
 
 ## References
-* [Agora API Documentation](https://doc.shengwang.cn/)
+* [Agora API Documentation](https://docs.agora.io/en/)
 
 ## License
 This project is licensed under the MIT License. For more details, please refer to the LICENSE file.

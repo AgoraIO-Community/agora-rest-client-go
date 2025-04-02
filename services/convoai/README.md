@@ -25,7 +25,7 @@ Agora's Conversational AI Engine redefines human-computer interaction, breaking 
   > Click the copy icon under Primary Certificate to obtain the App Certificate for your project.
   > ![](../../assets/imges/EN/copy_app_cert.png)
 
-- Enable Conversational AI Engine Service ----- [Enable Service](https://doc.shengwang.cn/doc/convoai/restful/get-started/enable-service)
+- Enable Conversational AI Engine Service ----- [Enable Service](https://docs.agora.io/en/conversational-ai/get-started/manage-agora-account)
   > ![](../../assets/imges/EN/open_convo_ai.png)
 
 
