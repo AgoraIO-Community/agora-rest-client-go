@@ -218,7 +218,7 @@ func main() {
 有关详细信息，请参阅 [语义化版本](https://semver.org/lang/zh-CN/) 规范。
 
 ## 参考
-* [Agora API 文档](https://doc.shengwang.cn/)
+* [声网 API 文档](https://doc.shengwang.cn/)
 
 ## 许可证
 该项目使用MIT许可证，详细信息请参阅LICENSE文件。
