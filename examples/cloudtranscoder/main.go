@@ -15,11 +15,11 @@ var (
 	appId    string
 	username string
 	password string
-	// 选择你的区域，目前支持的区域有：
-	// US: 北美
-	// EU: 欧洲
-	// CN: 中国大陆
-	// AP: 亚太
+	// Choose your region, currently supported regions are:
+	// US: North America
+	// EU: Europe
+	// CN: China
+	// AP: Asia Pacific
 	domainArea = domain.CN
 )
 

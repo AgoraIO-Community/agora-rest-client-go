@@ -44,7 +44,6 @@ type StopReqBody struct {
 }
 
 // StopClientRequest is the request body of stop.
-// 当 async_stop 为 true 时，表示异步停止录制。默认值为 false，异步情况下可能会获取不到对应的serverResponse内容
 type StopClientRequest struct {
 	AsyncStop bool `json:"async_stop"`
 }
@@ -55,19 +54,10 @@ type StopResp struct {
 }
 
 type StopSuccessResp struct {
-	// Cname 录制的频道名
-	Cname string `json:"cname"`
-
-	// UID 字符串内容为云端录制服务在 RTC 频道内使用的 UID，用于标识频道内的录制服务。
-	UID string `json:"uid"`
-
-	// ResourceId 云端录制资源 Resource ID。
-	//
-	// 使用这个 Resource ID 可以开始一段云端录制。这个 Resource ID 的有效期为 5 分钟，超时需要重新请求。
+	Cname      string `json:"cname"`
+	UID        string `json:"uid"`
 	ResourceId string `json:"resourceId"`
-
-	// Sid 录制 ID。成功开始云端录制后，你会得到一个 Sid （录制 ID）。该 ID 是一次录制周期的唯一标识。
-	Sid string `json:"sid"`
+	Sid        string `json:"sid"`
 }
 
 func (s *Stop) Do(ctx context.Context, resourceID string, sid string, mode string, payload *StopReqBody) (*StopResp, error) {

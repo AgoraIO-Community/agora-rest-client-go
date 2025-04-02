@@ -20,16 +20,16 @@ var (
 	username string
 	password string
 	token    string
-	// 选择你的区域，目前支持的区域有：
-	// US: 北美
-	// EU: 欧洲
-	// CN: 中国大陆
-	// AP: 亚太
+	// Choose your region, currently supported regions are:
+	// US: North America
+	// EU: Europe
+	// CN: China
+	// AP: Asia Pacific
 	domainArea = domain.CN
 )
 
-// 选择你的存储配置 第三方云存储地区说明详情见 https://doc.shengwang.cn/api-ref/cloud-recording/restful/region-vendor
-// 配置存储需要的参数
+// Select your storage configuration. For more details on third-party cloud storage regions,
+// Parameters needed for storage configuration
 var storageConfig = &v1.StorageConfig{
 	Vendor:    0,
 	Region:    0,
