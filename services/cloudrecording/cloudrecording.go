@@ -69,8 +69,8 @@ func (a *Client) Update(ctx context.Context, resourceID string, sid string, mode
 	return a.updateAPI.Do(ctx, resourceID, sid, mode, payload)
 }
 
-func (a *Client) UpdateLayout() *api.UpdateLayout {
-	return a.updateLayoutAPI
+func (a *Client) UpdateLayout(ctx context.Context, resourceID string, sid string, mode string, payload *api.UpdateLayoutReqBody) (*api.UpdateLayoutResp, error) {
+	return a.updateLayoutAPI.Do(ctx, resourceID, sid, mode, payload)
 }
 
 func (a *Client) IndividualRecording() *individualrecording.Client {
