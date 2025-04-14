@@ -5,47 +5,26 @@ import (
 	"log"
 	"time"
 
-	"github.com/AgoraIO-Community/agora-rest-client-go/agora"
-	"github.com/AgoraIO-Community/agora-rest-client-go/agora/domain"
-	agoraLogger "github.com/AgoraIO-Community/agora-rest-client-go/agora/log"
 	"github.com/AgoraIO-Community/agora-rest-client-go/examples/cloudrecording/base"
-	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording"
 	cloudRecordingAPI "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/api"
-	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/scenario/webrecording"
+	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/req"
 )
 
-type Service struct {
-	base.Service
+type Scenario struct {
+	*base.Service
 }
 
-func NewService(region domain.Area, appId, cname, uid string) *Service {
-	return &Service{
-		base.Service{
-			DomainArea: region,
-			AppId:      appId,
-			Cname:      cname,
-			Uid:        uid,
-			Credential: nil,
-		},
+func NewScenario(s *base.Service) *Scenario {
+	return &Scenario{
+		Service: s,
 	}
 }
 
-func (s *Service) RunWebRecorder(storageConfig *cloudRecordingAPI.StorageConfig) {
+func (s *Scenario) RunWebRecorder(storageConfig *cloudRecordingAPI.StorageConfig) {
 	ctx := context.Background()
-	config := &agora.Config{
-		AppID:      s.AppId,
-		Credential: s.Credential,
-		DomainArea: s.DomainArea,
-		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
-	}
-
-	cloudRecordingClient, err := cloudrecording.NewClient(config)
-	if err != nil {
-		log.Fatalln(err)
-	}
 
 	// acquire
-	acquireResp, err := cloudRecordingClient.WebRecording().Acquire(ctx, s.Cname, s.Uid, &webrecording.AcquireWebRecodingClientRequest{})
+	acquireResp, err := s.CloudRecordingClient.WebRecording().Acquire(ctx, s.Cname, s.Uid, &req.AcquireWebRecodingClientRequest{})
 	if err != nil {
 		log.Println(err)
 		return
@@ -59,7 +38,7 @@ func (s *Service) RunWebRecorder(storageConfig *cloudRecordingAPI.StorageConfig)
 
 	resourceId := acquireResp.SuccessRes.ResourceId
 	// start
-	startResp, err := cloudRecordingClient.WebRecording().Start(ctx, resourceId, s.Cname, s.Uid, &webrecording.StartWebRecordingClientRequest{
+	startResp, err := s.CloudRecordingClient.WebRecording().Start(ctx, resourceId, s.Cname, s.Uid, &req.StartWebRecordingClientRequest{
 		RecordingFileConfig: &cloudRecordingAPI.RecordingFileConfig{
 			AvFileType: []string{
 				"hls",
@@ -98,7 +77,7 @@ func (s *Service) RunWebRecorder(storageConfig *cloudRecordingAPI.StorageConfig)
 	sid := startResp.SuccessResponse.Sid
 	// stop
 	defer func() {
-		stopResp, err := cloudRecordingClient.WebRecording().Stop(ctx, resourceId, sid, s.Cname, s.Uid, true)
+		stopResp, err := s.CloudRecordingClient.WebRecording().Stop(ctx, resourceId, sid, s.Cname, s.Uid, true)
 		if err != nil {
 			log.Println(err)
 			return
@@ -113,7 +92,7 @@ func (s *Service) RunWebRecorder(storageConfig *cloudRecordingAPI.StorageConfig)
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := cloudRecordingClient.WebRecording().Query(ctx, resourceId, sid)
+		queryResp, err := s.CloudRecordingClient.WebRecording().Query(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
@@ -128,7 +107,7 @@ func (s *Service) RunWebRecorder(storageConfig *cloudRecordingAPI.StorageConfig)
 	}
 
 	// update
-	updateResp, err := cloudRecordingClient.WebRecording().Update(ctx, resourceId, sid, s.Cname, s.Uid, &webrecording.UpdateWebRecordingClientRequest{
+	updateResp, err := s.CloudRecordingClient.WebRecording().Update(ctx, resourceId, sid, s.Cname, s.Uid, &req.UpdateWebRecordingClientRequest{
 		WebRecordingConfig: &cloudRecordingAPI.UpdateWebRecordingConfig{
 			Onhold: false,
 		},
@@ -146,7 +125,7 @@ func (s *Service) RunWebRecorder(storageConfig *cloudRecordingAPI.StorageConfig)
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := cloudRecordingClient.WebRecording().Query(ctx, resourceId, sid)
+		queryResp, err := s.CloudRecordingClient.WebRecording().Query(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
@@ -161,21 +140,10 @@ func (s *Service) RunWebRecorder(storageConfig *cloudRecordingAPI.StorageConfig)
 	}
 }
 
-func (s *Service) RunWebRecorderAndRtmpPublish(storageConfig *cloudRecordingAPI.StorageConfig) {
+func (s *Scenario) RunWebRecorderAndRtmpPublish(storageConfig *cloudRecordingAPI.StorageConfig) {
 	ctx := context.Background()
-	config := &agora.Config{
-		AppID:      s.AppId,
-		Credential: s.Credential,
-		DomainArea: s.DomainArea,
-		Logger:     agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
-	}
-
-	cloudRecordingClient, err := cloudrecording.NewClient(config)
-	if err != nil {
-		log.Fatalln(err)
-	}
 	// acquire
-	acquireResp, err := cloudRecordingClient.WebRecording().Acquire(ctx, s.Cname, s.Uid, &webrecording.AcquireWebRecodingClientRequest{})
+	acquireResp, err := s.CloudRecordingClient.WebRecording().Acquire(ctx, s.Cname, s.Uid, &req.AcquireWebRecodingClientRequest{})
 	if err != nil {
 		log.Println(err)
 		return
@@ -189,7 +157,7 @@ func (s *Service) RunWebRecorderAndRtmpPublish(storageConfig *cloudRecordingAPI.
 
 	resourceId := acquireResp.SuccessRes.ResourceId
 	// start
-	startResp, err := cloudRecordingClient.WebRecording().Start(ctx, resourceId, s.Cname, s.Uid, &webrecording.StartWebRecordingClientRequest{
+	startResp, err := s.CloudRecordingClient.WebRecording().Start(ctx, resourceId, s.Cname, s.Uid, &req.StartWebRecordingClientRequest{
 		RecordingFileConfig: &cloudRecordingAPI.RecordingFileConfig{
 			AvFileType: []string{
 				"hls",
@@ -239,7 +207,7 @@ func (s *Service) RunWebRecorderAndRtmpPublish(storageConfig *cloudRecordingAPI.
 	sid := startResp.SuccessResponse.Sid
 	// stop
 	defer func() {
-		stopResp, err := cloudRecordingClient.WebRecording().Stop(ctx, resourceId, sid, s.Cname, s.Uid, true)
+		stopResp, err := s.CloudRecordingClient.WebRecording().Stop(ctx, resourceId, sid, s.Cname, s.Uid, true)
 		if err != nil {
 			log.Println(err)
 			return
@@ -254,7 +222,7 @@ func (s *Service) RunWebRecorderAndRtmpPublish(storageConfig *cloudRecordingAPI.
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := cloudRecordingClient.WebRecording().Query(ctx, resourceId, sid)
+		queryResp, err := s.CloudRecordingClient.WebRecording().Query(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
@@ -269,7 +237,7 @@ func (s *Service) RunWebRecorderAndRtmpPublish(storageConfig *cloudRecordingAPI.
 	}
 
 	// update
-	updateResp, err := cloudRecordingClient.WebRecording().Update(ctx, resourceId, sid, s.Cname, s.Uid, &webrecording.UpdateWebRecordingClientRequest{
+	updateResp, err := s.CloudRecordingClient.WebRecording().Update(ctx, resourceId, sid, s.Cname, s.Uid, &req.UpdateWebRecordingClientRequest{
 		WebRecordingConfig: &cloudRecordingAPI.UpdateWebRecordingConfig{
 			Onhold: false,
 		},
@@ -294,7 +262,7 @@ func (s *Service) RunWebRecorderAndRtmpPublish(storageConfig *cloudRecordingAPI.
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := cloudRecordingClient.WebRecording().Query(ctx, resourceId, sid)
+		queryResp, err := s.CloudRecordingClient.WebRecording().Query(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return

@@ -41,12 +41,21 @@ type AcquireClientRequest struct {
 	RegionAffinity      int                 `json:"regionAffinity,omitempty"`
 }
 
+// @brief AcquireResp returned by the various of cloud recording scenarios Acquire API.
+//
+// @since v0.8.0
 type AcquireResp struct {
+	// Response returned by the cloud recording API, see Response for details
 	Response
+	// Successful response, see AcquireSuccessResp for details
 	SuccessRes AcquireSuccessResp
 }
 
+// @brief Successful response returned by the various of cloud recording scenarios Acquire API.
+//
+// @since v0.8.0
 type AcquireSuccessResp struct {
+	// Unique identifier of the resource
 	ResourceId string `json:"resourceId"`
 }
 
