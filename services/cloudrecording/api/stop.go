@@ -48,20 +48,32 @@ type StopClientRequest struct {
 	AsyncStop bool `json:"async_stop"`
 }
 
+// @brief StopResp returned by the various of cloud recording scenarios Stop API.
+//
+// @since v0.8.0
 type StopResp struct {
+	// Response returned by the cloud recording API, see Response for details
 	Response
+	// Successful response, see StopSuccessResp for details
 	SuccessResponse StopSuccessResp
 }
 
+// @brief Successful response returned by the various of cloud recording scenarios Stop API.
+//
+// @since v0.8.0
 type StopSuccessResp struct {
-	Cname      string `json:"cname"`
-	UID        string `json:"uid"`
+	// Name of the channel to be recorded
+	Cname string `json:"cname"`
+	// User ID used by the cloud recording service in the RTC channel to identify the recording service in the channel
+	UID string `json:"uid"`
+	// Unique identifier of the resource
 	ResourceId string `json:"resourceId"`
-	Sid        string `json:"sid"`
+	// Unique identifier of the recording session
+	Sid string `json:"sid"`
 }
 
-func (s *Stop) Do(ctx context.Context, resourceID string, sid string, mode string, payload *StopReqBody) (*StopResp, error) {
-	path := s.buildPath(resourceID, sid, mode)
+func (s *Stop) Do(ctx context.Context, resourceId string, sid string, mode string, payload *StopReqBody) (*StopResp, error) {
+	path := s.buildPath(resourceId, sid, mode)
 
 	responseData, err := s.client.DoREST(ctx, path, http.MethodPost, payload)
 	if err != nil {

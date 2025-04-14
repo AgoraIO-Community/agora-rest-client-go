@@ -36,6 +36,7 @@ const (
 	QueryMixRecordingHlsServerResponseMode
 	QueryMixRecordingHlsAndMp4ServerResponseMode
 	QueryWebRecordingServerResponseMode
+	QueryRtmpPublishServerResponseMode
 )
 
 type QuerySuccessResp struct {
@@ -48,6 +49,7 @@ type QuerySuccessResp struct {
 	mixRecordingHLSServerResponse       *QueryMixRecordingHLSServerResponse
 	mixRecordingHLSAndMP4ServerResponse *QueryMixRecordingHLSAndMP4ServerResponse
 	webRecordingServerResponse          *QueryWebRecordingServerResponse
+	rtmpPublishServerResponse           *QueryRtmpPublishServerResponse
 }
 
 type QueryResp struct {
@@ -55,85 +57,372 @@ type QueryResp struct {
 	SuccessResponse QuerySuccessResp
 }
 
+// @brief Server response returned by the individual recording Query API.
+//
+// @since v0.8.0
 type QueryIndividualRecordingServerResponse struct {
+	// Current status of the cloud service:
+	//
+	//  - 0: Cloud service has not started.
+	//
+	//  - 1: The cloud service initialization is complete.
+	//
+	//  - 2: The cloud service components are starting.
+	//
+	//  - 3: Some cloud service components are ready.
+	//
+	//  - 4: All cloud service components are ready.
+	//
+	//  - 5: The cloud service is in progress.
+	//
+	//  - 6: The cloud service receives the request to stop.
+	//
+	//  - 7: All components of the cloud service stop.
+	//
+	//  - 8: The cloud service exits.
+	//
+	//  - 20: The cloud service exits abnormally.
 	Status int `json:"status"`
 
+	// The data format of the fileList field:
+	//
+	//  - "string": fileList is of String type. In composite recording mode,
+	//     if avFileType is set to ["hls"], fileListMode is "string".
+	//
+	//  - "json": fileList is a JSON Array. When avFileType is set to ["hls","mp4"]
+	//     in the individual or composite recording mode, fileListMode is set to "json".
 	FileListMode string `json:"fileListMode"`
 
+	// The file list.
 	FileList []struct {
+		// The file names of the M3U8 and MP4 files generated during recording.
 		FileName string `json:"fileName"`
 
+		// The recording file type.
+		//
+		//  - "audio": Audio-only files.
+		//
+		//  - "video": Video-only files.
+		//
+		//  - "audio_and_video": audio and video files
 		TrackType string `json:"trackType"`
 
-		Uid          string `json:"uid"`
-		MixedAllUser bool   `json:"mixedAllUser"`
-
-		IsPlayable bool `json:"isPlayable"`
-
-		SliceStartTime int64 `json:"sliceStartTime"`
-	} `json:"fileList"`
-
-	SliceStartTime int64 `json:"sliceStartTime"`
-}
-
-type QueryIndividualVideoScreenshotServerResponse struct {
-	Status int `json:"status"`
-
-	SliceStartTime int64 `json:"sliceStartTime"`
-}
-
-type QueryMixRecordingHLSServerResponse struct {
-	Status int `json:"status"`
-
-	FileListMode string `json:"fileListMode"`
-
-	FileList string `json:"fileList"`
-
-	SliceStartTime int64 `json:"sliceStartTime"`
-}
-
-type QueryMixRecordingHLSAndMP4ServerResponse struct {
-	Status int `json:"status"`
-
-	FileListMode string `json:"fileListMode"`
-
-	FileList []struct {
-		FileName string `json:"fileName"`
-
-		TrackType string `json:"trackType"`
-
+		// User UID, indicating which user's audio or video stream is being recorded.
+		//
+		// In composite recording mode, the uid is "0".
 		Uid string `json:"uid"`
 
+		// Whether the users were recorded separately.
+		//
+		//  - true: All users are recorded in a single file.
+		//
+		//  - false: Each user is recorded separately.
 		MixedAllUser bool `json:"mixedAllUser"`
 
+		// Whether or not can be played online.
+		//
+		//  - true: The file can be played online.
+		//
+		//  - false: The file cannot be played online.
 		IsPlayable bool `json:"isPlayable"`
 
+		// The recording start time of the file, the Unix timestamp, in seconds.
 		SliceStartTime int64 `json:"sliceStartTime"`
 	} `json:"fileList"`
 
+	// The recording start time of the file, the Unix timestamp, in seconds.
 	SliceStartTime int64 `json:"sliceStartTime"`
 }
 
+// @brief Server response returned by the individual recording QueryVideoScreenshot API.
+//
+// @since v0.8.0
+type QueryIndividualVideoScreenshotServerResponse struct {
+	// Current status of the cloud service:
+	//
+	//  - 0: Cloud service has not started.
+	//
+	//  - 1: The cloud service initialization is complete.
+	//
+	//  - 2: The cloud service components are starting.
+	//
+	//  - 3: Some cloud service components are ready.
+	//
+	//  - 4: All cloud service components are ready.
+	//
+	//  - 5: The cloud service is in progress.
+	//
+	//  - 6: The cloud service receives the request to stop.
+	//
+	//  - 7: All components of the cloud service stop.
+	//
+	//  - 8: The cloud service exits.
+	//
+	//  - 20: The cloud service exits abnormally.
+	Status int `json:"status"`
+
+	// The recording start time of the file, the Unix timestamp, in seconds.
+	SliceStartTime int64 `json:"sliceStartTime"`
+}
+
+// @brief Server response returned by the mix recording QueryHLS API.
+//
+// @since v0.8.0
+type QueryMixRecordingHLSServerResponse struct {
+	// Current status of the cloud service:
+	//
+	//  - 0: Cloud service has not started.
+	//
+	//  - 1: The cloud service initialization is complete.
+	//
+	//  - 2: The cloud service components are starting.
+	//
+	//  - 3: Some cloud service components are ready.
+	//
+	//  - 4: All cloud service components are ready.
+	//
+	//  - 5: The cloud service is in progress.
+	//
+	//  - 6: The cloud service receives the request to stop.
+	//
+	//  - 7: All components of the cloud service stop.
+	//
+	//  - 8: The cloud service exits.
+	//
+	//  - 20: The cloud service exits abnormally.
+	Status int `json:"status"`
+
+	// The data format of the fileList field:
+	//
+	//  - "string": fileList is of String type. In composite recording mode,
+	//     if avFileType is set to ["hls"], fileListMode is "string".
+	//
+	//  - "json": fileList is a JSON Array. When avFileType is set to ["hls","mp4"]
+	//     in the individual or composite recording mode, fileListMode is set to "json".
+	FileListMode string `json:"fileListMode"`
+
+	// The file list.
+	FileList string `json:"fileList"`
+
+	// The recording start time of the file, the Unix timestamp, in seconds.
+	SliceStartTime int64 `json:"sliceStartTime"`
+}
+
+// @brief Server response returned by the mix recording QueryHLSAndMP4 API.
+//
+// @since v0.8.0
+type QueryMixRecordingHLSAndMP4ServerResponse struct {
+	// Current status of the cloud service:
+	//
+	//  - 0: Cloud service has not started.
+	//
+	//  - 1: The cloud service initialization is complete.
+	//
+	//  - 2: The cloud service components are starting.
+	//
+	//  - 3: Some cloud service components are ready.
+	//
+	//  - 4: All cloud service components are ready.
+	//
+	//  - 5: The cloud service is in progress.
+	//
+	//  - 6: The cloud service receives the request to stop.
+	//
+	//  - 7: All components of the cloud service stop.
+	//
+	//  - 8: The cloud service exits.
+	//
+	//  - 20: The cloud service exits abnormally.
+	Status int `json:"status"`
+
+	// The data format of the fileList field:
+	//
+	//  - "string": fileList is of String type. In composite recording mode,
+	//     if avFileType is set to ["hls"], fileListMode is "string".
+	//
+	//  - "json": fileList is a JSON Array. When avFileType is set to ["hls","mp4"]
+	//     in the individual or composite recording mode, fileListMode is set to "json".
+	FileListMode string `json:"fileListMode"`
+
+	// The file list.
+	FileList []struct {
+		// The file names of the M3U8 and MP4 files generated during recording.
+		FileName string `json:"fileName"`
+
+		// The recording file type.
+		//
+		//  - "audio": Audio-only files.
+		//
+		//  - "video": Video-only files.
+		//
+		//  - "audio_and_video": audio and video files
+		TrackType string `json:"trackType"`
+
+		// User UID, indicating which user's audio or video stream is being recorded.
+		//
+		// In composite recording mode, the uid is "0".
+		Uid string `json:"uid"`
+
+		// Whether the users were recorded separately.
+		//
+		//  - true: All users are recorded in a single file.
+		//
+		//  - false: Each user is recorded separately.
+		MixedAllUser bool `json:"mixedAllUser"`
+
+		// Whether or not can be played online.
+		//
+		//  - true: The file can be played online.
+		//
+		//  - false: The file cannot be played online.
+		IsPlayable bool `json:"isPlayable"`
+
+		// The recording start time of the file, the Unix timestamp, in seconds.
+		SliceStartTime int64 `json:"sliceStartTime"`
+	} `json:"fileList"`
+
+	// The recording start time of the file, the Unix timestamp, in seconds.
+	SliceStartTime int64 `json:"sliceStartTime"`
+}
+
+// @brief Server response returned by the web recording Query API.
+//
+// @since v0.8.0
 type QueryWebRecordingServerResponse struct {
-	Status                int `json:"status"`
+	// Current status of the cloud service:
+	//
+	//  - 0: Cloud service has not started.
+	//
+	//  - 1: The cloud service initialization is complete.
+	//
+	//  - 2: The cloud service components are starting.
+	//
+	//  - 3: Some cloud service components are ready.
+	//
+	//  - 4: All cloud service components are ready.
+	//
+	//  - 5: The cloud service is in progress.
+	//
+	//  - 6: The cloud service receives the request to stop.
+	//
+	//  - 7: All components of the cloud service stop.
+	//
+	//  - 8: The cloud service exits.
+	//
+	//  - 20: The cloud service exits abnormally.
+	Status int `json:"status"`
+	// Extension service state
 	ExtensionServiceState []struct {
+		// Extension service payload
 		Payload struct {
+			// File list
 			FileList []struct {
+				// The file names of the M3U8 and MP4 files generated during recording.
 				Filename string `json:"filename"`
 
+				// The recording start time of the file, the Unix timestamp, in seconds.
 				SliceStartTime int64 `json:"sliceStartTime"`
 			} `json:"fileList"`
-
+			// Whether the page recording is in pause state:
+			//
+			//  - true: In pause state.
+			//
+			//  - false: The page recording is running.
 			Onhold bool `json:"onhold"`
 
+			// The status of uploading subscription content to the extension service:
+			//
+			//  - "init": The service is initializing.
+			//
+			//  - "inProgress": The service has started and is currently in progress.
+			//
+			//  - "exit": Service exits.
+			State string `json:"state"`
+
+			// The status of the push stream to the CDN.
+			Outputs []struct {
+				// The CDN address to which you push the stream.
+				RtmpUrl string `json:"rtmpUrl"`
+				// The current status of stream pushing of the web page recording:
+				//
+				//  - "connecting": Connecting to the CDN server.
+				//
+				//  - "publishing": The stream pushing is going on.
+				//
+				//  - "onhold": Set whether to pause the stream pushing.
+				//
+				//  - "disconnected": Failed to connect to the CDN server. Agora recommends that you change the CDN address to push the stream.
+				Status string `json:"status"`
+			} `json:"outputs"`
+		} `json:"payload"`
+		// Name of the extended service:
+		//
+		//  - "web_recorder_service": Represents the extended service is web page recording.
+		//
+		//  - "rtmp_publish_service": Represents the extended service is to push web page recording to the CDN.
+		ServiceName string `json:"serviceName"`
+	} `json:"extensionServiceState"`
+}
+
+// @brief Server response returned by the web recording QueryRtmpPublish API.
+//
+// @since v0.8.0
+type QueryRtmpPublishServerResponse struct {
+	// Current status of the cloud service:
+	//
+	//  - 0: Cloud service has not started.
+	//
+	//  - 1: The cloud service initialization is complete.
+	//
+	//  - 2: The cloud service components are starting.
+	//
+	//  - 3: Some cloud service components are ready.
+	//
+	//  - 4: All cloud service components are ready.
+	//
+	//  - 5: The cloud service is in progress.
+	//
+	//  - 6: The cloud service receives the request to stop.
+	//
+	//  - 7: All components of the cloud service stop.
+	//
+	//  - 8: The cloud service exits.
+	//
+	//  - 20: The cloud service exits abnormally.
+	Status int `json:"status"`
+	// Extension service state
+	ExtensionServiceState []struct {
+		// Extension service payload
+		Payload struct {
+			// The status of uploading subscription content to the extension service:
+			//
+			//  - "init": The service is initializing.
+			//
+			//  - "inProgress": The service has started and is currently in progress.
+			//
+			//  - "exit": Service exits.
 			State string `json:"state"`
 
 			Outputs []struct {
+				// The CDN address to which you push the stream.
 				RtmpUrl string `json:"rtmpUrl"`
-
-
+				// The current status of stream pushing of the web page recording:
+				//
+				//  - "connecting": Connecting to the CDN server.
+				//
+				//  - "publishing": The stream pushing is going on.
+				//
+				//  - "onhold": Set whether to pause the stream pushing.
+				//
+				//  - "disconnected": Failed to connect to the CDN server. Agora recommends that you change the CDN address to push the stream.
+				Status string `json:"status"`
 			} `json:"outputs"`
 		} `json:"payload"`
+		// Name of the extended service:
+		//
+		//  - "web_recorder_service": Represents the extended service is web page recording.
+		//
+		//  - "rtmp_publish_service": Represents the extended service is to push web page recording to the CDN.
 		ServiceName string `json:"serviceName"`
 	} `json:"extensionServiceState"`
 }
@@ -156,6 +445,10 @@ func (q *QuerySuccessResp) GetMixRecordingHLSAndMP4ServerResponse() *QueryMixRec
 
 func (q *QuerySuccessResp) GetWebRecording2CDNServerResponse() *QueryWebRecordingServerResponse {
 	return q.webRecordingServerResponse
+}
+
+func (q *QuerySuccessResp) GetRtmpPublishServiceServerResponse() *QueryRtmpPublishServerResponse {
+	return q.rtmpPublishServerResponse
 }
 
 func (q *QuerySuccessResp) GetServerResponseMode() QueryRespServerResponseMode {
@@ -212,13 +505,26 @@ func (q *QuerySuccessResp) setServerResponse(rawBody []byte, mode string) error 
 		}
 
 	case WebMode:
-		serverResponseMode = QueryWebRecordingServerResponseMode
+		serviceName := gjson.GetBytes(rawBody, "serverResponse.extensionServiceState[*].serviceName")
 		serverResponse := gjson.GetBytes(rawBody, "serverResponse")
-		var resp QueryWebRecordingServerResponse
-		if err := json.Unmarshal([]byte(serverResponse.String()), &resp); err != nil {
-			return err
+		switch serviceName.String() {
+		case "rtmp_publish_service":
+			serverResponseMode = QueryRtmpPublishServerResponseMode
+			var resp QueryRtmpPublishServerResponse
+			if err := json.Unmarshal([]byte(serverResponse.String()), &resp); err != nil {
+				return err
+			}
+			q.rtmpPublishServerResponse = &resp
+		case "web_recorder_service":
+			serverResponseMode = QueryWebRecordingServerResponseMode
+			var resp QueryWebRecordingServerResponse
+			if err := json.Unmarshal([]byte(serverResponse.String()), &resp); err != nil {
+				return err
+			}
+			q.webRecordingServerResponse = &resp
+		default:
+			return errors.New("unknown service name")
 		}
-		q.webRecordingServerResponse = &resp
 	default:
 		return errors.New("unknown mode")
 

@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/domain"
+	"github.com/AgoraIO-Community/agora-rest-client-go/examples/cloudrecording/base"
 	"github.com/AgoraIO-Community/agora-rest-client-go/examples/cloudrecording/individualrecording"
 	"github.com/AgoraIO-Community/agora-rest-client-go/examples/cloudrecording/mixrecording"
 	"github.com/AgoraIO-Community/agora-rest-client-go/examples/cloudrecording/webrecording"
@@ -106,10 +107,14 @@ func main() {
 	web_scene := flag.String("web_scene", "web_recorder", "scene for web mode, options is web_recorder/web_recorder_and_rtmp_publish")
 	flag.Parse()
 
+	svc, err := base.NewService(domainArea, appId, cname, uid, username, password)
+	if err != nil {
+		panic(err)
+	}
+
 	switch *mode {
 	case "mix":
-		service := mixrecording.NewService(domainArea, appId, cname, uid)
-		service.SetCredential(username, password)
+		service := mixrecording.NewScenario(svc)
 
 		switch *mix_scene {
 		case "hls":
@@ -120,8 +125,7 @@ func main() {
 			panic("invalid mix_scene")
 		}
 	case "individual":
-		service := individualrecording.NewService(domainArea, appId, cname, uid)
-		service.SetCredential(username, password)
+		service := individualrecording.NewScenario(svc)
 
 		switch *individual_scene {
 		case "recording":
@@ -138,8 +142,7 @@ func main() {
 			panic("invalid individual_scene")
 		}
 	case "web":
-		service := webrecording.NewService(domainArea, appId, cname, uid)
-		service.SetCredential(username, password)
+		service := webrecording.NewScenario(svc)
 
 		switch *web_scene {
 		case "web_recorder":
