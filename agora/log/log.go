@@ -69,7 +69,7 @@ func (d *discardLogger) Level() Level {
 
 func (d *discardLogger) SetLevel(level Level) {}
 
-type sampleLogger struct {
+type SampleLogger struct {
 	DEBUG *log.Logger
 	ERROR *log.Logger
 	INFO  *log.Logger
@@ -91,8 +91,8 @@ var DefaultLogger = NewDefaultLogger(defaultLogLevel)
 // @param level Log level. See Level for details.
 //
 // @since v0.7.0
-func NewDefaultLogger(level Level) *sampleLogger {
-	return &sampleLogger{
+func NewDefaultLogger(level Level) *SampleLogger {
+	return &SampleLogger{
 		DEBUG: log.New(os.Stdout, fmt.Sprintf("DEBUG %s ", defaultLogPrefix), defaultLogFlag),
 		ERROR: log.New(os.Stdout, fmt.Sprintf("ERROR %s ", defaultLogPrefix), defaultLogFlag),
 		INFO:  log.New(os.Stdout, fmt.Sprintf("INFO %s ", defaultLogPrefix), defaultLogFlag),
@@ -101,58 +101,58 @@ func NewDefaultLogger(level Level) *sampleLogger {
 	}
 }
 
-func (d *sampleLogger) Debug(ctx context.Context, module string, v ...interface{}) {
+func (d *SampleLogger) Debug(ctx context.Context, module string, v ...interface{}) {
 	if d.level <= DebugLevel {
 		_ = d.DEBUG.Output(2, fmt.Sprintln(v...))
 	}
 }
 
-func (d *sampleLogger) Debugf(ctx context.Context, module string, format string, v ...interface{}) {
+func (d *SampleLogger) Debugf(ctx context.Context, module string, format string, v ...interface{}) {
 	if d.level <= DebugLevel {
 		_ = d.DEBUG.Output(2, fmt.Sprintf(format, v...))
 	}
 }
 
-func (d *sampleLogger) Error(ctx context.Context, module string, v ...interface{}) {
+func (d *SampleLogger) Error(ctx context.Context, module string, v ...interface{}) {
 	if d.level <= ErrLevel {
 		_ = d.ERROR.Output(2, fmt.Sprintln(v...))
 	}
 }
 
-func (d *sampleLogger) Errorf(ctx context.Context, module string, format string, v ...interface{}) {
+func (d *SampleLogger) Errorf(ctx context.Context, module string, format string, v ...interface{}) {
 	if d.level <= ErrLevel {
 		_ = d.ERROR.Output(2, fmt.Sprintf(format, v...))
 	}
 }
 
-func (d *sampleLogger) Info(ctx context.Context, module string, v ...interface{}) {
+func (d *SampleLogger) Info(ctx context.Context, module string, v ...interface{}) {
 	if d.level >= InfoLevel {
 		_ = d.INFO.Output(2, fmt.Sprintln(v...))
 	}
 }
 
-func (d *sampleLogger) Infof(ctx context.Context, module string, format string, v ...interface{}) {
+func (d *SampleLogger) Infof(ctx context.Context, module string, format string, v ...interface{}) {
 	if d.level >= InfoLevel {
 		_ = d.WARN.Output(2, fmt.Sprintln(v...))
 	}
 }
 
-func (d *sampleLogger) Warn(ctx context.Context, module string, v ...interface{}) {
+func (d *SampleLogger) Warn(ctx context.Context, module string, v ...interface{}) {
 	if d.level <= WarningLevel {
 		_ = d.WARN.Output(2, fmt.Sprintln(v...))
 	}
 }
 
-func (d *sampleLogger) Warnf(ctx context.Context, module string, format string, v ...interface{}) {
+func (d *SampleLogger) Warnf(ctx context.Context, module string, format string, v ...interface{}) {
 	if d.level <= WarningLevel {
 		_ = d.WARN.Output(2, fmt.Sprintf(format, v...))
 	}
 }
 
-func (d *sampleLogger) Level() Level {
+func (d *SampleLogger) Level() Level {
 	return d.level
 }
 
-func (d *sampleLogger) SetLevel(level Level) {
+func (d *SampleLogger) SetLevel(level Level) {
 	d.level = level
 }
