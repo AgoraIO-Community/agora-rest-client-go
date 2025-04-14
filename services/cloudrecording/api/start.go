@@ -160,8 +160,8 @@ type ServiceParamInterface interface {
 }
 
 type ExtensionService struct {
-	ServiceName       string               `json:"serviceName"`
-	ErrorHandlePolicy string               `json:"errorHandlePolicy"`
+	ServiceName       string                `json:"serviceName"`
+	ErrorHandlePolicy string                `json:"errorHandlePolicy"`
 	ServiceParam      ServiceParamInterface `json:"serviceParam"`
 }
 
