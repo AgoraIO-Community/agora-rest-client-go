@@ -141,6 +141,8 @@ type StorageConfig struct {
 	Bucket          string           `json:"bucket"`
 	AccessKey       string           `json:"accessKey"`
 	SecretKey       string           `json:"secretKey"`
+	StsToken        string           `json:"stsToken,omitempty"`
+	StsExpiration   uint64           `json:"stsExpiration,omitempty"`
 	FileNamePrefix  []string         `json:"fileNamePrefix,omitempty"`
 	ExtensionParams *ExtensionParams `json:"extensionParams,omitempty"`
 }
