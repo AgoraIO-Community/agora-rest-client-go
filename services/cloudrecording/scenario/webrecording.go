@@ -135,6 +135,40 @@ func (w *WebRecording) Query(ctx context.Context, resourceID string, sid string)
 	return &webResp, nil
 }
 
+// @brief Query the status of pushing web page recording to the CDN.
+//
+// @since v0.8.0
+//
+// @param ctx Context to control the request lifecycle.
+//
+// @param resourceID The resource ID.
+//
+// @param sid The recording ID, identifying a recording cycle.
+//
+// @return Returns the response *QueryRtmpPublishResp. See resp.QueryRtmpPublishResp for details.
+//
+// @return Returns an error object. If the request fails, the error object is not nil and contains error information.
+func (w *WebRecording) QueryRtmpPublish(ctx context.Context, resourceID string, sid string) (*resp.QueryRtmpPublishResp, error) {
+	respData, err := w.queryAPI.Do(ctx, resourceID, sid, api.WebMode)
+	if err != nil {
+		return nil, err
+	}
+
+	var webResp resp.QueryRtmpPublishResp
+
+	webResp.Response = respData.Response
+	if respData.IsSuccess() {
+		successResp := respData.SuccessResponse
+		webResp.SuccessResponse = resp.QueryRtmpPublishSuccessResp{
+			ResourceId:     successResp.ResourceId,
+			Sid:            successResp.Sid,
+			ServerResponse: successResp.GetRtmpPublishServiceServerResponse(),
+		}
+	}
+
+	return &webResp, nil
+}
+
 // @brief Update web recording configuration.
 //
 // @since v0.8.0

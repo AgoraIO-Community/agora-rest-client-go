@@ -222,7 +222,7 @@ func (s *Scenario) RunWebRecorderAndRtmpPublish(storageConfig *cloudRecordingAPI
 
 	// query
 	for i := 0; i < 3; i++ {
-		queryResp, err := s.CloudRecordingClient.WebRecording().Query(ctx, resourceId, sid)
+		queryResp, err := s.CloudRecordingClient.WebRecording().QueryRtmpPublish(ctx, resourceId, sid)
 		if err != nil {
 			log.Println(err)
 			return
