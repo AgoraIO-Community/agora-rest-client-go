@@ -197,6 +197,23 @@ func (s *Service) RunWithCustomTTS(ttsVendor req.TTSVendor, ttsParam req.TTSVend
 
 	time.Sleep(time.Second * 1)
 
+	speakResp, err := convoaiClient.Speak(ctx, agentId, &req.SpeakBody{
+		Text:          agoraUtils.Ptr("Hello, how can I help you?"),
+		Priority:      agoraUtils.Ptr("INTERRUPT"),
+		Interruptable: agoraUtils.Ptr(true),
+	})
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	if speakResp.IsSuccess() {
+		log.Printf("Speak success:%+v", speakResp)
+	} else {
+		log.Printf("Speak failed:%+v", speakResp)
+		return
+	}
+	time.Sleep(time.Second * 1)
+
 	updateResp, err := convoaiClient.Update(ctx, agentId, &req.UpdateReqBody{
 		Token: updateToken,
 	})
