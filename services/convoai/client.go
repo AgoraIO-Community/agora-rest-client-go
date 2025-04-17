@@ -18,11 +18,13 @@ import (
 const projectName = "conversational-ai-agent"
 
 type Client struct {
-	joinAPI   *api.Join
-	leaveAPI  *api.Leave
-	listAPI   *api.List
-	queryAPI  *api.Query
-	updateAPI *api.Update
+	joinAPI      *api.Join
+	leaveAPI     *api.Leave
+	listAPI      *api.List
+	queryAPI     *api.Query
+	updateAPI    *api.Update
+	interruptAPI *api.Interrupt
+	historyAPI   *api.History
 }
 
 // @brief ServiceRegion represents the region of the Conversational AI engine service
@@ -104,11 +106,13 @@ func NewClient(config *Config) (*Client, error) {
 	}
 
 	return &Client{
-		joinAPI:   api.NewJoin("convoai:join", config.Logger, c, prefixPath),
-		leaveAPI:  api.NewLeave("convoai:leave", config.Logger, c, prefixPath),
-		listAPI:   api.NewList("convoai:list", config.Logger, c, prefixPath),
-		queryAPI:  api.NewQuery("convoai:query", config.Logger, c, prefixPath),
-		updateAPI: api.NewUpdate("convoai:update", config.Logger, c, prefixPath),
+		joinAPI:      api.NewJoin("convoai:join", config.Logger, c, prefixPath),
+		leaveAPI:     api.NewLeave("convoai:leave", config.Logger, c, prefixPath),
+		listAPI:      api.NewList("convoai:list", config.Logger, c, prefixPath),
+		queryAPI:     api.NewQuery("convoai:query", config.Logger, c, prefixPath),
+		updateAPI:    api.NewUpdate("convoai:update", config.Logger, c, prefixPath),
+		interruptAPI: api.NewInterrupt("convoai:interrupt", config.Logger, c, prefixPath),
+		historyAPI:   api.NewHistory("convoai:history", config.Logger, c, prefixPath),
 	}, nil
 }
 
@@ -223,4 +227,42 @@ func (c *Client) List(ctx context.Context, options ...req.ListOption) (*resp.Lis
 // @return Returns an error object. If the request fails, the error object is not nil and contains error information.
 func (c *Client) Update(ctx context.Context, agentId string, payload *req.UpdateReqBody) (*resp.UpdateResp, error) {
 	return c.updateAPI.Do(ctx, agentId, payload)
+}
+
+// Interrupt
+//
+// @brief Interrupts the specified agent instance
+//
+// @since v0.9.0
+//
+// @example Use this method to interrupt the specified agent instance.
+//
+// @param ctx Context to control the request lifecycle.
+//
+// @param agentId Agent ID.
+//
+// @return Returns the response *InterruptResp. See api.InterruptResp for details.
+//
+// @return Returns an error object. If the request fails, the error object is not nil and contains error information.
+func (c *Client) Interrupt(ctx context.Context, agentId string) (*resp.InterruptResp, error) {
+	return c.interruptAPI.Do(ctx, agentId)
+}
+
+// GetHistory
+//
+// @brief Acquires the short-term memory of the specified agent instance
+//
+// @since v0.9.0
+//
+// @example Use this method to acquire the short-term memory of the specified agent instance.
+//
+// @param ctx Context to control the request lifecycle.
+//
+// @param agentId Agent ID.
+//
+// @return Returns the response *HistoryResp. See api.HistoryResp for details.
+//
+// @return Returns an error object. If the request fails, the error object is not nil and contains error information.
+func (c *Client) GetHistory(ctx context.Context, agentId string) (*resp.HistoryResp, error) {
+	return c.historyAPI.Do(ctx, agentId)
 }

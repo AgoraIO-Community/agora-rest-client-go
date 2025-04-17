@@ -170,6 +170,33 @@ func (s *Service) RunWithCustomTTS(ttsVendor req.TTSVendor, ttsParam req.TTSVend
 		time.Sleep(time.Second * 3)
 	}
 
+	interruptResp, err := convoaiClient.Interrupt(ctx, agentId)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	if interruptResp.IsSuccess() {
+		log.Printf("Interrupt success:%+v", interruptResp)
+	} else {
+		log.Printf("Interrupt failed:%+v", interruptResp)
+		return
+	}
+	time.Sleep(time.Second * 1)
+
+	historyResp, err := convoaiClient.GetHistory(ctx, agentId)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	if historyResp.IsSuccess() {
+		log.Printf("History success:%+v", historyResp)
+	} else {
+		log.Printf("History failed:%+v", historyResp)
+		return
+	}
+
+	time.Sleep(time.Second * 1)
+
 	updateResp, err := convoaiClient.Update(ctx, agentId, &req.UpdateReqBody{
 		Token: updateToken,
 	})

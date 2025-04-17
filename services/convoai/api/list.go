@@ -6,12 +6,10 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-	"time"
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora"
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/client"
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/log"
-	"github.com/AgoraIO-Community/agora-rest-client-go/agora/retry"
 	"github.com/AgoraIO-Community/agora-rest-client-go/services/convoai/req"
 	"github.com/AgoraIO-Community/agora-rest-client-go/services/convoai/resp"
 )
@@ -86,7 +84,7 @@ func buildQueryFields(options ...req.ListOption) map[string]any {
 func (q *List) Do(ctx context.Context, options ...req.ListOption) (*resp.ListResp, error) {
 	queryFields := buildQueryFields(options...)
 	path := q.buildPath(queryFields)
-	responseData, err := q.doRESTWithRetry(ctx, path, http.MethodGet, nil)
+	responseData, err := q.client.DoREST(ctx, path, http.MethodGet, nil)
 	if err != nil {
 		var internalErr *agora.InternalErr
 		if !errors.As(err, &internalErr) {
@@ -113,52 +111,4 @@ func (q *List) Do(ctx context.Context, options ...req.ListOption) (*resp.ListRes
 	}
 
 	return &listResp, nil
-}
-
-const listRetryCount = 3
-
-func (q *List) doRESTWithRetry(ctx context.Context, path string, method string, requestBody interface{}) (*agora.BaseResponse, error) {
-	var (
-		baseResponse *agora.BaseResponse
-		err          error
-		retryCount   int
-	)
-
-	err = retry.Do(func(retryCount int) error {
-		var doErr error
-
-		baseResponse, doErr = q.client.DoREST(ctx, path, method, requestBody)
-		if doErr != nil {
-			return agora.NewRetryErr(false, doErr)
-		}
-
-		statusCode := baseResponse.HttpStatusCode
-		switch {
-		case statusCode == 200 || statusCode == 201:
-			return nil
-		case statusCode >= 400 && statusCode < 499:
-			q.logger.Debugf(ctx, q.module, "http status code is %d, no retry,http response:%s", statusCode, baseResponse.RawBody)
-			return agora.NewRetryErr(
-				false,
-				agora.NewInternalErr(fmt.Sprintf("http status code is %d, no retry,http response:%s", statusCode, baseResponse.RawBody)),
-			)
-		default:
-			q.logger.Debugf(ctx, q.module, "http status code is %d, retry,http response:%s", statusCode, baseResponse.RawBody)
-			return fmt.Errorf("http status code is %d, retry", baseResponse.RawBody)
-		}
-	}, func() bool {
-		select {
-		case <-ctx.Done():
-			return true
-		default:
-		}
-		return retryCount >= listRetryCount
-	}, func(i int) time.Duration {
-		return time.Second * time.Duration(i+1)
-	}, func(err error) {
-		q.logger.Debugf(ctx, q.module, "http request err:%s", err)
-		retryCount++
-	})
-
-	return baseResponse, err
 }
