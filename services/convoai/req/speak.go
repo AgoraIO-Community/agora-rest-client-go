@@ -11,10 +11,10 @@ type SpeakBody struct {
 	//  - "INTERRUPT" (default): High priority, interrupt and speak. The agent will terminate the current interaction and speak the message directly.
 	//  - "APPEND": Middle priority, append and speak. The agent will speak the message after the current interaction.
 	//  - "IGNORE": Low priority, speak when idle. If the agent is currently interacting, it will directly ignore and discard the message to be spoken; only when the agent is not interacting will it speak the message.
-	Priority *string `json:"priority"`
+	Priority *string `json:"priority,omitempty"`
 	// Whether to allow the user to speak to interrupt the agent's speech(Optional):
 	//
 	//  - true (default): Allow.
 	//  - false: Disallow.
-	Interruptable *bool `json:"interrupt"`
+	Interruptable *bool `json:"interrupt,omitempty"`
 }
