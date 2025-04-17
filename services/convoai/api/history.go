@@ -11,12 +11,12 @@ import (
 	"github.com/AgoraIO-Community/agora-rest-client-go/services/convoai/resp"
 )
 
-type Query struct {
+type History struct {
 	baseHandler
 }
 
-func NewQuery(module string, logger log.Logger, client client.Client, prefixPath string) *Query {
-	return &Query{
+func NewHistory(module string, logger log.Logger, client client.Client, prefixPath string) *History {
+	return &History{
 		baseHandler: baseHandler{
 			module:     module,
 			logger:     logger,
@@ -27,14 +27,14 @@ func NewQuery(module string, logger log.Logger, client client.Client, prefixPath
 }
 
 // buildPath returns the request path.
-// /api/conversational-ai-agent/v2/projects/{appid}/agents/{agentId}
-func (q *Query) buildPath(agentId string) string {
-	return q.prefixPath + "/agents/" + agentId
+// /api/conversational-ai-agent/v2/projects/{appid}/agents/{agentId}/history
+func (h *History) buildPath(agentId string) string {
+	return h.prefixPath + "/agents/" + agentId + "/history"
 }
 
-func (q *Query) Do(ctx context.Context, agentId string) (*resp.QueryResp, error) {
-	path := q.buildPath(agentId)
-	responseData, err := q.client.DoREST(ctx, path, http.MethodGet, nil)
+func (h *History) Do(ctx context.Context, agentId string) (*resp.HistoryResp, error) {
+	path := h.buildPath(agentId)
+	responseData, err := h.client.DoREST(ctx, path, http.MethodGet, nil)
 	if err != nil {
 		var internalErr *agora.InternalErr
 		if !errors.As(err, &internalErr) {
@@ -42,23 +42,23 @@ func (q *Query) Do(ctx context.Context, agentId string) (*resp.QueryResp, error)
 		}
 	}
 
-	var queryResp resp.QueryResp
+	var historyResp resp.HistoryResp
 
-	queryResp.BaseResponse = responseData
+	historyResp.BaseResponse = responseData
 
 	if responseData.HttpStatusCode == http.StatusOK {
-		var successResponse resp.QuerySuccessResp
+		var successResponse resp.HistorySuccessResp
 		if err = responseData.UnmarshalToTarget(&successResponse); err != nil {
 			return nil, err
 		}
-		queryResp.SuccessRes = successResponse
+		historyResp.SuccessRes = successResponse
 	} else {
 		var errResponse resp.ErrResponse
 		if err = responseData.UnmarshalToTarget(&errResponse); err != nil {
 			return nil, err
 		}
-		queryResp.ErrResponse = errResponse
+		historyResp.ErrResponse = errResponse
 	}
 
-	return &queryResp, nil
+	return &historyResp, nil
 }
