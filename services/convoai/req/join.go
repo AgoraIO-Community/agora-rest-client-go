@@ -199,6 +199,16 @@ type JoinPropertiesCustomLLMBody struct {
 	//
 	// If filled, it will be returned through the TTS module when the LLM call fails.
 	FailureMessage string `json:"failure_message,omitempty"`
+
+	// Silence message for the agent (optional)
+	//
+	// After the agent is created and a user joins the channel,
+	// the duration of the agent's non-listening, thinking, or speaking state is called the agent's silence time.
+	// When the silence time reaches the set value, the agent will report the silence prompt message in llm.silence_message,
+	// and then recalculate the silence time.
+	//
+	// When silence_timeout is set to 0, this parameter is ignored.
+	SilenceMessage *string `json:"silence_message,omitempty"`
 }
 
 // @brief Defines the Voice Activity Detection (VAD) configuration for the agent to join the RTC channel
@@ -267,6 +277,19 @@ type JoinPropertiesReqBody struct {
 	//
 	// If set to 0, the agent will not stop until manually exited
 	IdleTimeout *int `json:"idle_timeout,omitempty"`
+
+	// Silence timeout (s) (optional)
+	//
+	// The maximum silence time of the agent (s), range is [0,60].
+	//
+	// After the agent is created and a user joins the channel, the duration of the agent's non-listening, thinking, or speaking state is called the agent's silence time.
+	//
+	// When the silence time reaches the set value, the agent will report the silence prompt message in llm.silence_message, and then recalculate the silence time.
+	//
+	//  - 0 (default): Do not enable this feature.
+	//
+	//  - (0,60]: Must also set llm.silence_message to enable the feature.
+	SilenceTimeout *int `json:"silence_timeout,omitempty"`
 
 	// Agent user ID in the RTM channel
 	//
