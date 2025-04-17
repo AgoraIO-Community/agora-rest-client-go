@@ -67,11 +67,11 @@ export CONVOAI_TTS_ELEVENLABS_VOICE_ID=<Your tts elevenLabs voice id>
 使用以下命令运行示例项目：
 
 ```bash
-go run main.go -ttsVendor=<ttsVendor> --serviceRegion=<serviceRegion>
+go run main.go --ttsVendor=<ttsVendor> --serviceRegion=<serviceRegion>
 ```
 
 `ttsVendor` 代表不同的 TTS 提供商。根据您的需求选择合适的 TTS 提供商。
 `serviceRegion` 代表选择的服务区域。目前支持的服务区域有：
-* `ChineseMainland`
-* `Global`
+* `1`:`ChineseMainland`
+* `2`:`Global`
 

@@ -67,11 +67,11 @@ export CONVOAI_TTS_ELEVENLABS_VOICE_ID=<Your tts elevenLabs voice id>
 Run the sample project with the following command:
 
 ```bash
-go run main.go -ttsVendor=<ttsVendor> --serviceRegion=<serviceRegion>
+go run main.go --ttsVendor=<ttsVendor> --serviceRegion=<serviceRegion>
 ```
 
 `ttsVendor` represents different TTS providers. Choose the appropriate TTS provider based on your requirements.
 `serviceRegion` represents chosen service region. The currently supported service regions are:
-* `ChineseMainland`
-* `Global`
+* `1`:`ChineseMainland`
+* `2`:`Global`
 
