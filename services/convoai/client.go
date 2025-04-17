@@ -25,6 +25,7 @@ type Client struct {
 	updateAPI    *api.Update
 	interruptAPI *api.Interrupt
 	historyAPI   *api.History
+	speakAPI     *api.Speak
 }
 
 // @brief ServiceRegion represents the region of the Conversational AI engine service
@@ -113,6 +114,7 @@ func NewClient(config *Config) (*Client, error) {
 		updateAPI:    api.NewUpdate("convoai:update", config.Logger, c, prefixPath),
 		interruptAPI: api.NewInterrupt("convoai:interrupt", config.Logger, c, prefixPath),
 		historyAPI:   api.NewHistory("convoai:history", config.Logger, c, prefixPath),
+		speakAPI:     api.NewSpeak("convoai:speak", config.Logger, c, prefixPath),
 	}, nil
 }
 
@@ -265,4 +267,23 @@ func (c *Client) Interrupt(ctx context.Context, agentId string) (*resp.Interrupt
 // @return Returns an error object. If the request fails, the error object is not nil and contains error information.
 func (c *Client) GetHistory(ctx context.Context, agentId string) (*resp.HistoryResp, error) {
 	return c.historyAPI.Do(ctx, agentId)
+}
+
+// Speak
+//
+// @brief Speaks a custom message for the specified agent instance
+//
+// @since v0.9.0
+//
+// @param ctx Context to control the request lifecycle.
+//
+// @param agentId Agent ID.
+//
+// @param payload Request body for the specified agent to speak a custom message. See api.SpeakBody for details.
+//
+// @return Returns the response *SpeakResp. See api.SpeakResp for details.
+//
+// @return Returns an error object. If the request fails, the error object is not nil and contains error information.
+func (c *Client) Speak(ctx context.Context, agentId string, payload *req.SpeakBody) (*resp.SpeakResp, error) {
+	return c.speakAPI.Do(ctx, agentId, payload)
 }
