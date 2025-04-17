@@ -403,6 +403,7 @@ type QueryRtmpPublishServerResponse struct {
 			//  - "exit": Service exits.
 			State string `json:"state"`
 
+			// The push stream to the CDN output.
 			Outputs []struct {
 				// The CDN address to which you push the stream.
 				RtmpUrl string `json:"rtmpUrl"`
