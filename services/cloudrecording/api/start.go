@@ -159,7 +159,7 @@ type RecordingConfig struct {
 	//
 	// The unit is seconds.
 	//
-	// The value range is [5,259,200].
+	// The value range is [5,259200].
 	//
 	// The default value is 30.
 	MaxIdleTime int `json:"maxIdleTime,omitempty"`
@@ -177,7 +177,7 @@ type RecordingConfig struct {
 	//
 	// If you want to subscribe to the video streams of all UIDs, no need to set this field.
 	SubscribeVideoUIDs []string `json:"subscribeVideoUids,omitempty"`
-	// Specify which UIDs' audio streams not to subscribe to.(Optional)
+	// Specify which UIDs' video streams not to subscribe to.(Optional)
 	//
 	// The cloud recording service will subscribe to the video streams of all UIDs except the specified ones.
 	UnsubscribeVideoUIDs []string `json:"unSubscribeVideoUids,omitempty"`
@@ -241,6 +241,8 @@ type TransConfig struct {
 }
 
 // @brief Audio properties of the file.
+//
+// @since v0.8.0
 type Audio struct {
 	// Audio sampling rate.(Optional)
 	//
