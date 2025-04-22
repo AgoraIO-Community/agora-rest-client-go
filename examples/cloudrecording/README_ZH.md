@@ -52,8 +52,6 @@ go run main.go -mode=web -web_scene=<scene>
 * recording: 仅录制
 * snapshot: 仅截图
 * recording_and_snapshot: 录制+截图
-* recording_and_postpone_transcoding: 录制+延时转码
-* recording_and_audio_mix: 录制+延时混音
 
 其中 `web_scene` 表示页面录制场景：
 

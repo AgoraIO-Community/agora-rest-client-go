@@ -52,8 +52,6 @@ Where `individual_scene` indicates the individual recording scenario:
 * recording: Recording only
 * snapshot: Screenshot only
 * recording_and_snapshot: Recording + Screenshot
-* recording_and_postpone_transcoding: Recording + Delayed transcoding
-* recording_and_audio_mix: Recording + Delayed audio mixing
 
 Where `web_scene` indicates the web recording scenario:
 

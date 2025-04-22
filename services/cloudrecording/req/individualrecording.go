@@ -51,12 +51,6 @@ type StartIndividualRecordingClientRequest struct {
 
 	// Configurations for screenshot capture.(Optional)
 	SnapshotConfig *api.SnapshotConfig
-
-	// Configuration for the application.(Optional)
-	AppsCollection *api.AppsCollection
-
-	// Configurations for the recorded files generated under postponed transcoding or audio mixing.(Optional)
-	TranscodeOptions *api.TranscodeOptions
 }
 
 // @brief Client request for updating individual recording.
