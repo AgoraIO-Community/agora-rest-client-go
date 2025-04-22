@@ -44,10 +44,6 @@ func NewIndividualRecording(
 //
 // @param uid The user ID used by the cloud recording service in the RTC channel to identify the recording service in the channel.
 //
-// @param enablePostpone Whether to postpone the recording.
-//   - true: Postpone the recording.
-//   - false: Start the recording immediately.
-//
 // @param clientRequest The request body.
 //
 // @return Returns the response *AcquireResp. See api.AcquireResp for details.
