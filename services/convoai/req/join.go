@@ -304,5 +304,6 @@ type JoinPropertiesReqBody struct {
 	// Voice Activity Detection (VAD) configuration (optional), see JoinPropertiesVadBody for details
 	Vad *JoinPropertiesVadBody `json:"vad,omitempty"`
 	// Automatic Speech Recognition (ASR) configuration (optional), see JoinPropertiesAsrBody for details
-	Asr *JoinPropertiesAsrBody `json:"asr,omitempty"`
+	Asr        *JoinPropertiesAsrBody `json:"asr,omitempty"`
+	Parameters map[string]any         `json:"parameters,omitempty"`
 }
