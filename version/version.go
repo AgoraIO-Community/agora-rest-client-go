@@ -6,7 +6,7 @@ import (
 
 // Version is the current version of the application
 
-const version = "0.9.0"
+const version = "0.10.0"
 
 func GetSDKVersion() string {
 	return version
