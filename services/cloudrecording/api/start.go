@@ -46,33 +46,11 @@ type StartReqBody struct {
 
 type StartClientRequest struct {
 	Token                  string                  `json:"token,omitempty"`
-	AppsCollection         *AppsCollection         `json:"appsCollection,omitempty"`
 	RecordingConfig        *RecordingConfig        `json:"recordingConfig,omitempty"`
-	TranscodeOptions       *TranscodeOptions       `json:"transcodeOptions,omitempty"`
 	RecordingFileConfig    *RecordingFileConfig    `json:"recordingFileConfig,omitempty"`
 	SnapshotConfig         *SnapshotConfig         `json:"snapshotConfig,omitempty"`
 	StorageConfig          *StorageConfig          `json:"storageConfig,omitempty"`
 	ExtensionServiceConfig *ExtensionServiceConfig `json:"extensionServiceConfig,omitempty"`
-}
-
-// @brief Combination policy.
-//
-// @since v0.8.0
-type CombinationPolicy string
-
-const (
-	// Use this policy except for postponed transcoding and audio mixing.
-	DefaultCombinationPolicy CombinationPolicy = "default"
-	// Use this policy if you need to postpone transcoding or audio mixing.
-	PostPhoneTranscodingCombinationPolicy CombinationPolicy = "postpone_transcoding"
-)
-
-// @brief Configuration for the application.
-//
-// @since v0.8.0
-type AppsCollection struct {
-	// The combination of cloud recording applications.(Optional) See CombinationPolicy.
-	CombinationPolicy CombinationPolicy `json:"combinationPolicy,omitempty"`
 }
 
 // @brief Configuration for recorded audio and video streams.
@@ -191,78 +169,6 @@ type RecordingConfig struct {
 	//  - 4: 18 to 32 UIDs.
 	//  - 5: 33 to 49 UIDs.
 	SubscribeUidGroup int `json:"subscribeUidGroup,omitempty"`
-}
-
-// @brief Container format.
-//
-// @since v0.8.0
-type Container struct {
-	// The container format of the file.(Optional)
-	//
-	// The container format can be set to:
-	//
-	//  - "mp4": the default format for the postponed transcoding. MP4 format.
-	//  - "mp3": The default format for postponed audio mixing. MP3 format.
-	//  - "m4a": M4A format.
-	//  - "aac": AAC format.
-	Format string `json:"format"`
-}
-
-// @brief Configurations for the recorded files generated under postponed transcoding or audio mixing.
-//
-// @since v0.8.0
-type TranscodeOptions struct {
-	// The container format of the recorded files.(Optional)
-	Container *Container `json:"container"`
-	// The configuration for transcoding.(Required)
-	TransConfig *TransConfig `json:"transConfig"`
-	// Audio properties of the file.
-	Audio *Audio `json:"audio,omitempty"`
-}
-
-// @brief Transcoding mode.
-//
-// @since v0.8.0
-type TransMode string
-
-const (
-	// Postponed transcoding.
-	PostponeTranscodingTransMode TransMode = "postponeTranscoding"
-	// Postponed audio mixing.
-	AudioMixingTransMode TransMode = "audioMix"
-)
-
-// @brief Configuration for transcoding.
-//
-// @since v0.8.0
-type TransConfig struct {
-	// The transcoding mode.(Required) See TransMode.
-	TransMode TransMode `json:"transMode"`
-}
-
-// @brief Audio properties of the file.
-//
-// @since v0.8.0
-type Audio struct {
-	// Audio sampling rate.(Optional)
-	//
-	// The sampling rate can be set to:
-	//
-	//  - "48000": 48 kHz.（Default）
-	//  - "32000": 32 kHz.
-	//  - "16000": 16 kHz.
-	SampleRate string `json:"sampleRate"`
-	// Audio bitrate(Kbps).(Optional)
-	//
-	// It supports a customized value and the default value is "48000".
-	BitRate string `json:"bitrate"`
-	// Audio channels.(Optional)
-	//
-	// The channels can be set to:
-	//
-	//  - "1": Mono.
-	//  - "2": Stereo.（Default）
-	Channels string `json:"channels"`
 }
 
 // @brief Configurations for transcoded video output.

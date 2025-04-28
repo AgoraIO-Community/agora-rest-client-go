@@ -44,16 +44,12 @@ func NewIndividualRecording(
 //
 // @param uid The user ID used by the cloud recording service in the RTC channel to identify the recording service in the channel.
 //
-// @param enablePostpone Whether to postpone the recording.
-//   - true: Postpone the recording.
-//   - false: Start the recording immediately.
-//
 // @param clientRequest The request body.
 //
 // @return Returns the response *AcquireResp. See api.AcquireResp for details.
 //
 // @return Returns an error object. If the request fails, the error object is not nil and contains error information.
-func (i *IndividualRecording) Acquire(ctx context.Context, cname string, uid string, enablePostpone bool,
+func (i *IndividualRecording) Acquire(ctx context.Context, cname string, uid string,
 	clientRequest *req.AcquireIndividualRecordingClientRequest,
 ) (*api.AcquireResp, error) {
 	var startParameter *api.StartClientRequest
@@ -64,20 +60,14 @@ func (i *IndividualRecording) Acquire(ctx context.Context, cname string, uid str
 			RecordingConfig:     clientRequest.StartParameter.RecordingConfig,
 			RecordingFileConfig: clientRequest.StartParameter.RecordingFileConfig,
 			SnapshotConfig:      clientRequest.StartParameter.SnapshotConfig,
-			AppsCollection:      clientRequest.StartParameter.AppsCollection,
-			TranscodeOptions:    clientRequest.StartParameter.TranscodeOptions,
 		}
 	}
 
-	scene := 0
-	if enablePostpone {
-		scene = 2
-	}
 	return i.acquireAPI.Do(ctx, &api.AcquireReqBody{
 		Cname: cname,
 		Uid:   uid,
 		ClientRequest: &api.AcquireClientRequest{
-			Scene:               scene,
+			Scene:               0,
 			ResourceExpiredHour: clientRequest.ResourceExpiredHour,
 			ExcludeResourceIds:  clientRequest.ExcludeResourceIds,
 			RegionAffinity:      clientRequest.RegionAffinity,
@@ -111,10 +101,8 @@ func (i *IndividualRecording) Start(ctx context.Context, resourceId string, cnam
 		Uid:   uid,
 		ClientRequest: &api.StartClientRequest{
 			Token:               clientRequest.Token,
-			AppsCollection:      clientRequest.AppsCollection,
 			RecordingConfig:     clientRequest.RecordingConfig,
 			RecordingFileConfig: clientRequest.RecordingFileConfig,
-			TranscodeOptions:    clientRequest.TranscodeOptions,
 			SnapshotConfig:      clientRequest.SnapshotConfig,
 			StorageConfig:       clientRequest.StorageConfig,
 		},

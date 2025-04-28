@@ -134,10 +134,6 @@ func main() {
 			service.RunSnapshot(token, storageConfig)
 		case "recording_and_snapshot":
 			service.RunRecordingAndSnapshot(token, storageConfig)
-		case "recording_and_postpone_transcoding":
-			service.RunRecordingAndPostponeTranscoding(token, storageConfig)
-		case "recording_and_audio_mix":
-			service.RunRecordingAndAudioMix(token, storageConfig)
 		default:
 			panic("invalid individual_scene")
 		}
