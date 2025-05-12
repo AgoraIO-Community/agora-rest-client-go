@@ -1,4 +1,5 @@
 # Agora REST Client for Go
+
 <p>
 <img alt="GitHub License" src="https://img.shields.io/github/license/AgoraIO-Community/agora-rest-client-go">
 <a href="https://pkg.go.dev/github.com/AgoraIO-Community/agora-rest-client-go"><img src="https://pkg.go.dev/badge/github.com/AgoraIO-Community/agora-rest-client-go.svg" alt="Go Reference"></a>
@@ -14,31 +15,38 @@ English | [简体中文](./README_ZH.md)
 `agora-rest-client-go` is an open-source project written in Go, specifically designed for the Agora REST API. It includes wrappers and internal implementations of the official Agora REST API interfaces, making it easier for developers to integrate the server-side Agora REST API.
 
 > [!IMPORTANT]
-This SDK has undergone some testing to ensure its basic functionality works correctly. However, due to the complexity of software development, we cannot guarantee it is completely free of defects. We encourage community developers and users to actively participate and help improve this project.
+> This SDK has undergone some testing to ensure its basic functionality works correctly. However, due to the complexity of software development, we cannot guarantee it is completely free of defects. We encourage community developers and users to actively participate and help improve this project.
 
 ## Features
-* Encapsulates the request and response handling of the Agora REST API, simplifying the communication process with the Agora REST API.
-* Provides automatic switching to the best domain in case of DNS resolution failure, network errors, or request timeouts, ensuring the availability of the REST API service.
-* Offers easy-to-use APIs to easily implement common functions of the Agora REST API, such as starting and stopping cloud recording.
-* Based on Go language, it is efficient, concurrent, and scalable.
+
+-   Encapsulates the request and response handling of the Agora REST API, simplifying the communication process with the Agora REST API.
+-   Provides automatic switching to the best domain in case of DNS resolution failure, network errors, or request timeouts, ensuring the availability of the REST API service.
+-   Offers easy-to-use APIs to easily implement common functions of the Agora REST API, such as starting and stopping cloud recording.
+-   Based on Go language, it is efficient, concurrent, and scalable.
 
 ## Supported Services
-* [Cloud Recording](./services/cloudrecording/README.md)
-* [Cloud Transcoder](./services/cloudtranscoder/README.md)
-* [Conversational AI Engine](./services/convoai/README.md)
+
+-   [Cloud Recording](./services/cloudrecording/README.md)
+-   [Cloud Transcoder](./services/cloudtranscoder/README.md)
+-   [Conversational AI Engine](./services/convoai/README.md)
 
 ## Environment Setup
-* [Go 1.18 or later](https://go.dev/)
-* App ID and App Certificate obtained from the [Agora Console](https://console.agora.io/v2)
-* Basic Auth credentials from the [Agora Console](https://console.agora.io/v2)
-* Enable the relevant service capabilities on the [Agora Console](https://console.agora.io/v2)
+
+-   [Go 1.18 or later](https://go.dev/)
+-   App ID and App Certificate obtained from the [Agora Console](https://console.agora.io/v2)
+-   Basic Auth credentials from the [Agora Console](https://console.agora.io/v2)
+-   Enable the relevant service capabilities on the [Agora Console](https://console.agora.io/v2)
 
 ## Installation
+
 Install the dependency from GitHub using the following command:
+
 ```shell
 go get -u github.com/AgoraIO-Community/agora-rest-client-go
 ```
+
 ## Usage Example
+
 Here is an example of calling the cloud recording service:
 
 ```go
@@ -49,13 +57,12 @@ import (
 	"log"
 	"time"
 
-	"github.com/AgoraIO-Community/agora-rest-client-go/agora"
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/auth"
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/domain"
 	agoraLogger "github.com/AgoraIO-Community/agora-rest-client-go/agora/log"
 	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording"
 	cloudRecordingAPI "github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/api"
-	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/scenario/mixrecording"
+	"github.com/AgoraIO-Community/agora-rest-client-go/services/cloudrecording/req"
 )
 
 const (
@@ -79,8 +86,8 @@ var storageConfig = &cloudRecordingAPI.StorageConfig{
 }
 
 func main() {
-	// Initialize Agora Config
-	config := &agora.Config{
+	// Initialize Cloud Recording Config
+	config := &cloudrecording.Config{
 		AppID:      appId,
 		Credential: auth.NewBasicAuthCredential(username, password),
 		// Specify the region where the server is located. Options include CN, EU, AP, US.
@@ -99,8 +106,8 @@ func main() {
 
 	// Call the Acquire API of the cloud recording service client
 	acquireResp, err := cloudRecordingClient.MixRecording().
-		Acquire(context.TODO(), cname, uid, &mixrecording.AcquireMixRecodingClientRequest{})
-	// Handle non-business errors
+		Acquire(context.TODO(), cname, uid, &req.AcquireMixRecodingClientRequest{})
+		// Handle non-business errors
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -115,7 +122,7 @@ func main() {
 	// Call the Start API of the cloud recording service client
 	resourceId := acquireResp.SuccessRes.ResourceId
 	startResp, err := cloudRecordingClient.MixRecording().
-		Start(context.TODO(), resourceId, cname, uid, &mixrecording.StartMixRecordingClientRequest{
+		Start(context.TODO(), resourceId, cname, uid, &req.StartMixRecordingClientRequest{
 			Token: token,
 			RecordingConfig: &cloudRecordingAPI.RecordingConfig{
 				ChannelType:  1,
@@ -145,7 +152,7 @@ func main() {
 			},
 			StorageConfig: storageConfig,
 		})
-	// Handle non-business errors
+		// Handle non-business errors
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -162,7 +169,7 @@ func main() {
 	for i := 0; i < 6; i++ {
 		queryResp, err := cloudRecordingClient.MixRecording().
 			QueryHLSAndMP4(context.TODO(), resourceId, sid)
-		// Handle non-business errors
+			// Handle non-business errors
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -179,7 +186,7 @@ func main() {
 	// Call the Stop API of the cloud recording service client
 	stopResp, err := cloudRecordingClient.MixRecording().
 		Stop(context.TODO(), resourceId, sid, cname, uid, true)
-	// Handle non-business errors
+		// Handle non-business errors
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -192,7 +199,9 @@ func main() {
 	}
 }
 
+
 ```
+
 For more examples, see [Example](./examples).
 
 ## Contribution
@@ -203,13 +212,15 @@ This project welcomes and accepts contributions. If you encounter any issues or 
 
 This project uses Semantic Versioning (SemVer) to manage versions. The format is MAJOR.MINOR.PATCH.
 
-* MAJOR version indicates incompatible changes.
-* MINOR version indicates backward-compatible new features or enhancements.
-* PATCH version indicates backward-compatible bug fixes and maintenance.
-For more details, please refer to the [Semantic Versioning](https://semver.org) specification.
+-   MAJOR version indicates incompatible changes.
+-   MINOR version indicates backward-compatible new features or enhancements.
+-   PATCH version indicates backward-compatible bug fixes and maintenance.
+    For more details, please refer to the [Semantic Versioning](https://semver.org) specification.
 
 ## References
-* [Agora API Documentation](https://docs.agora.io/en/)
+
+-   [Agora API Documentation](https://docs.agora.io/en/)
 
 ## License
+
 This project is licensed under the MIT License. For more details, please refer to the LICENSE file.
