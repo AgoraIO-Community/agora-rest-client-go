@@ -75,6 +75,7 @@ func NewClient(config *Config) (*Client, error) {
 		HttpTimeout: config.HttpTimeout,
 		Credential:  config.Credential,
 		DomainArea:  config.DomainArea,
+		Logger:      config.Logger,
 	})
 	if err != nil {
 		return nil, err
