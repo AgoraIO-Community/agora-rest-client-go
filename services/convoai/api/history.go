@@ -15,11 +15,12 @@ type History struct {
 	baseHandler
 }
 
-func NewHistory(module string, logger log.Logger, client client.Client, prefixPath string) *History {
+func NewHistory(module string, logger log.Logger, retryCount int, client client.Client, prefixPath string) *History {
 	return &History{
 		baseHandler: baseHandler{
 			module:     module,
 			logger:     logger,
+			retryCount: retryCount,
 			client:     client,
 			prefixPath: prefixPath,
 		},
@@ -34,7 +35,7 @@ func (h *History) buildPath(agentId string) string {
 
 func (h *History) Do(ctx context.Context, agentId string) (*resp.HistoryResp, error) {
 	path := h.buildPath(agentId)
-	responseData, err := h.client.DoREST(ctx, path, http.MethodGet, nil)
+	responseData, err := doRESTWithRetry(ctx, h.module, h.logger, h.retryCount, h.client, path, http.MethodGet, nil)
 	if err != nil {
 		var internalErr *agora.InternalErr
 		if !errors.As(err, &internalErr) {

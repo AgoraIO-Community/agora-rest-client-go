@@ -10,15 +10,23 @@ import (
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora"
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/client"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/log"
 )
 
 type Query struct {
-	client     client.Client
-	prefixPath string // /v1/apps/{appid}/cloud_recording
+	baseHandler
 }
 
-func NewQuery(client client.Client, prefixPath string) *Query {
-	return &Query{client: client, prefixPath: prefixPath}
+func NewQuery(module string, logger log.Logger, retryCount int, client client.Client, prefixPath string) *Query {
+	return &Query{
+		baseHandler: baseHandler{
+			module:     module,
+			logger:     logger,
+			retryCount: retryCount,
+			client:     client,
+			prefixPath: prefixPath,
+		},
+	}
 }
 
 // buildPath returns the request path.
@@ -537,7 +545,7 @@ func (q *QuerySuccessResp) setServerResponse(rawBody []byte, mode string) error 
 func (q *Query) Do(ctx context.Context, resourceID string, sid string, mode string) (*QueryResp, error) {
 	path := q.buildPath(resourceID, sid, mode)
 
-	responseData, err := q.client.DoREST(ctx, path, http.MethodGet, nil)
+	responseData, err := doRESTWithRetry(ctx, q.module, q.logger, q.retryCount, q.client, path, http.MethodGet, nil)
 	if err != nil {
 		var internalErr *agora.InternalErr
 		if !errors.As(err, &internalErr) {

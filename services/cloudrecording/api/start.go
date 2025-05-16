@@ -3,27 +3,29 @@ package api
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/tidwall/gjson"
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora"
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/client"
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/log"
-	"github.com/AgoraIO-Community/agora-rest-client-go/agora/retry"
 )
 
 type Start struct {
-	module     string
-	logger     log.Logger
-	client     client.Client
-	prefixPath string // /v1/apps/{appid}/cloud_recording
+	baseHandler
 }
 
-func NewStart(module string, logger log.Logger, client client.Client, prefixPath string) *Start {
-	return &Start{module: module, logger: logger, client: client, prefixPath: prefixPath}
+func NewStart(module string, logger log.Logger, retryCount int, client client.Client, prefixPath string) *Start {
+	return &Start{
+		baseHandler: baseHandler{
+			module:     module,
+			logger:     logger,
+			retryCount: retryCount,
+			client:     client,
+			prefixPath: prefixPath,
+		},
+	}
 }
 
 const (
@@ -570,7 +572,7 @@ type StartSuccessResp struct {
 func (s *Start) Do(ctx context.Context, resourceID string, mode string, payload *StartReqBody) (*StartResp, error) {
 	path := s.buildPath(resourceID, mode)
 
-	responseData, err := s.doRESTWithRetry(ctx, path, http.MethodPost, payload)
+	responseData, err := doRESTWithRetry(ctx, s.module, s.logger, s.retryCount, s.client, path, http.MethodPost, payload)
 	if err != nil {
 		var internalErr *agora.InternalErr
 		if !errors.As(err, &internalErr) {
@@ -599,52 +601,4 @@ func (s *Start) Do(ctx context.Context, resourceID string, mode string, payload 
 	}
 	resp.BaseResponse = responseData
 	return &resp, nil
-}
-
-const startRetryCount = 3
-
-func (s *Start) doRESTWithRetry(ctx context.Context, path string, method string, requestBody interface{}) (*agora.BaseResponse, error) {
-	var (
-		resp       *agora.BaseResponse
-		err        error
-		retryCount int
-	)
-
-	err = retry.Do(func(retryCount int) error {
-		var doErr error
-
-		resp, doErr = s.client.DoREST(ctx, path, method, requestBody)
-		if doErr != nil {
-			return agora.NewRetryErr(false, doErr)
-		}
-
-		statusCode := resp.HttpStatusCode
-		switch {
-		case statusCode == 200 || statusCode == 201:
-			return nil
-		case statusCode >= 400 && statusCode < 499:
-			s.logger.Debugf(ctx, s.module, "http status code is %d, no retry,http response:%s", statusCode, resp.RawBody)
-			return agora.NewRetryErr(
-				false,
-				agora.NewInternalErr(fmt.Sprintf("http status code is %d, no retry,http response:%s", statusCode, resp.RawBody)),
-			)
-		default:
-			s.logger.Debugf(ctx, s.module, "http status code is %d, retry,http response:%s", statusCode, resp.RawBody)
-			return fmt.Errorf("http status code is %d, retry", resp.RawBody)
-		}
-	}, func() bool {
-		select {
-		case <-ctx.Done():
-			return true
-		default:
-		}
-		return retryCount >= startRetryCount
-	}, func(i int) time.Duration {
-		return time.Second * time.Duration(i+1)
-	}, func(err error) {
-		s.logger.Debugf(ctx, s.module, "http request err:%s", err)
-		retryCount++
-	})
-
-	return resp, err
 }

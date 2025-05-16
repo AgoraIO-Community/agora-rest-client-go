@@ -9,15 +9,23 @@ import (
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora"
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/client"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/log"
 )
 
 type UpdateLayout struct {
-	client     client.Client
-	prefixPath string // /apps/{appid}/cloud_recording
+	baseHandler
 }
 
-func NewUpdateLayout(client client.Client, prefixPath string) *UpdateLayout {
-	return &UpdateLayout{client: client, prefixPath: prefixPath}
+func NewUpdateLayout(module string, logger log.Logger, retryCount int, client client.Client, prefixPath string) *UpdateLayout {
+	return &UpdateLayout{
+		baseHandler: baseHandler{
+			module:     module,
+			logger:     logger,
+			retryCount: retryCount,
+			client:     client,
+			prefixPath: prefixPath,
+		},
+	}
 }
 
 // buildPath returns the request path.
@@ -167,7 +175,7 @@ type UpdateLayoutResp struct {
 func (u *UpdateLayout) Do(ctx context.Context, resourceID string, sid string, mode string, payload *UpdateLayoutReqBody) (*UpdateLayoutResp, error) {
 	path := u.buildPath(resourceID, sid, mode)
 
-	responseData, err := u.client.DoREST(ctx, path, http.MethodPost, payload)
+	responseData, err := doRESTWithRetry(ctx, u.module, u.logger, u.retryCount, u.client, path, http.MethodPost, payload)
 	if err != nil {
 		var internalErr *agora.InternalErr
 		if !errors.As(err, &internalErr) {

@@ -15,11 +15,12 @@ type Interrupt struct {
 	baseHandler
 }
 
-func NewInterrupt(module string, logger log.Logger, client client.Client, prefixPath string) *Interrupt {
+func NewInterrupt(module string, logger log.Logger, retryCount int, client client.Client, prefixPath string) *Interrupt {
 	return &Interrupt{
 		baseHandler: baseHandler{
 			module:     module,
 			logger:     logger,
+			retryCount: retryCount,
 			client:     client,
 			prefixPath: prefixPath,
 		},
@@ -35,7 +36,7 @@ func (i *Interrupt) buildPath(agentId string) string {
 
 func (i *Interrupt) Do(ctx context.Context, agentId string) (*resp.InterruptResp, error) {
 	path := i.buildPath(agentId)
-	responseData, err := i.client.DoREST(ctx, path, http.MethodPost, nil)
+	responseData, err := doRESTWithRetry(ctx, i.module, i.logger, i.retryCount, i.client, path, http.MethodPost, nil)
 	if err != nil {
 		var internalErr *agora.InternalErr
 		if !errors.As(err, &internalErr) {

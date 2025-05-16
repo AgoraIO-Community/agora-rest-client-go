@@ -18,11 +18,12 @@ type List struct {
 	baseHandler
 }
 
-func NewList(module string, logger log.Logger, client client.Client, prefixPath string) *List {
+func NewList(module string, logger log.Logger, retryCount int, client client.Client, prefixPath string) *List {
 	return &List{
 		baseHandler: baseHandler{
 			module:     module,
 			logger:     logger,
+			retryCount: retryCount,
 			client:     client,
 			prefixPath: prefixPath,
 		},
@@ -31,8 +32,8 @@ func NewList(module string, logger log.Logger, client client.Client, prefixPath 
 
 // buildPath returns the request path.
 // /api/conversational-ai-agent/v2/projects/{appid}/agents?limit=10&state=2&from_time=1733013296&to_time=1734016896
-func (q *List) buildPath(queryFields map[string]any) string {
-	return q.prefixPath + "/agents?" + buildQuery(queryFields)
+func (l *List) buildPath(queryFields map[string]any) string {
+	return l.prefixPath + "/agents?" + buildQuery(queryFields)
 }
 
 func buildQuery(queryFields map[string]any) string {
@@ -81,10 +82,10 @@ func buildQueryFields(options ...req.ListOption) map[string]any {
 	return queryFields
 }
 
-func (q *List) Do(ctx context.Context, options ...req.ListOption) (*resp.ListResp, error) {
+func (l *List) Do(ctx context.Context, options ...req.ListOption) (*resp.ListResp, error) {
 	queryFields := buildQueryFields(options...)
-	path := q.buildPath(queryFields)
-	responseData, err := q.client.DoREST(ctx, path, http.MethodGet, nil)
+	path := l.buildPath(queryFields)
+	responseData, err := doRESTWithRetry(ctx, l.module, l.logger, l.retryCount, l.client, path, http.MethodGet, nil)
 	if err != nil {
 		var internalErr *agora.InternalErr
 		if !errors.As(err, &internalErr) {

@@ -16,11 +16,12 @@ type Join struct {
 	baseHandler
 }
 
-func NewJoin(module string, logger log.Logger, client client.Client, prefixPath string) *Join {
+func NewJoin(module string, logger log.Logger, retryCount int, client client.Client, prefixPath string) *Join {
 	return &Join{
 		baseHandler: baseHandler{
 			module:     module,
 			logger:     logger,
+			retryCount: retryCount,
 			client:     client,
 			prefixPath: prefixPath,
 		},
@@ -40,7 +41,7 @@ func (d *Join) Do(ctx context.Context, name string, propertiesBody *req.JoinProp
 		"name":       name,
 		"properties": propertiesBody,
 	}
-	responseData, err := d.client.DoREST(ctx, path, http.MethodPost, request)
+	responseData, err := doRESTWithRetry(ctx, d.module, d.logger, d.retryCount, d.client, path, http.MethodPost, request)
 	if err != nil {
 		var internalErr *agora.InternalErr
 		if !errors.As(err, &internalErr) {

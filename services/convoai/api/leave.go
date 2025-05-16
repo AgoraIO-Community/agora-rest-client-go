@@ -16,11 +16,12 @@ type Leave struct {
 }
 
 // NewLeave Creates a new Leave instance
-func NewLeave(module string, logger log.Logger, client client.Client, prefixPath string) *Leave {
+func NewLeave(module string, logger log.Logger, retryCount int, client client.Client, prefixPath string) *Leave {
 	return &Leave{
 		baseHandler: baseHandler{
 			module:     module,
 			logger:     logger,
+			retryCount: retryCount,
 			client:     client,
 			prefixPath: prefixPath,
 		},
@@ -35,7 +36,7 @@ func (d *Leave) buildPath(agentId string) string {
 
 func (d *Leave) Do(ctx context.Context, agentId string) (*resp.LeaveResp, error) {
 	path := d.buildPath(agentId)
-	responseData, err := d.client.DoREST(ctx, path, http.MethodPost, nil)
+	responseData, err := doRESTWithRetry(ctx, d.module, d.logger, d.retryCount, d.client, path, http.MethodPost, nil)
 	if err != nil {
 		var internalErr *agora.InternalErr
 		if !errors.As(err, &internalErr) {
