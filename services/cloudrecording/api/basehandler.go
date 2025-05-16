@@ -10,5 +10,5 @@ type baseHandler struct {
 	logger     log.Logger
 	client     client.Client
 	retryCount int
-	prefixPath string // /api/conversational-ai-agent/v2/projects/{appid}
+	prefixPath string // /v1/apps/{appid}/cloud_recording
 }

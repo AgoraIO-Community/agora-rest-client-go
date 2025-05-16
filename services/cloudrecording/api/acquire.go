@@ -9,15 +9,23 @@ import (
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora"
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/client"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/log"
 )
 
 type Acquire struct {
-	client     client.Client
-	prefixPath string // /v1/apps/{appid}/cloud_recording/
+	baseHandler
 }
 
-func NewAcquire(client client.Client, prefixPath string) *Acquire {
-	return &Acquire{client: client, prefixPath: prefixPath}
+func NewAcquire(module string, logger log.Logger, retryCount int, client client.Client, prefixPath string) *Acquire {
+	return &Acquire{
+		baseHandler: baseHandler{
+			module:     module,
+			logger:     logger,
+			retryCount: retryCount,
+			client:     client,
+			prefixPath: prefixPath,
+		},
+	}
 }
 
 // buildPath returns the request path.
@@ -62,7 +70,7 @@ type AcquireSuccessResp struct {
 func (a *Acquire) Do(ctx context.Context, payload *AcquireReqBody) (*AcquireResp, error) {
 	path := a.buildPath()
 
-	responseData, err := a.client.DoREST(ctx, path, http.MethodPost, payload)
+	responseData, err := doRESTWithRetry(ctx, a.module, a.logger, a.retryCount, a.client, path, http.MethodPost, payload)
 	if err != nil {
 		var internalErr *agora.InternalErr
 		if !errors.As(err, &internalErr) {

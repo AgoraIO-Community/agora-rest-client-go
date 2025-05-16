@@ -18,6 +18,8 @@ type Client struct {
 	updateAPI  *api.Update
 }
 
+var RetryCount = 3
+
 func NewClient(config *agora.Config) (*Client, error) {
 	prefixPath := "/v1/projects/" + config.AppID + "/" + projectName
 	c, err := agoraClient.New(config)
@@ -26,11 +28,11 @@ func NewClient(config *agora.Config) (*Client, error) {
 	}
 
 	return &Client{
-		acquireAPI: api.NewAcquire("cloudTranscoder:acquire", config.Logger, c, prefixPath),
-		createAPI:  api.NewCreate("cloudTranscoder:create", config.Logger, c, prefixPath),
-		queryAPI:   api.NewQuery("cloudTranscoder:query", config.Logger, c, prefixPath),
-		deleteAPI:  api.NewDelete("cloudTranscoder:delete", config.Logger, c, prefixPath),
-		updateAPI:  api.NewUpdate("cloudTranscoder:update", config.Logger, c, prefixPath),
+		acquireAPI: api.NewAcquire("cloudTranscoder:acquire", config.Logger, RetryCount, c, prefixPath),
+		createAPI:  api.NewCreate("cloudTranscoder:create", config.Logger, RetryCount, c, prefixPath),
+		queryAPI:   api.NewQuery("cloudTranscoder:query", config.Logger, RetryCount, c, prefixPath),
+		deleteAPI:  api.NewDelete("cloudTranscoder:delete", config.Logger, RetryCount, c, prefixPath),
+		updateAPI:  api.NewUpdate("cloudTranscoder:update", config.Logger, RetryCount, c, prefixPath),
 	}, nil
 }
 
@@ -51,6 +53,7 @@ func (a *Client) Delete(ctx context.Context, taskId string, tokenName string) (*
 }
 
 func (a *Client) Update(ctx context.Context, taskId string, tokenName string, sequenceId uint, updateMask string,
-	payload *api.UpdateReqBody) (*api.UpdateResp, error) {
+	payload *api.UpdateReqBody,
+) (*api.UpdateResp, error) {
 	return a.updateAPI.Do(ctx, taskId, tokenName, sequenceId, updateMask, payload)
 }

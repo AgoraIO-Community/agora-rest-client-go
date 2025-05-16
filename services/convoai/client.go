@@ -72,6 +72,8 @@ type Config struct {
 	ServiceRegion ServiceRegion
 }
 
+var RetryCount = 3
+
 // NewClient
 //
 // @brief Creates a Conversational AI engine client with the specified configuration
@@ -107,14 +109,14 @@ func NewClient(config *Config) (*Client, error) {
 	}
 
 	return &Client{
-		joinAPI:      api.NewJoin("convoai:join", config.Logger, c, prefixPath),
-		leaveAPI:     api.NewLeave("convoai:leave", config.Logger, c, prefixPath),
-		listAPI:      api.NewList("convoai:list", config.Logger, c, prefixPath),
-		queryAPI:     api.NewQuery("convoai:query", config.Logger, c, prefixPath),
-		updateAPI:    api.NewUpdate("convoai:update", config.Logger, c, prefixPath),
-		interruptAPI: api.NewInterrupt("convoai:interrupt", config.Logger, c, prefixPath),
-		historyAPI:   api.NewHistory("convoai:history", config.Logger, c, prefixPath),
-		speakAPI:     api.NewSpeak("convoai:speak", config.Logger, c, prefixPath),
+		joinAPI:      api.NewJoin("convoai:join", config.Logger, RetryCount, c, prefixPath),
+		leaveAPI:     api.NewLeave("convoai:leave", config.Logger, RetryCount, c, prefixPath),
+		listAPI:      api.NewList("convoai:list", config.Logger, RetryCount, c, prefixPath),
+		queryAPI:     api.NewQuery("convoai:query", config.Logger, RetryCount, c, prefixPath),
+		updateAPI:    api.NewUpdate("convoai:update", config.Logger, RetryCount, c, prefixPath),
+		interruptAPI: api.NewInterrupt("convoai:interrupt", config.Logger, RetryCount, c, prefixPath),
+		historyAPI:   api.NewHistory("convoai:history", config.Logger, RetryCount, c, prefixPath),
+		speakAPI:     api.NewSpeak("convoai:speak", config.Logger, RetryCount, c, prefixPath),
 	}, nil
 }
 

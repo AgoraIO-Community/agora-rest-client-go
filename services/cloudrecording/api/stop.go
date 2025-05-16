@@ -9,15 +9,23 @@ import (
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora"
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/client"
+	"github.com/AgoraIO-Community/agora-rest-client-go/agora/log"
 )
 
 type Stop struct {
-	client     client.Client
-	prefixPath string // /v1/apps/{appid}/cloud_recording
+	baseHandler
 }
 
-func NewStop(client client.Client, prefixPath string) *Stop {
-	return &Stop{client: client, prefixPath: prefixPath}
+func NewStop(module string, logger log.Logger, retryCount int, client client.Client, prefixPath string) *Stop {
+	return &Stop{
+		baseHandler: baseHandler{
+			module:     module,
+			logger:     logger,
+			retryCount: retryCount,
+			client:     client,
+			prefixPath: prefixPath,
+		},
+	}
 }
 
 // buildPath returns the request path.
@@ -75,7 +83,7 @@ type StopSuccessResp struct {
 func (s *Stop) Do(ctx context.Context, resourceId string, sid string, mode string, payload *StopReqBody) (*StopResp, error) {
 	path := s.buildPath(resourceId, sid, mode)
 
-	responseData, err := s.client.DoREST(ctx, path, http.MethodPost, payload)
+	responseData, err := doRESTWithRetry(ctx, s.module, s.logger, s.retryCount, s.client, path, http.MethodPost, payload)
 	if err != nil {
 		var internalErr *agora.InternalErr
 		if !errors.As(err, &internalErr) {

@@ -16,11 +16,12 @@ type Speak struct {
 	baseHandler
 }
 
-func NewSpeak(module string, logger log.Logger, client client.Client, prefixPath string) *Speak {
+func NewSpeak(module string, logger log.Logger, retryCount int, client client.Client, prefixPath string) *Speak {
 	return &Speak{
 		baseHandler: baseHandler{
 			module:     module,
 			logger:     logger,
+			retryCount: retryCount,
 			client:     client,
 			prefixPath: prefixPath,
 		},
@@ -36,7 +37,7 @@ func (s *Speak) buildPath(agentId string) string {
 
 func (s *Speak) Do(ctx context.Context, agentId string, body *req.SpeakBody) (*resp.SpeakResp, error) {
 	path := s.buildPath(agentId)
-	responseData, err := s.client.DoREST(ctx, path, http.MethodPost, body)
+	responseData, err := doRESTWithRetry(ctx, s.module, s.logger, s.retryCount, s.client, path, http.MethodPost, body)
 	if err != nil {
 		var internalErr *agora.InternalErr
 		if !errors.As(err, &internalErr) {

@@ -3,25 +3,23 @@ package api
 import (
 	"context"
 	"errors"
-	"fmt"
 	"net/http"
-	"time"
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora"
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/client"
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/log"
-	"github.com/AgoraIO-Community/agora-rest-client-go/agora/retry"
 )
 
 type Create struct {
-	module     string
-	logger     log.Logger
-	client     client.Client
-	prefixPath string // /v1/projects/{appid}/rtsc/cloud-transcoder
+	baseHandler
 }
 
-func NewCreate(module string, logger log.Logger, client client.Client, prefixPath string) *Create {
-	return &Create{module: module, logger: logger, client: client, prefixPath: prefixPath}
+func NewCreate(module string, logger log.Logger, retryCount int, client client.Client, prefixPath string) *Create {
+	return &Create{
+		baseHandler: baseHandler{
+			module: module, logger: logger, retryCount: retryCount, client: client, prefixPath: prefixPath,
+		},
+	}
 }
 
 // buildPath returns the request path.
@@ -49,7 +47,7 @@ type CloudTranscoderConfig struct {
 }
 
 type CloudTranscoderConfigPayload struct {
-	// Maximum idle time (in seconds) for cloud transcoder. Idle means all broadcasters corresponding to the audio/video streams 
+	// Maximum idle time (in seconds) for cloud transcoder. Idle means all broadcasters corresponding to the audio/video streams
 	// processed by the cloud transcoder have left the channel.
 	// After being idle for the set idleTimeOut, the cloud transcoder will be automatically destroyed.
 	//
@@ -71,32 +69,32 @@ type CloudTranscoderAudioInput struct {
 type CloudTranscoderRtc struct {
 	// RTC channel name for the audio/video input source (or output)
 	//
-	// Currently only supports subscribing to audio/video sources from a single channel. 
+	// Currently only supports subscribing to audio/video sources from a single channel.
 	// Audio and video sources must belong to the same channel.
 	RtcChannel string `json:"rtcChannel,omitempty"`
-	
+
 	// UID corresponding to the audio/video input source (or output)
 	//
 	// Duplicate UIDs are not allowed in an RTC channel, so ensure this value differs from other users' UIDs in the channel.
 	//
 	// Note: The default value of rtcUid is 0, indicating that AudioInputs will use full-channel audio mixing
 	RtcUID int `json:"rtcUid"`
-	
+
 	// Token required for the cloud transcoder to enter the RTC channel of the video source to be transcoded (or the transcoded output audio/video stream).
 	//
 	// This value can be used to ensure channel security and prevent unauthorized users from disrupting other users in the channel.
 	//
 	// Note:
-	//   - When configuring input streams, the UID of the cloud transcoder in the RTC channel is randomly assigned by Agora. 
+	//   - When configuring input streams, the UID of the cloud transcoder in the RTC channel is randomly assigned by Agora.
 	//     Therefore, when generating the Token, you must use uid=0.
-	//   - When configuring output streams, the UID of the cloud transcoder in the RTC channel is the outputs.rtc.rtcUid you specified. 
+	//   - When configuring output streams, the UID of the cloud transcoder in the RTC channel is the outputs.rtc.rtcUid you specified.
 	//     Therefore, when generating the Token, you must use the same uid as outputs.rtc.rtcUid
 	RtcToken string `json:"rtcToken,omitempty"`
 }
 
 type CloudTranscoderVideoInput struct {
 	Rtc *CloudTranscoderRtc `json:"rtc,omitempty"`
-	
+
 	// URL of the placeholder image when the user is offline.
 	//
 	// Must be a valid URL and include a jpg or png suffix.
@@ -111,24 +109,24 @@ type CloudTranscoderRegion struct {
 	//
 	// Range: [0,120]
 	X uint `json:"x"`
-	
+
 	// Y coordinate (px) of the image on the canvas.
 	//
 	// With the top-left corner of the canvas as the origin, the y-coordinate is the vertical displacement of the top-left corner of the image relative to the origin.
 	//
 	// Range: [0,3840]
 	Y uint `json:"y"`
-	
+
 	// Width of the image (px).
 	//
 	// Range: [120,3840]
 	Width uint `json:"width,omitempty"`
-	
+
 	// Height of the image (px).
 	//
 	// Range: [120,3840]
 	Height uint `json:"height,omitempty"`
-	
+
 	// Layer number of the image.
 	//  - 0 represents the bottom layer.
 	//  - 100 represents the top layer.
@@ -142,12 +140,12 @@ type CloudTranscoderCanvas struct {
 	//
 	// Range: [120,3840]
 	Width uint `json:"width,omitempty"`
-	
+
 	// Height of the canvas (px).
 	//
 	// Range: [120,3840]
 	Height uint `json:"height,omitempty"`
-	
+
 	// Background color of the canvas.
 	//
 	// RGB color value, expressed as a decimal number.
@@ -156,14 +154,14 @@ type CloudTranscoderCanvas struct {
 	//
 	// Range: [0,16777215]
 	Color uint `json:"color"`
-	
+
 	// Background image of the canvas.
 	//
 	// Must be a valid URL and include a jpg or png suffix.
 	//
 	// Note: If no value is provided, there will be no canvas background image.
 	BackgroundImage string `json:"backgroundImage,omitempty"`
-	
+
 	// Fill mode for the canvas background image:
 	//
 	//  - "FILL": Scale the image while maintaining the aspect ratio, and crop it centered.
@@ -179,7 +177,7 @@ type CloudTranscoderWaterMark struct {
 	// Must be a valid URL and include a jpg or png suffix.
 	ImageURL string                 `json:"imageUrl,omitempty"`
 	Region   *CloudTranscoderRegion `json:"region,omitempty"`
-	
+
 	// Fill mode for the canvas background image:
 	//
 	//  - "FILL": Scale the image while maintaining the aspect ratio, and crop it centered.
@@ -209,24 +207,24 @@ type CloudTranscoderOutputVideoOption struct {
 	//
 	// Default: 15
 	FPS uint `json:"fps,omitempty"`
-	
+
 	// Codec for the transcoded output video. Values include:
 	//  - "H264": Standard H.264 encoding.
 	//  - "VP8": Standard VP8 encoding.
 	Codec string `json:"codec,omitempty"`
-	
+
 	// Bitrate of the transcoded output video.
 	//
 	// Range: [1,10000]
 	//
 	// Note: If you do not provide a value, Agora will automatically set the video bitrate based on network conditions and other video properties.
 	Bitrate uint `json:"bitrate,omitempty"`
-	
+
 	// Width of the image (px).
 	//
 	// Range: [120,3840]
 	Width uint `json:"width,omitempty"`
-	
+
 	// Height of the image (px).
 	//
 	// Range: [120,3840]
@@ -242,10 +240,10 @@ type CloudTranscoderOutput struct {
 type CreateSuccessResp struct {
 	// Transcoding task ID, a UUID used to identify the cloud transcoder for this request operation
 	TaskID string `json:"taskId"`
-	
+
 	// Unix timestamp (seconds) when the transcoding task was created
 	CreateTs int64 `json:"createTs"`
-	
+
 	// Running status of the transcoding task:
 	//  - "IDLE": Task has not started.
 	//
@@ -278,7 +276,7 @@ type CreateResp struct {
 
 func (c *Create) Do(ctx context.Context, tokenName string, payload *CreateReqBody) (*CreateResp, error) {
 	path := c.buildPath(tokenName)
-	responseData, err := c.doRESTWithRetry(ctx, path, http.MethodPost, payload)
+	responseData, err := doRESTWithRetry(ctx, c.module, c.logger, c.retryCount, c.client, path, http.MethodPost, payload)
 	if err != nil {
 		var internalErr *agora.InternalErr
 		if !errors.As(err, &internalErr) {
@@ -305,52 +303,4 @@ func (c *Create) Do(ctx context.Context, tokenName string, payload *CreateReqBod
 	resp.BaseResponse = responseData
 
 	return &resp, nil
-}
-
-const createRetryCount = 3
-
-func (c *Create) doRESTWithRetry(ctx context.Context, path string, method string, requestBody interface{}) (*agora.BaseResponse, error) {
-	var (
-		resp       *agora.BaseResponse
-		err        error
-		retryCount int
-	)
-
-	err = retry.Do(func(retryCount int) error {
-		var doErr error
-
-		resp, doErr = c.client.DoREST(ctx, path, method, requestBody)
-		if doErr != nil {
-			return agora.NewRetryErr(false, doErr)
-		}
-
-		statusCode := resp.HttpStatusCode
-		switch {
-		case statusCode == 200 || statusCode == 201:
-			return nil
-		case statusCode >= 400 && statusCode < 499:
-			c.logger.Debugf(ctx, c.module, "http status code is %d, no retry,http response:%s", statusCode, resp.RawBody)
-			return agora.NewRetryErr(
-				false,
-				agora.NewInternalErr(fmt.Sprintf("http status code is %d, no retry,http response:%s", statusCode, resp.RawBody)),
-			)
-		default:
-			c.logger.Debugf(ctx, c.module, "http status code is %d, retry,http response:%s", statusCode, resp.RawBody)
-			return fmt.Errorf("http status code is %d, retry", resp.RawBody)
-		}
-	}, func() bool {
-		select {
-		case <-ctx.Done():
-			return true
-		default:
-		}
-		return retryCount >= createRetryCount
-	}, func(i int) time.Duration {
-		return time.Second * time.Duration(i+1)
-	}, func(err error) {
-		c.logger.Debugf(ctx, c.module, "http request err:%s", err)
-		retryCount++
-	})
-
-	return resp, err
 }

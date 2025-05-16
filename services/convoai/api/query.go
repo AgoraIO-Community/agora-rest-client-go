@@ -15,11 +15,12 @@ type Query struct {
 	baseHandler
 }
 
-func NewQuery(module string, logger log.Logger, client client.Client, prefixPath string) *Query {
+func NewQuery(module string, logger log.Logger, retryCount int, client client.Client, prefixPath string) *Query {
 	return &Query{
 		baseHandler: baseHandler{
 			module:     module,
 			logger:     logger,
+			retryCount: retryCount,
 			client:     client,
 			prefixPath: prefixPath,
 		},
@@ -34,7 +35,7 @@ func (q *Query) buildPath(agentId string) string {
 
 func (q *Query) Do(ctx context.Context, agentId string) (*resp.QueryResp, error) {
 	path := q.buildPath(agentId)
-	responseData, err := q.client.DoREST(ctx, path, http.MethodGet, nil)
+	responseData, err := doRESTWithRetry(ctx, q.module, q.logger, q.retryCount, q.client, path, http.MethodGet, nil)
 	if err != nil {
 		var internalErr *agora.InternalErr
 		if !errors.As(err, &internalErr) {

@@ -54,6 +54,8 @@ type Config struct {
 	Logger log.Logger
 }
 
+var RetryCount = 3
+
 // NewClient
 //
 // @brief Creates a Cloud Recording client with the specified configuration
@@ -79,12 +81,12 @@ func NewClient(config *Config) (*Client, error) {
 	}
 
 	c := &Client{
-		acquireAPI:      api.NewAcquire(agoraClient, prefixPath),
-		startAPI:        api.NewStart("cloudRecording:start", config.Logger, agoraClient, prefixPath),
-		stopAPI:         api.NewStop(agoraClient, prefixPath),
-		queryAPI:        api.NewQuery(agoraClient, prefixPath),
-		updateLayoutAPI: api.NewUpdateLayout(agoraClient, prefixPath),
-		updateAPI:       api.NewUpdate(agoraClient, prefixPath),
+		acquireAPI:      api.NewAcquire("cloudRecording:acquire", config.Logger, RetryCount, agoraClient, prefixPath),
+		startAPI:        api.NewStart("cloudRecording:start", config.Logger, RetryCount, agoraClient, prefixPath),
+		stopAPI:         api.NewStop("cloudRecording:stop", config.Logger, RetryCount, agoraClient, prefixPath),
+		queryAPI:        api.NewQuery("cloudRecording:query", config.Logger, RetryCount, agoraClient, prefixPath),
+		updateLayoutAPI: api.NewUpdateLayout("cloudRecording:updateLayout", config.Logger, RetryCount, agoraClient, prefixPath),
+		updateAPI:       api.NewUpdate("cloudRecording:update", config.Logger, RetryCount, agoraClient, prefixPath),
 	}
 
 	c.individualRecordingScenario = scenario.NewIndividualRecording(c.acquireAPI, c.startAPI, c.stopAPI, c.queryAPI, c.updateAPI)
