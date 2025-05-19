@@ -247,7 +247,7 @@ type TranscodingConfig struct {
 // @since v0.8.0
 type LayoutConfig struct {
 	// The content of the string is the UID of the user to be displayed in the area, 32-bit unsigned integer.
-	UID string `json:"uid"`
+	UID string `json:"uid,omitempty"`
 	// The relative value of the horizontal coordinate of the upper-left corner of the screen,
 	// accurate to six decimal places.
 	//
