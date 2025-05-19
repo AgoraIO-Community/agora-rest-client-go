@@ -57,7 +57,7 @@ type UpdateLayoutConfig struct {
 	// The content of the string is the UID of the user to be displayed in the area, 32-bit unsigned integer.(Optional)
 	//
 	// If the UID is not specified, the screen settings in layoutConfig will be matched automatically in the order that users join the channel.
-	UID string `json:"uid"`
+	UID string `json:"uid,omitempty"`
 
 	// The relative value of the horizontal coordinate of the upper-left corner of the screen, accurate to six decimal places.(Required)
 	//
