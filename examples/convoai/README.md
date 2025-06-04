@@ -21,31 +21,6 @@ You can find the relevant parameters in the [Conversational AI Service Documenta
 
 When choosing different TTS providers, you need to configure additional environment variables. The currently supported TTS providers are:
 
-### bytedance
-
-```bash
-export CONVOAI_TTS_BYTEDANCE_TOKEN=<Your tts bytedance token>
-export CONVOAI_TTS_BYTEDANCE_APP_ID=<Your tts bytedance app id>
-export CONVOAI_TTS_BYTEDANCE_CLUSTER=<Your tts bytedance cluster>
-export CONVOAI_TTS_BYTEDANCE_VOICE_TYPE=<Your tts bytedance voice type>
-```
-
-### tencent
-
-```bash
-export CONVOAI_TTS_TENCENT_APP_ID=<Your tts tencent app id>
-export CONVOAI_TTS_TENCENT_SECRET_ID=<Your tts tencent secret id>
-export CONVOAI_TTS_TENCENT_SECRET_KEY=<Your tts tencent secret key>
-```
-
-### minimax
-
-```bash
-export CONVOAI_TTS_MINIMAX_GROUP_ID=<Your tts minimax group id>
-export CONVOAI_TTS_MINIMAX_GROUP_KEY=<Your tts minimax group key>
-export CONVOAI_TTS_MINIMAX_GROUP_MODEL=<Your tts minimax group model>
-```
-
 ### microsoft
 
 ```bash
@@ -67,11 +42,12 @@ export CONVOAI_TTS_ELEVENLABS_VOICE_ID=<Your tts elevenLabs voice id>
 Run the sample project with the following command:
 
 ```bash
-go run main.go --ttsVendor=<ttsVendor> --serviceRegion=<serviceRegion>
+go run main.go --ttsVendor=<ttsVendor> --serviceRegion=2
 ```
 
-`ttsVendor` represents different TTS providers. Choose the appropriate TTS provider based on your requirements.
-`serviceRegion` represents chosen service region. The currently supported service regions are:
-* `1`:`ChineseMainland`
-* `2`:`Global`
+`ttsVendor` represents different TTS providers, currently supported TTS providers are:
 
+-   `microsoft`
+-   `elevenLabs`
+
+Choose the appropriate TTS provider based on your requirements.

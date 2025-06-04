@@ -8,26 +8,25 @@ Agora's Conversational AI Engine redefines human-computer interaction, breaking 
 
 ## Environment Setup
 
-- Obtain Agora App ID -------- [Agora Console](https://console.agora.io/v2)
+-   Obtain Agora App ID -------- [Agora Console](https://console.agora.io/v2)
 
-  > - Click Create Application
-  >
-  >   ![](../../assets/imges/EN/create_app_1.png)
-  >
-  > - Select the type of application you want to create
-  >
-  >   ![](../../assets/imges/EN/create_app_2.png)
+    > -   Click Create Application
+    >
+    >     ![](../../assets/imges/EN/create_app_1.png)
+    >
+    > -   Select the type of application you want to create
+    >
+    >     ![](../../assets/imges/EN/create_app_2.png)
 
-- Obtain App Certificate ----- [Agora Console](https://console.agora.io/v2)
+-   Obtain App Certificate ----- [Agora Console](https://console.agora.io/v2)
 
-  > In the project management page of the Agora Console, find your project and click Configure.
-  > ![](../../assets/imges/EN/config_app.png)
-  > Click the copy icon under Primary Certificate to obtain the App Certificate for your project.
-  > ![](../../assets/imges/EN/copy_app_cert.png)
+    > In the project management page of the Agora Console, find your project and click Configure.
+    > ![](../../assets/imges/EN/config_app.png)
+    > Click the copy icon under Primary Certificate to obtain the App Certificate for your project.
+    > ![](../../assets/imges/EN/copy_app_cert.png)
 
-- Enable Conversational AI Engine Service ----- [Enable Service](https://docs.agora.io/en/conversational-ai/get-started/manage-agora-account)
-  > ![](../../assets/imges/EN/open_convo_ai.png)
-
+-   Enable Conversational AI Engine Service ----- [Enable Service](https://docs.agora.io/en/conversational-ai/get-started/manage-agora-account)
+    > ![](../../assets/imges/EN/open_convo_ai.png)
 
 ## API Definition
 
@@ -40,23 +39,20 @@ For more api details, please refer to the [API Documentation](https://docs.agora
 ```go
     const (
         appId                 = "<your appId>"
-        cname                 = "<your cname>"
         username              = "<the username of basic auth credential>"
         password              = "<the password of basic auth credential>"
-	)   
+	)
 	// Initialize Conversational AI Config
 	config := &convoai.Config{
 		AppID:      appId,
 		Credential: auth.NewBasicAuthCredential(username, password),
 		// Specify the region where the server is located. Options include CN, EU, AP, US.
 		// The client will automatically switch to use the best domain based on the configured region.
-		DomainArea: domain.CN,
+		DomainArea: domain.US,
 		// Specify the log output level. Options include DebugLevel, InfoLevel, WarningLevel, ErrLevel.
 		// To disable log output, set logger to DiscardLogger.
 		Logger: agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
-		// Specify the service region. Options include ChineseMainlandServiceRegion, GlobalServiceRegion.
-		// ChineseMainlandServiceRegion and GlobalServiceRegion are two different services.
-		ServiceRegion: convoai.ChineseMainlandServiceRegion,
+		ServiceRegion: convoai.GlobalServiceRegion,
 	}
 
 	// Initialize the Conversational AI service client
@@ -67,15 +63,16 @@ For more api details, please refer to the [API Documentation](https://docs.agora
 ```
 
 ### Create Conversational Agent
->
+
 > Create a Conversational AI agent instance and join an RTC channel.
 
 Parameters to set: LLM, TTS, and Agent related parameters.
 
-Call the `Join` method to create a conversational agent, using Bytedance TTS as an example:
+Call the `Join` method to create a conversational agent, using Microsoft TTS as an example:
 
 ```go
     const (
+		appId                 = "<your appId>"
         cname                 = "<your cname>"
         agentRtcUid           = "<your agent rtc uid>"
         username              = "<the username of basic auth credential>"
@@ -84,15 +81,13 @@ Call the `Join` method to create a conversational agent, using Bytedance TTS as 
         llmURL                = "<your LLM URL>"
         llmAPIKey             = "<your LLM API Key>"
         llmModel              = "<your LLM model>"
-        ttsBytedanceToken     = "<your bytedance tts token>"
-        ttsBytedanceAppId     = "<your bytedance tts app id>"
-        ttsBytedanceCluster   = "<your bytedance tts cluster>"
-        ttsBytedanceVoiceType = "<your bytedance tts voice type>"
+		ttsMicrosoftKey       = "<your microsoft tts key>"
+		ttsMicrosoftRegion    = "<your microsoft tts region>"
+		ttsMicrosoftVoiceName = "<your microsoft tts voice name>"
     )
-	name := appId + ":" + cname
-
 	// Start agent
-	joinResp, err := convoaiClient.Join(ctx, name, &req.JoinPropertiesReqBody{
+	name := appId + ":" + cname
+	joinResp, err := convoaiClient.Join(context.Background(), name, &req.JoinPropertiesReqBody{
 		Token:           agentRtcToken,
 		Channel:         cname,
 		AgentRtcUId:     agentRtcUid,
@@ -116,16 +111,14 @@ Call the `Join` method to create a conversational agent, using Bytedance TTS as 
 			GreetingMessage: "Hello, how can I help you?",
 		},
 		TTS: &req.JoinPropertiesTTSBody{
-			Vendor: req.BytedanceTTSVendor,
-			Params: &req.TTSBytedanceVendorParams{
-				Token:       ttsBytedanceToken,
-				AppId:       ttsBytedanceAppId,
-				Cluster:     ttsBytedanceCluster,
-				VoiceType:   ttsBytedanceVoiceType,
-				SpeedRatio:  1.0,
-				VolumeRatio: 1.0,
-				PitchRatio:  1.0,
-				Emotion:     "happy",
+			Vendor: req.MicrosoftTTSVendor,
+			Params: &req.TTSMicrosoftVendorParams{
+				Key:        ttsMicrosoftKey,
+				Region:     ttsMicrosoftRegion,
+				VoiceName:  ttsMicrosoftVoiceName,
+				Speed:      1.0,
+				Volume:     70,
+				SampleRate: 24000,
 			},
 		},
 	})
@@ -146,7 +139,8 @@ Call the `Join` method to create a conversational agent, using Bytedance TTS as 
 > Stop the conversational agent and leave the RTC channel.
 
 Parameters to set:
-- AgentId returned by the `Join` interface
+
+-   AgentId returned by the `Join` interface
 
 ```go
     // Leave agent
@@ -167,8 +161,9 @@ Parameters to set:
 > Currently, only the Token information of a running conversational agent can be updated.
 
 Parameters to set:
-- AgentId returned by the `Join` interface
-- Token to be updated
+
+-   AgentId returned by the `Join` interface
+-   Token to be updated
 
 ```go
     // Update agent
@@ -191,7 +186,8 @@ Parameters to set:
 > Query the status of the conversational agent.
 
 Parameters to set:
-- AgentId returned by the `Join` interface
+
+-   AgentId returned by the `Join` interface
 
 ```go
     // Query agent
@@ -208,13 +204,13 @@ Parameters to set:
 	}
 ```
 
-
 ## Retrieves a list of agents
 
 > Retrieves a list of agents that meet the specified criteria.
 
 Parameters to set:
-- AgentId returned by the `Join` interface
+
+-   AgentId returned by the `Join` interface
 
 ```go
      // List agent
@@ -234,4 +230,5 @@ Parameters to set:
 ```
 
 ## Error Codes and Response Status Codes Handling
+
 For specific business response codes, please refer to the [Business Response Codes](https://docs.agora.io/en/conversational-ai/rest-api/reference) documentation.

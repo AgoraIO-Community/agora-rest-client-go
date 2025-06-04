@@ -75,6 +75,7 @@
 
 ```go
     const (
+		appId                 = "<your appId>"
         cname                 = "<your cname>"
         agentRtcUid           = "<your agent rtc uid>"
         username              = "<the username of basic auth credential>"
