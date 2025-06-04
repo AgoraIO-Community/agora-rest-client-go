@@ -48,7 +48,7 @@ For more api details, please refer to the [API Documentation](https://docs.agora
 		Credential: auth.NewBasicAuthCredential(username, password),
 		// Specify the region where the server is located. Options include CN, EU, AP, US.
 		// The client will automatically switch to use the best domain based on the configured region.
-		DomainArea: domain.CN,
+		DomainArea: domain.US,
 		// Specify the log output level. Options include DebugLevel, InfoLevel, WarningLevel, ErrLevel.
 		// To disable log output, set logger to DiscardLogger.
 		Logger: agoraLogger.NewDefaultLogger(agoraLogger.DebugLevel),
