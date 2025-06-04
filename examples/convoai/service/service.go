@@ -126,6 +126,15 @@ func (s *Service) RunWithCustomTTS(ttsVendor req.TTSVendor, ttsParam req.TTSVend
 		Asr: &req.JoinPropertiesAsrBody{
 			Language: "zh-CN",
 		},
+		Parameters: &req.Parameters{
+			FixedParams: &req.FixedParams{
+				SilenceConfig: &req.SilenceConfig{
+					TimeoutMs: agoraUtils.Ptr(1200),
+					Action:    agoraUtils.Ptr("speak"),
+					Content:   agoraUtils.Ptr("Hello, how can I help you?"),
+				},
+			},
+		},
 	})
 	if err != nil {
 		log.Fatalln(err)
@@ -216,6 +225,19 @@ func (s *Service) RunWithCustomTTS(ttsVendor req.TTSVendor, ttsParam req.TTSVend
 
 	updateResp, err := convoaiClient.Update(ctx, agentId, &req.UpdateReqBody{
 		Token: updateToken,
+		LLM: &req.UpdateLLMBody{
+			SystemMessages: []map[string]any{
+				{
+					"role":    "system",
+					"content": "You are a helpful chatbot, and you are a new assistant.",
+				},
+			},
+			Params: map[string]any{
+				"model":      llmModel,
+				"max_tokens": 2048,
+				"username":   "Tom",
+			},
+		},
 	})
 	if err != nil {
 		log.Fatalln(err)
@@ -350,14 +372,14 @@ func (s *Service) RunWithMinimaxTTS() {
 		GroupId: ttsGroupId,
 		Key:     ttsGroupKey,
 		Model:   ttsGroupModel,
-		VoiceSetting: req.TTSMinimaxVendorVoiceSettingParam{
+		VoiceSetting: &req.TTSMinimaxVendorVoiceSettingParam{
 			VoiceId: "female-shaonv",
 			Speed:   1,
 			Vol:     1,
 			Pitch:   0,
 			Emotion: "happy",
 		},
-		AudioSetting: req.TTSMinimaxVendorAudioSettingParam{
+		AudioSetting: &req.TTSMinimaxVendorAudioSettingParam{
 			SampleRate: 16000,
 		},
 	}
@@ -382,11 +404,12 @@ func (s *Service) RunWithMicrosoftTTS() {
 	}
 
 	ttsParam := req.TTSMicrosoftVendorParams{
-		Key:       ttsKey,
-		Region:    ttsRegion,
-		VoiceName: ttsVoiceName,
-		Rate:      1.8,
-		Volume:    70,
+		Key:        ttsKey,
+		Region:     ttsRegion,
+		VoiceName:  ttsVoiceName,
+		Speed:      1.0,
+		Volume:     70,
+		SampleRate: 24000,
 	}
 
 	s.RunWithCustomTTS(req.MicrosoftTTSVendor, ttsParam)
@@ -409,7 +432,7 @@ func (s *Service) RunWithElevenLabsTTS() {
 	}
 
 	ttsParam := req.TTSElevenLabsVendorParams{
-		APIKey:  ttsApiKey,
+		Key:     ttsApiKey,
 		ModelId: ttsModelId,
 		VoiceId: ttsVoiceId,
 	}

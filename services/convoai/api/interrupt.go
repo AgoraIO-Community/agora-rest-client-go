@@ -36,7 +36,7 @@ func (i *Interrupt) buildPath(agentId string) string {
 
 func (i *Interrupt) Do(ctx context.Context, agentId string) (*resp.InterruptResp, error) {
 	path := i.buildPath(agentId)
-	responseData, err := doRESTWithRetry(ctx, i.module, i.logger, i.retryCount, i.client, path, http.MethodPost, nil)
+	responseData, err := doRESTWithRetry(ctx, i.module, i.logger, i.retryCount, i.client, path, http.MethodPost, map[string]any{})
 	if err != nil {
 		var internalErr *agora.InternalErr
 		if !errors.As(err, &internalErr) {

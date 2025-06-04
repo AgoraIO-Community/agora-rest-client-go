@@ -1,5 +1,9 @@
 package req
 
+import (
+	"encoding/json"
+)
+
 // @brief Defines advanced feature configurations for the agent to join the RTC channel
 //
 // @since v0.7.0
@@ -27,15 +31,26 @@ type TTSVendorParamsInterface interface {
 }
 
 type TTSMinimaxVendorVoiceSettingParam struct {
-	VoiceId string  `json:"voice_id"`
-	Speed   float32 `json:"speed"`
-	Vol     float32 `json:"vol"`
-	Pitch   int     `json:"pitch"`
-	Emotion string  `json:"emotion"`
+	VoiceId              string  `json:"voice_id"`
+	Speed                float32 `json:"speed"`
+	Vol                  float32 `json:"vol"`
+	Pitch                int     `json:"pitch"`
+	Emotion              string  `json:"emotion"`
+	LatexRender          bool    `json:"latex_render"`
+	EnglishNormalization bool    `json:"english_normalization"`
 }
 
 type TTSMinimaxVendorAudioSettingParam struct {
 	SampleRate int `json:"sample_rate"`
+}
+
+type PronunciationDictParam struct {
+	Tone []string `json:"tone"`
+}
+
+type TimberWeightsParam struct {
+	VoiceId string `json:"voice_id"`
+	Weight  int    `json:"weight"`
 }
 
 // @brief Defines the Minimax vendor parameters for the Text-to-Speech (TTS) module when the agent joins the RTC channel, see
@@ -43,11 +58,13 @@ type TTSMinimaxVendorAudioSettingParam struct {
 //
 // @since v0.7.0
 type TTSMinimaxVendorParams struct {
-	GroupId      string                            `json:"group_id"`
-	Key          string                            `json:"key"`
-	Model        string                            `json:"model"`
-	VoiceSetting TTSMinimaxVendorVoiceSettingParam `json:"voice_setting"`
-	AudioSetting TTSMinimaxVendorAudioSettingParam `json:"audio_setting"`
+	GroupId           string                             `json:"group_id"`
+	Key               string                             `json:"key"`
+	Model             string                             `json:"model"`
+	VoiceSetting      *TTSMinimaxVendorVoiceSettingParam `json:"voice_setting,omitempty"`
+	AudioSetting      *TTSMinimaxVendorAudioSettingParam `json:"audio_setting,omitempty"`
+	PronunciationDict *PronunciationDictParam            `json:"pronunciation_dict,omitempty"`
+	TimberWeights     []TimberWeightsParam               `json:"timber_weights,omitempty"`
 }
 
 func (TTSMinimaxVendorParams) VendorParam() {}
@@ -87,19 +104,53 @@ type TTSBytedanceVendorParams struct {
 func (TTSBytedanceVendorParams) VendorParam() {}
 
 type TTSMicrosoftVendorParams struct {
-	Key       string  `json:"key"`
-	Region    string  `json:"region"`
-	VoiceName string  `json:"voice_name"`
-	Rate      float32 `json:"rate"`
-	Volume    float32 `json:"volume"`
+	// The API key used for authentication.(Required)
+	Key string `json:"key"`
+	// The Azure region where the speech service is hosted.(Required)
+	Region string `json:"region"`
+	// The identifier for the selected voice for speech synthesis.(Optional)
+	VoiceName string `json:"voice_name"`
+	// Indicates the speaking rate of the text.(Optional)
+	//
+	// The rate can be applied at the word or sentence level and should be between 0.5 and 2.0 times the original audio speed.
+	Speed float32 `json:"speed"`
+	// Specifies the audio volume as a number between 0.0 and 100.0, where 0.0 is the quietest and 100.0 is the loudest.
+	//
+	// For example, a value of 75 sets the volume to 75% of the maximum.
+	//
+	// The default value is100.
+	Volume float32 `json:"volume"`
+	// Specifies the audio sampling rate in Hz.(Optional)
+	//
+	// The default value is 24000.
+	SampleRate int `json:"sample_rate"`
 }
 
 func (TTSMicrosoftVendorParams) VendorParam() {}
 
 type TTSElevenLabsVendorParams struct {
-	APIKey  string `json:"api_key"`
+	// The API key used for authentication.(Required)
+	Key string `json:"key"`
+	// Identifier of the model to be used.(Required)
 	ModelId string `json:"model_id"`
+	// The identifier for the selected voice for speech synthesis.(Required)
 	VoiceId string `json:"voice_id"`
+	// Specifies the audio sampling rate in Hz.(Optional)
+	//
+	// The default value is 24000.
+	SampleRate int `json:"sample_rate"`
+	// The stability for voice settings.(Optional)
+	Stability float32 `json:"stability"`
+	// Determines how closely the AI should adhere to the original voice when attempting to replicate it.
+	SimilarityBoost float32 `json:"similarity_boost"`
+	// Determines the style exaggeration of the voice. This setting attempts to amplify the style of the original speaker.
+	//
+	// It does consume additional computational resources and might increase latency if set to anything other than 0.
+	Style float32 `json:"style"`
+	// This setting boosts the similarity to the original speaker.
+	//
+	// Using this setting requires a slightly higher computational load, which in turn increases latency.
+	UseSpeakerBoost bool `json:"use_speaker_boost"`
 }
 
 func (TTSElevenLabsVendorParams) VendorParam() {}
@@ -208,7 +259,35 @@ type JoinPropertiesCustomLLMBody struct {
 	// and then recalculate the silence time.
 	//
 	// When silence_timeout is set to 0, this parameter is ignored.
+	//
+	// Deprecated: Use [Parameters.SilenceConfig] instead
+	//
+	// @deprecated This field is deprecated since v0.11.0
 	SilenceMessage *string `json:"silence_message,omitempty"`
+	// LLM provider(Optional), supports the following settings:
+	//
+	// - "custom": Custom LLM provider.
+	//   When you set this option, the agent includes the following fields, in addition to role and content when making requests to the custom LLM:
+	//		-  turn_id: A unique identifier for each conversation turn. It starts from 0 and increments with each turn. One user-agent interaction corresponds to one turn_id.
+	//		-  timestamp: The request timestamp, in milliseconds.
+	// - "aliyun": Aliyun LLM provider.(Only available in China Mainland service region)
+	//
+	// - "bytedance": Bytedance LLM provider.(Only available in China Mainland service region)
+	//
+	// - "deepseek": DeepSeek LLM provider.(Only available in China Mainland service region)
+	//
+	// - "tencent": Tencent LLM provider.(Only available in China Mainland service region)
+	//
+	Vendor string `json:"vendor,omitempty"`
+
+	// The request style for chat completion.(Optional)(Only available in global service region)
+	//
+	//  - "openai": OpenAI style.(Default)
+	//
+	//  - "gemini": Gemini style.
+	//
+	//  - "anthropic": Anthropic style.
+	Style string `json:"style,omitempty"`
 }
 
 // @brief Defines the Voice Activity Detection (VAD) configuration for the agent to join the RTC channel
@@ -289,11 +368,19 @@ type JoinPropertiesReqBody struct {
 	//  - 0 (default): Do not enable this feature.
 	//
 	//  - (0,60]: Must also set llm.silence_message to enable the feature.
+	//
+	// Deprecated: Use [Parameters.SilenceConfig] instead
+	//
+	// @deprecated This field is deprecated since v0.11.0
 	SilenceTimeout *int `json:"silence_timeout,omitempty"`
 
 	// Agent user ID in the RTM channel
 	//
 	// Only valid when advanced_features.enable_rtm is true
+	//
+	// Deprecated: Use AgentRtcUId instead
+	//
+	// @deprecated This field is deprecated since v0.11.0
 	AgentRtmUId *string `json:"agent_rtm_uid,omitempty"`
 	// Advanced feature configurations (optional), see JoinPropertiesAdvancedFeaturesBody for details
 	AdvancedFeatures *JoinPropertiesAdvancedFeaturesBody `json:"advanced_features,omitempty"`
@@ -304,6 +391,118 @@ type JoinPropertiesReqBody struct {
 	// Voice Activity Detection (VAD) configuration (optional), see JoinPropertiesVadBody for details
 	Vad *JoinPropertiesVadBody `json:"vad,omitempty"`
 	// Automatic Speech Recognition (ASR) configuration (optional), see JoinPropertiesAsrBody for details
-	Asr        *JoinPropertiesAsrBody `json:"asr,omitempty"`
-	Parameters map[string]any         `json:"parameters,omitempty"`
+	Asr *JoinPropertiesAsrBody `json:"asr,omitempty"`
+	// Conversation turn detection settings
+	TurnDetection *TurnDetectionBody `json:"turn_detection,omitempty"`
+	// Agent parameters configuration (optional), see Parameters for details
+	Parameters *Parameters `json:"parameters,omitempty"`
+}
+
+// @brief Conversation turn detection settings
+//
+// @since v0.11.0
+type TurnDetectionBody struct {
+	// When the agent is interacting (speaking or thinking), the mode of human voice interrupting the agent's behavior, support the following values:
+	//
+	//  - "interrupt"(Default): Interrupt mode, human voice immediately interrupts the agent's interaction.
+	//	               The agent will terminate the current interaction and directly process the human voice input.
+	//
+	//  - "append": Append mode, human voice does not interrupt the agent. (Default)
+	//				The agent will process the human voice request after the current interaction ends.
+	//
+	//  - "ignore": Ignore mode, the agent ignores the human voice request.
+	//				If the agent is speaking or thinking and receives human voice during the process,
+	//				the agent will directly ignore and discard the human voice request, not storing it in the context.
+	InterruptMode string `json:"interrupt_mode,omitempty"`
+}
+
+// @brief Fixed parameters
+//
+// @since v0.11.0
+type FixedParams struct {
+	// Silence configuration for the agent
+	SilenceConfig *SilenceConfig `json:"silence_config,omitempty"`
+}
+
+// @brief Silence configuration for the agent
+//
+// @since v0.11.0
+type SilenceConfig struct {
+	// Agent maximum silence time (ms).(Optional)
+	//
+	// After the agent is created and a user joins the channel,
+	// the duration of the agent's non-listening, thinking, or speaking state is called the agent's silence time.
+	//
+	// When the silence time reaches the set value, the agent will report the silence prompt message.
+	//
+	// This feature can be used to let the agent remind users when users are inactive.
+	//
+	// Set 0: Do not enable this feature.
+	//
+	// Set to (0,60000]: Must also set content to enable normal reporting of silence prompts, otherwise the setting is invalid.
+	TimeoutMs *int `json:"timeout_ms,omitempty"`
+
+	// When the silence time reaches the set value, the agent will take the following actions(Optional):
+	//
+	//  - "speak": Use TTS module to report the silence message (Default)
+	//
+	//  - "think": Append the silence message to the end of the context and pass it to LLM
+	Action *string `json:"action,omitempty"`
+
+	// Content of the silence message (Optional)
+	//
+	// The content will be used in different ways according to the settings in the action.
+	Content *string `json:"content,omitempty"`
+}
+
+// @brief Agent parameters configuration
+//
+// @note Parameters that contains both extra data and fixed data. The same key in extra data and fixed data will be merged.
+//
+// @since v0.11.0
+type Parameters struct {
+	// Extra parameters for flexible key-value pairs
+	ExtraParams map[string]any `json:"-"`
+	// Fixed parameters for type-safe parameters
+	FixedParams *FixedParams `json:"-"`
+}
+
+// MarshalJSON implements custom JSON marshaling
+func (p *Parameters) MarshalJSON() ([]byte, error) {
+	// Create a map to hold the merged data
+	merged := make(map[string]any)
+
+	// Add fixed parameters if present
+	if p.FixedParams != nil {
+		structBytes, err := json.Marshal(p.FixedParams)
+		if err != nil {
+			return nil, err
+		}
+		var structMap map[string]any
+		if err := json.Unmarshal(structBytes, &structMap); err != nil {
+			return nil, err
+		}
+		for k, v := range structMap {
+			merged[k] = v
+		}
+	}
+
+	// Add extra parameters if present
+	if p.ExtraParams != nil {
+		for k, v := range p.ExtraParams {
+			merged[k] = v
+		}
+	}
+
+	return json.Marshal(merged)
+}
+
+// UnmarshalJSON implements custom JSON unmarshaling
+func (p *Parameters) UnmarshalJSON(data []byte) error {
+	var mapData map[string]any
+	if err := json.Unmarshal(data, &mapData); err != nil {
+		return err
+	}
+	p.ExtraParams = mapData
+	return nil
 }
