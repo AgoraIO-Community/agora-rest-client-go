@@ -1,6 +1,6 @@
 # 对话式 AI 引擎服务
 
- [English](./README.md) |  简体中文
+[English](./README.md) | 简体中文
 
 > 这是一个对话式 AI 引擎的示例项目，利用对话式 AI 引擎 API 实现对话式 AI 功能。
 
@@ -54,24 +54,19 @@ export CONVOAI_TTS_MICROSOFT_REGION=<Your tts microsoft region>
 export CONVOAI_TTS_MICROSOFT_VOICE_NAME=<Your tts microsoft voice name>
 ```
 
-### elevenLabs
-
-```bash
-export CONVOAI_TTS_ELEVENLABS_API_KEY=<Your tts elevenLabs api key>
-export CONVOAI_TTS_ELEVENLABS_MODEL_ID=<Your tts elevenLabs model id>
-export CONVOAI_TTS_ELEVENLABS_VOICE_ID=<Your tts elevenLabs voice id>
-```
-
 ## 执行
 
 使用以下命令运行示例项目：
 
 ```bash
-go run main.go --ttsVendor=<ttsVendor> --serviceRegion=<serviceRegion>
+go run main.go --ttsVendor=<ttsVendor> --serviceRegion=1
 ```
 
-`ttsVendor` 代表不同的 TTS 提供商。根据您的需求选择合适的 TTS 提供商。
-`serviceRegion` 代表选择的服务区域。目前支持的服务区域有：
-* `1`:`ChineseMainland`
-* `2`:`Global`
+`ttsVendor` 代表不同的 TTS 提供商，目前支持的 TTS 提供商有：
 
+-   `bytedance`
+-   `tencent`
+-   `minimax`
+-   `microsoft`
+
+根据您的需求选择合适的 TTS 提供商。
