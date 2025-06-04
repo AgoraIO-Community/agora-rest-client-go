@@ -416,10 +416,10 @@ type TurnDetectionBody struct {
 	InterruptMode string `json:"interrupt_mode,omitempty"`
 }
 
-// @brief Structured data for parameters
+// @brief Fixed parameters
 //
 // @since v0.11.0
-type ParametersStructData struct {
+type FixedParams struct {
 	// Silence configuration for the agent
 	SilenceConfig *SilenceConfig `json:"silence_config,omitempty"`
 }
@@ -464,7 +464,7 @@ type Parameters struct {
 	// Extra parameters for flexible key-value pairs
 	ExtraParams map[string]any `json:"-"`
 	// Fixed parameters for type-safe parameters
-	FixedParams *ParametersStructData `json:"-"`
+	FixedParams *FixedParams `json:"-"`
 }
 
 // MarshalJSON implements custom JSON marshaling

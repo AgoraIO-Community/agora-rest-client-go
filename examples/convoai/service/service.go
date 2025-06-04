@@ -127,7 +127,7 @@ func (s *Service) RunWithCustomTTS(ttsVendor req.TTSVendor, ttsParam req.TTSVend
 			Language: "zh-CN",
 		},
 		Parameters: &req.Parameters{
-			FixedParams: &req.ParametersStructData{
+			FixedParams: &req.FixedParams{
 				SilenceConfig: &req.SilenceConfig{
 					TimeoutMs: agoraUtils.Ptr(1200),
 					Action:    agoraUtils.Ptr("speak"),
