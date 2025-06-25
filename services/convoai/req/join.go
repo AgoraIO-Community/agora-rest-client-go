@@ -172,6 +172,24 @@ type JoinPropertiesTTSBody struct {
 	//
 	//  - TTSElevenLabsVendorParams
 	Params TTSVendorParamsInterface `json:"params"`
+
+	// Controls whether the TTS module skips bracketed content when reading LLM response text.
+	//
+	// This prevents the agent from vocalizing structural prompt information like tone indicators,
+	// action descriptions, and system prompts, creating a more natural and immersive listening experience.
+	//
+	// Enable this feature by specifying one or more values:
+	//
+	// 1: Skip content in Chinese parentheses （ ）,unicode is \uFF08 \uFF09
+	//
+	// 2: Skip content in Chinese square brackets 【】,unicode is \u3010 \u3011
+	//
+	// 3: Skip content in parentheses (),unicode is \u0028 \u0029
+	//
+	// 4: Skip content in square brackets [ ],unicode is \u005B \u005D
+	//
+	// 5: Skip content in curly braces { },unicode is \u007B \u007D
+	SkipPatterns []int `json:"skipPatterns,omitempty"`
 }
 
 // @brief Defines the TTS vendor enumeration
