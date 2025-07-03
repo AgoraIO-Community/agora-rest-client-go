@@ -31,17 +31,20 @@ type TTSVendorParamsInterface interface {
 }
 
 type TTSMinimaxVendorVoiceSettingParam struct {
-	VoiceId              string  `json:"voice_id"`
-	Speed                float32 `json:"speed"`
-	Vol                  float32 `json:"vol"`
-	Pitch                int     `json:"pitch"`
-	Emotion              string  `json:"emotion"`
-	LatexRender          bool    `json:"latex_render"`
-	EnglishNormalization bool    `json:"english_normalization"`
+	VoiceId              string  `json:"voice_id,omitempty"`
+	Speed                float32 `json:"speed,omitempty"`
+	Vol                  float32 `json:"vol,omitempty"`
+	Pitch                int     `json:"pitch,omitempty"`
+	Emotion              string  `json:"emotion,omitempty"`
+	LatexRender          bool    `json:"latex_render,omitempty"`
+	EnglishNormalization bool    `json:"english_normalization,omitempty"`
 }
 
 type TTSMinimaxVendorAudioSettingParam struct {
-	SampleRate int `json:"sample_rate"`
+	SampleRate int    `json:"sample_rate,omitempty"` // The sample rate of the generated audio. Optional, defaults to 32000.
+	Bitrate    int    `json:"bitrate,omitempty"`     // Bitrate of the generated audio. Optional, default value is 128000.
+	Format     string `json:"format,omitempty"`      // Audio format of the generated audio. Default mp3, options [mp3,pcm,flac,wav]
+	Channel    uint8  `json:"channel,omitempty"`     // Number of audio channels. Default 1: mono, options: 1: mono 2: stereo
 }
 
 type PronunciationDictParam struct {
