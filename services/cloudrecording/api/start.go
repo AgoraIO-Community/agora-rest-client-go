@@ -351,6 +351,7 @@ type StorageConfig struct {
 	//  - 6: Google Cloud
 	//  - 7: Huawei Cloud
 	//  - 8: Baidu IntelligentCloud
+	//  - 11: Self-built cloud storage
 	Vendor int `json:"vendor"`
 
 	// The region information specified for the third-party cloud storage.(Required)
@@ -404,6 +405,10 @@ type ExtensionParams struct {
 	// This field is only applicable to Alibaba Cloud and Amazon S3.
 	// For other third-party cloud storage services, this field is not required.
 	Tag string `json:"tag"`
+	// Domain name of self-built cloud storage.(Optional)
+	//
+	// This field is required when vendor is set to 11.
+	Endpoint string `json:"endpoint,omitempty"`
 }
 
 // @brief Configurations for extended services.
