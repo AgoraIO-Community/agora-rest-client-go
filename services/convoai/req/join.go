@@ -189,7 +189,7 @@ type JoinPropertiesTTSBody struct {
 	// 4: Skip content in square brackets [ ],unicode is \u005B \u005D
 	//
 	// 5: Skip content in curly braces { },unicode is \u007B \u007D
-	SkipPatterns []int `json:"skipPatterns,omitempty"`
+	SkipPatterns []int `json:"skip_patterns,omitempty"`
 }
 
 // @brief Defines the TTS vendor enumeration
