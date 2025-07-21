@@ -24,10 +24,31 @@ type JoinPropertiesAdvancedFeaturesBody struct {
 	//  - false: Disable (default)
 	//
 	EnableRtm *bool `json:"enable_rtm,omitempty"`
+
+	// Enable Multimodal Large Language Model.
+	//
+	//  - true: Enable
+	//  - false: Disable (default)
+	//
+	// Enabling MLLM automatically disables ASR, LLM, and TTS. When you set this parameter to true, enable_aivad is also disabled.
+	//
+	// @since v0.12.0
+	EnableMLLM *bool `json:"enable_mllm,omitempty"`
 }
 
+// @brief Defines the interface for TTS vendor parameters
+//
+// @since v0.12.0
 type TTSVendorParamsInterface interface {
+	// VendorParam marks this type as a valid TTS vendor parameter
+	//
+	// @since v0.12.0
 	VendorParam()
+
+	// GetVendorType returns the vendor type identifier for validation
+	//
+	// @since v0.12.0
+	GetVendorType() TTSVendor
 }
 
 type TTSMinimaxVendorVoiceSettingParam struct {
@@ -67,7 +88,8 @@ type TTSMinimaxVendorParams struct {
 	TimberWeights     []TimberWeightsParam               `json:"timber_weights,omitempty"`
 }
 
-func (TTSMinimaxVendorParams) VendorParam() {}
+func (TTSMinimaxVendorParams) VendorParam()             {}
+func (TTSMinimaxVendorParams) GetVendorType() TTSVendor { return MinimaxTTSVendor }
 
 // @brief Defines the Tencent vendor parameters for the Text-to-Speech (TTS) module when the agent joins the RTC channel, see
 // https://cloud.tencent.com/document/product/1073/94308 for details
@@ -84,7 +106,8 @@ type TTSTencentVendorParams struct {
 	EmotionIntensity int    `json:"emotion_intensity"`
 }
 
-func (TTSTencentVendorParams) VendorParam() {}
+func (TTSTencentVendorParams) VendorParam()             {}
+func (TTSTencentVendorParams) GetVendorType() TTSVendor { return TencentTTSVendor }
 
 // @brief Defines the Bytedance vendor parameters for the Text-to-Speech (TTS) module when the agent joins the RTC channel, see
 // https://www.volcengine.com/docs/6561/79823 for details
@@ -101,7 +124,8 @@ type TTSBytedanceVendorParams struct {
 	Emotion     string  `json:"emotion"`
 }
 
-func (TTSBytedanceVendorParams) VendorParam() {}
+func (TTSBytedanceVendorParams) VendorParam()             {}
+func (TTSBytedanceVendorParams) GetVendorType() TTSVendor { return BytedanceTTSVendor }
 
 type TTSMicrosoftVendorParams struct {
 	// The API key used for authentication.(Required)
@@ -118,7 +142,7 @@ type TTSMicrosoftVendorParams struct {
 	//
 	// For example, a value of 75 sets the volume to 75% of the maximum.
 	//
-	// The default value is100.
+	// The default value is 100.
 	Volume float32 `json:"volume"`
 	// Specifies the audio sampling rate in Hz.(Optional)
 	//
@@ -126,7 +150,8 @@ type TTSMicrosoftVendorParams struct {
 	SampleRate int `json:"sample_rate"`
 }
 
-func (TTSMicrosoftVendorParams) VendorParam() {}
+func (TTSMicrosoftVendorParams) VendorParam()             {}
+func (TTSMicrosoftVendorParams) GetVendorType() TTSVendor { return MicrosoftTTSVendor }
 
 type TTSElevenLabsVendorParams struct {
 	// The API key used for authentication.(Required)
@@ -153,7 +178,42 @@ type TTSElevenLabsVendorParams struct {
 	UseSpeakerBoost bool `json:"use_speaker_boost"`
 }
 
-func (TTSElevenLabsVendorParams) VendorParam() {}
+func (TTSElevenLabsVendorParams) VendorParam()             {}
+func (TTSElevenLabsVendorParams) GetVendorType() TTSVendor { return ElevenLabsTTSVendor }
+
+// @brief Defines the Cartesia vendor parameters for the Text-to-Speech (TTS) module when the agent joins the RTC channel
+//
+// @since v0.12.0
+type TTSCartesiaVendorParams struct {
+	APIKey  string                  `json:"api_key"`
+	ModelId string                  `json:"model_id"`
+	Voice   *TTSCartesiaVendorVoice `json:"voice"`
+}
+
+// @brief Defines the Cartesia vendor voice for the Text-to-Speech (TTS) module when the agent joins the RTC channel
+//
+// @since v0.12.0
+type TTSCartesiaVendorVoice struct {
+	Mode string `json:"mode"`
+	Id   string `json:"id"`
+}
+
+func (TTSCartesiaVendorParams) VendorParam()             {}
+func (TTSCartesiaVendorParams) GetVendorType() TTSVendor { return CartesiaTTSVendor }
+
+// @brief Defines the OpenAI vendor parameters for the Text-to-Speech (TTS) module when the agent joins the RTC channel
+//
+// @since v0.12.0
+type TTSOpenAIVendorParams struct {
+	APIKey       string  `json:"api_key"`
+	Model        string  `json:"model"`
+	Voice        string  `json:"voice"`
+	Instructions string  `json:"instructions"`
+	Speed        float32 `json:"speed"`
+}
+
+func (TTSOpenAIVendorParams) VendorParam()             {}
+func (TTSOpenAIVendorParams) GetVendorType() TTSVendor { return OpenAITTSVendor }
 
 // @brief Defines the Text-to-Speech (TTS) module configuration for the agent to join the RTC channel
 //
@@ -171,6 +231,12 @@ type JoinPropertiesTTSBody struct {
 	//  - TTSMicrosoftVendorParams
 	//
 	//  - TTSElevenLabsVendorParams
+	//
+	//  - TTSCartesiaVendorParams
+	//
+	//  - TTSOpenAIVendorParams
+	//
+	// @since v0.12.0
 	Params TTSVendorParamsInterface `json:"params"`
 
 	// Controls whether the TTS module skips bracketed content when reading LLM response text.
@@ -189,6 +255,8 @@ type JoinPropertiesTTSBody struct {
 	// 4: Skip content in square brackets [ ],unicode is \u005B \u005D
 	//
 	// 5: Skip content in curly braces { },unicode is \u007B \u007D
+	//
+	// @since v0.12.0
 	SkipPatterns []int `json:"skip_patterns,omitempty"`
 }
 
@@ -208,6 +276,14 @@ const (
 	MicrosoftTTSVendor TTSVendor = "microsoft"
 	// ElevenLabs TTS vendor
 	ElevenLabsTTSVendor TTSVendor = "elevenLabs"
+	// Cartesia TTS vendor
+	//
+	// @since v0.12.0
+	CartesiaTTSVendor TTSVendor = "cartesia"
+	// OpenAI TTS vendor
+	//
+	// @since v0.12.0
+	OpenAITTSVendor TTSVendor = "openai"
 )
 
 // @brief Defines the custom language model (LLM) configuration for the agent to join the RTC channel
@@ -236,7 +312,7 @@ type JoinPropertiesCustomLLMBody struct {
 
 	// Number of short-term memory entries cached in the LLM (optional)
 	//
-	// Default value is 10
+	// Default value is 32.
 	//
 	// Passing 0 means no short-term memory is cached. The agent and subscribed users will record entries separately
 	MaxHistory *int `json:"max_history,omitempty"`
@@ -305,12 +381,18 @@ type JoinPropertiesCustomLLMBody struct {
 	//  - "gemini": Gemini style.
 	//
 	//  - "anthropic": Anthropic style.
+	//
+	//  - "dify": Dify style.
+	//
+	// @since v0.11.0
 	Style string `json:"style,omitempty"`
 }
 
 // @brief Defines the Voice Activity Detection (VAD) configuration for the agent to join the RTC channel
 //
 // @since v0.7.0
+//
+// @deprecated This field is deprecated since v0.12.0
 type JoinPropertiesVadBody struct {
 	// Human voice duration threshold (ms), range is [120, 1200] (optional)
 	//
@@ -332,6 +414,75 @@ type JoinPropertiesVadBody struct {
 	Threshold *float64 `json:"threshold,omitempty"`
 }
 
+// @brief Defines the Automatic Speech Recognition (ASR) vendor for the agent to join the RTC channel
+//
+// @since v0.12.0
+type ASRVendor string
+
+const (
+	// Fengming ASR vendor
+	//
+	// @since v0.12.0
+	ASRVendorFengming ASRVendor = "fengming"
+	// Tencent ASR vendor
+	//
+	// @since v0.12.0
+	ASRVendorTencent ASRVendor = "tencent"
+	// Microsoft ASR vendor
+	//
+	// @since v0.12.0
+	ASRVendorMicrosoft ASRVendor = "microsoft"
+	// Ares ASR vendor
+	//
+	// @since v0.12.0
+	ASRVendorAres ASRVendor = "ares"
+	// Deepgram ASR vendor
+	//
+	// @since v0.12.0
+	ASRVendorDeepgram ASRVendor = "deepgram"
+)
+
+type ASRVendorParamsInterface interface {
+	VendorParam()
+}
+
+// @brief Defines the Automatic Speech Recognition (ASR) Tencent vendor parameter for the agent to join the RTC channel
+//
+// @since v0.12.0
+type ASRTencentVendorParam struct {
+	Key             string `json:"key"`
+	AppId           string `json:"app_id"`
+	Secret          string `json:"secret"`
+	EngineModelType string `json:"engine_model_type"`
+	VoiceId         string `json:"voice_id"`
+}
+
+func (ASRTencentVendorParam) VendorParam() {}
+
+// @brief Defines the Automatic Speech Recognition (ASR) Microsoft vendor parameter for the agent to join the RTC channel
+//
+// @since v0.12.0
+type ASRMicrosoftVendorParam struct {
+	Key        string   `json:"key"`
+	Region     string   `json:"region"`
+	Language   string   `json:"language"`
+	PhraseList []string `json:"phrase_list"`
+}
+
+func (ASRMicrosoftVendorParam) VendorParam() {}
+
+// @brief Defines the Automatic Speech Recognition (ASR) deepgram vendor parameter for the agent to join the RTC channel
+//
+// @since v0.12.0
+type ASRDeepgramVendorParam struct {
+	Url      string `json:"url"`
+	Key      string `json:"key"`
+	Model    string `json:"model"`
+	Language string `json:"language"`
+}
+
+func (ASRDeepgramVendorParam) VendorParam() {}
+
 // @brief Defines the Automatic Speech Recognition (ASR) configuration for the agent to join the RTC channel
 //
 // @since v0.7.0
@@ -342,6 +493,81 @@ type JoinPropertiesAsrBody struct {
 	//
 	//  - en-US: English
 	Language string `json:"language,omitempty"`
+	// ASR vendor, see ASRVendor for details
+	//
+	// @since v0.12.0
+	Vendor ASRVendor `json:"vendor,omitempty"`
+
+	// ASR vendor parameter description, see
+	//
+	//  - ASRVendorTencentParams
+	//
+	//  - ASRVendorMicrosoftParams
+	//
+	//  - ASRVendorAresParams
+	//
+	//  - ASRVendorDeepgramParams
+	//
+	// @since v0.12.0
+	Params ASRVendorParamsInterface `json:"params,omitempty"`
+}
+
+// @brief Multi-modal language model (MLLM) configuration
+//
+// @since v0.12.0
+type JoinPropertiesMLLMBody struct {
+	// The WebSocket URL for OpenAI Realtime API(Required)
+	Url string `json:"url"`
+
+	// The API key used for authentication.(Required)
+	//
+	// Get your API key from the OpenAI Console.
+	APIKey string `json:"api_key"`
+
+	// Array of conversation items used for short-term memory management.(Optional)
+	//
+	// Uses the same structure as item.content from the OpenAI Realtime API(https://platform.openai.com/docs/api-reference/realtime-client-events/conversation/item/create).
+	Messages []map[string]any `json:"messages"`
+
+	// Additional MLLM configuration parameters.(Optional)
+	//
+	//  - Modalities override: The modalities setting in params is overridden by `input_modalities` and `output_modalities`.
+	//
+	//  - Turn detection override: The turn_detection setting in params is overridden by the `turn_detection` section outside of `mllm`.
+	Params map[string]any `json:"params"`
+
+	// The number of conversation history messages to maintain.
+	//
+	// Cannot exceed the model's context window.
+	//
+	// Default value is 32.
+	MaxHistory *int `json:"max_history,omitempty"`
+
+	// Input modalities for the MLLM (optional)
+	//
+	// 	- ["audio"]: Audio only (default)
+	//
+	//  - ["audio", "text"]: Audio and text.
+	//
+	InputModalities []string `json:"input_modalities,omitempty"`
+
+	// Output format options:
+	//
+	//  - ["text", "audio"] for both text and voice responses.
+	OutputModalities []string `json:"output_modalities,omitempty"`
+
+	// Initial message the agent speaks when a user joins the channel.
+	GreetingMessage string `json:"greeting_message,omitempty"`
+
+	// MLLM provider identifier.
+	//
+	// Set to `openai` for OpenAI Realtime API.
+	Vendor string `json:"vendor,omitempty"`
+
+	// API request style.
+	//
+	// Set to `openai` for OpenAI Realtime API format.
+	Style string `json:"style,omitempty"`
 }
 
 // @brief Request body for calling the Conversational AI engine Join API
@@ -404,9 +630,17 @@ type JoinPropertiesReqBody struct {
 	AdvancedFeatures *JoinPropertiesAdvancedFeaturesBody `json:"advanced_features,omitempty"`
 	// Custom language model (LLM) configuration (required), see JoinPropertiesCustomLLMBody for details
 	LLM *JoinPropertiesCustomLLMBody `json:"llm,omitempty"`
+	// Multimodal Large Language Model (MLLM) configuration for real-time audio and text processing(optional), see JoinPropertiesMLLMBody for details
+	//
+	// @since v0.12.0
+	MLLM *JoinPropertiesMLLMBody `json:"mllm,omitempty"`
 	// Text-to-Speech (TTS) module configuration (required), see JoinPropertiesTTSBody for details
 	TTS *JoinPropertiesTTSBody `json:"tts,omitempty"`
 	// Voice Activity Detection (VAD) configuration (optional), see JoinPropertiesVadBody for details
+	//
+	// Deprecated: Use [TurnDetection] instead
+	//
+	// @deprecated This field is deprecated since v0.12.0
 	Vad *JoinPropertiesVadBody `json:"vad,omitempty"`
 	// Automatic Speech Recognition (ASR) configuration (optional), see JoinPropertiesAsrBody for details
 	Asr *JoinPropertiesAsrBody `json:"asr,omitempty"`
@@ -420,6 +654,20 @@ type JoinPropertiesReqBody struct {
 //
 // @since v0.11.0
 type TurnDetectionBody struct {
+	// Turn detection mechanism.(Optional)
+	//
+	//  - "agora_vad": Agora VAD.(Default)
+	//
+	//  - "server_vad": The model detects the start and end of speech based on audio volume and responds at the end of user speech.
+	// 				 	Only available when mllm is enabled and OpenAI is selected.
+	//
+	//  - "semantic_vad": Uses a turn detection model in conjunction with VAD to semantically estimate whether the user has finished speaking,
+	// 					then dynamically sets a timeout based on this probability for more natural conversations.
+	// 					Only available when mllm is enabled and OpenAI is selected.
+	//
+	// @since v0.12.0
+	Type string `json:"type"`
+
 	// When the agent is interacting (speaking or thinking), the mode of human voice interrupting the agent's behavior, support the following values:
 	//
 	//  - "interrupt"(Default): Interrupt mode, human voice immediately interrupts the agent's interaction.
@@ -432,6 +680,71 @@ type TurnDetectionBody struct {
 	//				If the agent is speaking or thinking and receives human voice during the process,
 	//				the agent will directly ignore and discard the human voice request, not storing it in the context.
 	InterruptMode string `json:"interrupt_mode,omitempty"`
+
+	// The amount of time in milliseconds that the user's voice must exceed the VAD threshold before an interruption is triggered.(Optional)
+	//
+	// Default value is 160.
+	//
+	// @since v0.12.0
+	InterruptDurationMs *int `json:"interrupt_duration_ms,omitempty"`
+
+	// The extra forward padding time in milliseconds before the processing system starts to process the speech input. This padding helps capture the beginning of the speech.
+	//
+	// Default value is 800.
+	//
+	// @since v0.12.0
+	PrefixPaddingMs *int `json:"prefix_padding_ms,omitempty"`
+
+	// The duration of audio silence in milliseconds.(Optional)
+	//
+	// If no voice activity is detected during this period, the agent assumes that the user has stopped speaking.
+	//
+	// Default value is 480.
+	//
+	// @since v0.12.0
+	SilenceDurationMs *int `json:"silence_duration_ms,omitempty"`
+
+	// Identification sensitivity determines the level of sound in the audio signal that is considered voice activity.(Optional)
+	//
+	// Lower values make it easier for the agent to detect speech, and higher values ignore weak sounds.
+	//
+	// The value range is (0.0, 1.0).
+	//
+	// Default value is 0.5.
+	//
+	// @since v0.12.0
+	Threshold *float64 `json:"threshold,omitempty"`
+
+	// Whether to automatically generate a response when a VAD stop event occurs.(Optional)
+	//
+	// Only available in server_vad and semantic_vad modes when using OpenAI Realtime API.
+	//
+	// Default value is true.
+	//
+	// @since v0.12.0
+	CreateResponse *bool `json:"create_response,omitempty"`
+
+	// Whether to automatically interrupt any ongoing response when a VAD start event occurs.
+	//
+	// Only available in server_vad and semantic_vad modes when using OpenAI Realtime API.
+	//
+	// Default value is true.
+	//
+	// @since v0.12.0
+	InterruptResponse *bool `json:"interrupt_response,omitempty"`
+
+	// The eagerness of the model to respond(Optional):
+	//
+	//  - "auto": Equivalent to medium(Default)
+	//
+	//  - "low": Wait longer for the user to continue speaking
+	//
+	//  - "high": Respond more quickly
+	//
+	// Only available in semantic_vad mode when using OpenAI Realtime API.
+	//
+	// @since v0.12.0
+	Eagerness *string `json:"eagerness,omitempty"`
 }
 
 // @brief Fixed parameters
@@ -440,6 +753,37 @@ type TurnDetectionBody struct {
 type FixedParams struct {
 	// Silence configuration for the agent
 	SilenceConfig *SilenceConfig `json:"silence_config,omitempty"`
+
+	// Agent data transmission channel(Optional):
+	//
+	//  - "rtm": Use RTM transmission. This configuration takes effect only when advanced_features.enable_rtm is true.
+	//
+	//  - "datastream": Use RTC data stream transport.(Default)
+	//
+	// @since v0.12.0
+	DataChannel *string `json:"data_channel,omitempty"`
+
+	// Whether to receive agent performance data(Optional):
+	//
+	//  - true: Receive agent performance data.
+	//
+	//  - false: Do not receive agent performance data.(Default)
+	//
+	// This setting only takes effect when advanced_features.enable_rtm is true.
+	//
+	// @since v0.12.0
+	EnableMetrics bool `json:"enable_metrics,omitempty"`
+
+	// Whether to receive agent error events(Optional):
+	//
+	//  - true: Receive agent error events.
+	//
+	//  - false: Do not receive agent error events.(Default)
+	//
+	// This setting only takes effect when advanced_features.enable_rtm is true
+	//
+	// @since v0.12.0
+	EnableErrorMessage bool `json:"enable_error_message,omitempty"`
 }
 
 // @brief Silence configuration for the agent
