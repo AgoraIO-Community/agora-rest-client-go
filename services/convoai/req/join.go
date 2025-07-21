@@ -444,7 +444,24 @@ const (
 
 type ASRVendorParamsInterface interface {
 	VendorParam()
+	GetVendorType() ASRVendor
 }
+
+// @brief Defines the Automatic Speech Recognition (ASR) Fengming vendor parameter for the agent to join the RTC channel
+//
+// @since v0.12.0
+type ASRFengmingVendorParam struct{}
+
+func (ASRFengmingVendorParam) VendorParam()             {}
+func (ASRFengmingVendorParam) GetVendorType() ASRVendor { return ASRVendorFengming }
+
+// @brief Defines the Automatic Speech Recognition (ASR) Ares vendor parameter for the agent to join the RTC channel
+//
+// @since v0.12.0
+type ASRAresVendorParam struct{}
+
+func (ASRAresVendorParam) VendorParam()             {}
+func (ASRAresVendorParam) GetVendorType() ASRVendor { return ASRVendorAres }
 
 // @brief Defines the Automatic Speech Recognition (ASR) Tencent vendor parameter for the agent to join the RTC channel
 //
@@ -457,7 +474,8 @@ type ASRTencentVendorParam struct {
 	VoiceId         string `json:"voice_id"`
 }
 
-func (ASRTencentVendorParam) VendorParam() {}
+func (ASRTencentVendorParam) VendorParam()             {}
+func (ASRTencentVendorParam) GetVendorType() ASRVendor { return ASRVendorTencent }
 
 // @brief Defines the Automatic Speech Recognition (ASR) Microsoft vendor parameter for the agent to join the RTC channel
 //
@@ -469,7 +487,8 @@ type ASRMicrosoftVendorParam struct {
 	PhraseList []string `json:"phrase_list"`
 }
 
-func (ASRMicrosoftVendorParam) VendorParam() {}
+func (ASRMicrosoftVendorParam) VendorParam()             {}
+func (ASRMicrosoftVendorParam) GetVendorType() ASRVendor { return ASRVendorMicrosoft }
 
 // @brief Defines the Automatic Speech Recognition (ASR) deepgram vendor parameter for the agent to join the RTC channel
 //
@@ -481,7 +500,8 @@ type ASRDeepgramVendorParam struct {
 	Language string `json:"language"`
 }
 
-func (ASRDeepgramVendorParam) VendorParam() {}
+func (ASRDeepgramVendorParam) VendorParam()             {}
+func (ASRDeepgramVendorParam) GetVendorType() ASRVendor { return ASRVendorDeepgram }
 
 // @brief Defines the Automatic Speech Recognition (ASR) configuration for the agent to join the RTC channel
 //
