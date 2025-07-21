@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora/auth"
@@ -34,7 +35,7 @@ func (s *Service) SetCredential(username string, password string) {
 	s.credential = auth.NewBasicAuthCredential(username, password)
 }
 
-func (s *Service) RunWithCustomTTS(ttsVendor req.TTSVendor, ttsParam req.TTSVendorParamsInterface) {
+func (s *Service) RunWithCustomTTS(ttsParam req.TTSVendorParamsInterface) {
 	ctx := context.Background()
 	config := &convoai.Config{
 		AppID:         s.appId,
@@ -114,7 +115,7 @@ func (s *Service) RunWithCustomTTS(ttsVendor req.TTSVendor, ttsParam req.TTSVend
 			GreetingMessage: "Hello,how can I help you?",
 		},
 		TTS: &req.JoinPropertiesTTSBody{
-			Vendor: ttsVendor,
+			Vendor: ttsParam.GetVendorType(),
 			Params: ttsParam,
 		},
 		Vad: &req.JoinPropertiesVadBody{
@@ -320,7 +321,7 @@ func (s *Service) RunWithBytedanceTTS() {
 		PitchRatio:  1.0,
 		Emotion:     "happy",
 	}
-	s.RunWithCustomTTS(req.BytedanceTTSVendor, ttsParam)
+	s.RunWithCustomTTS(ttsParam)
 }
 
 func (s *Service) RunWithTencentTTS() {
@@ -349,7 +350,7 @@ func (s *Service) RunWithTencentTTS() {
 		EmotionCategory:  "happy",
 		EmotionIntensity: 100,
 	}
-	s.RunWithCustomTTS(req.TencentTTSVendor, ttsParam)
+	s.RunWithCustomTTS(ttsParam)
 }
 
 func (s *Service) RunWithMinimaxTTS() {
@@ -384,7 +385,7 @@ func (s *Service) RunWithMinimaxTTS() {
 		},
 	}
 
-	s.RunWithCustomTTS(req.MinimaxTTSVendor, ttsParam)
+	s.RunWithCustomTTS(ttsParam)
 }
 
 func (s *Service) RunWithMicrosoftTTS() {
@@ -412,7 +413,7 @@ func (s *Service) RunWithMicrosoftTTS() {
 		SampleRate: 24000,
 	}
 
-	s.RunWithCustomTTS(req.MicrosoftTTSVendor, ttsParam)
+	s.RunWithCustomTTS(ttsParam)
 }
 
 func (s *Service) RunWithElevenLabsTTS() {
@@ -437,5 +438,80 @@ func (s *Service) RunWithElevenLabsTTS() {
 		VoiceId: ttsVoiceId,
 	}
 
-	s.RunWithCustomTTS(req.ElevenLabsTTSVendor, ttsParam)
+	s.RunWithCustomTTS(ttsParam)
+}
+
+func (s *Service) RunWithCartesiaTTS() {
+	ttsApiKey := os.Getenv("CONVOAI_TTS_CARTESIA_API_KEY")
+	if ttsApiKey == "" {
+		log.Fatalln("CONVOAI_TTS_CARTESIA_API_KEY is required")
+	}
+
+	ttsModelId := os.Getenv("CONVOAI_TTS_CARTESIA_MODEL_ID")
+	if ttsModelId == "" {
+		log.Fatalln("CONVOAI_TTS_CARTESIA_MODEL_ID is required")
+	}
+
+	ttsVoiceMode := os.Getenv("CONVOAI_TTS_CARTESIA_VOICE_MODE")
+	if ttsVoiceMode == "" {
+		log.Fatalln("CONVOAI_TTS_CARTESIA_VOICE_MODE is required")
+	}
+
+	ttsVoiceId := os.Getenv("CONVOAI_TTS_CARTESIA_VOICE_ID")
+	if ttsVoiceId == "" {
+		log.Fatalln("CONVOAI_TTS_CARTESIA_VOICE_ID is required")
+	}
+
+	ttsParam := req.TTSCartesiaVendorParams{
+		APIKey:  ttsApiKey,
+		ModelId: ttsModelId,
+		Voice: &req.TTSCartesiaVendorVoice{
+			Mode: ttsVoiceMode,
+			Id:   ttsVoiceId,
+		},
+	}
+
+	s.RunWithCustomTTS(ttsParam)
+}
+
+func (s *Service) RunWithOpenAITTS() {
+	ttsApiKey := os.Getenv("CONVOAI_TTS_OPENAI_API_KEY")
+	if ttsApiKey == "" {
+		log.Fatalln("CONVOAI_TTS_OPENAI_API_KEY is required")
+	}
+
+	ttsModel := os.Getenv("CONVOAI_TTS_OPENAI_MODEL")
+	if ttsModel == "" {
+		log.Fatalln("CONVOAI_TTS_OPENAI_MODEL is required")
+	}
+
+	ttsVoice := os.Getenv("CONVOAI_TTS_OPENAI_VOICE")
+	if ttsVoice == "" {
+		log.Fatalln("CONVOAI_TTS_OPENAI_VOICE is required")
+	}
+
+	ttsInstructions := os.Getenv("CONVOAI_TTS_OPENAI_INSTRUCTIONS")
+	if ttsInstructions == "" {
+		log.Fatalln("CONVOAI_TTS_OPENAI_INSTRUCTIONS is required")
+	}
+
+	ttsSpeed := os.Getenv("CONVOAI_TTS_OPENAI_SPEED")
+	if ttsSpeed == "" {
+		log.Fatalln("CONVOAI_TTS_OPENAI_SPEED is required")
+	}
+
+	speed, err := strconv.ParseFloat(ttsSpeed, 32)
+	if err != nil {
+		log.Fatalln("CONVOAI_TTS_OPENAI_SPEED is not a valid float")
+	}
+
+	ttsParam := req.TTSOpenAIVendorParams{
+		APIKey:       ttsApiKey,
+		Model:        ttsModel,
+		Voice:        ttsVoice,
+		Instructions: ttsInstructions,
+		Speed:        float32(speed),
+	}
+
+	s.RunWithCustomTTS(ttsParam)
 }

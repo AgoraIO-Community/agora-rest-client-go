@@ -35,7 +35,7 @@ func main() {
 		panic("BASIC_AUTH_PASSWORD is required")
 	}
 
-	ttsVendor := flag.String("ttsVendor", "", "tts vendor, e.g. bytedance,microsoft,tencent,minimax,elevenLabs")
+	ttsVendor := flag.String("ttsVendor", "", "tts vendor, e.g. bytedance,microsoft,tencent,minimax,elevenLabs,cartesia,openai")
 	serviceRegion := flag.Int("serviceRegion", 0, "service region, e.g. 1: ChineseMainland, 2: Global")
 	flag.Parse()
 
@@ -54,10 +54,6 @@ func main() {
 
 		s.RunWithBytedanceTTS()
 	case "microsoft":
-		if *serviceRegion == 2 {
-			log.Fatalln("Microsoft TTS is not supported in ChineseMainland service region")
-		}
-
 		s.RunWithMicrosoftTTS()
 	case "tencent":
 		if *serviceRegion == 2 {
@@ -72,11 +68,23 @@ func main() {
 
 		s.RunWithMinimaxTTS()
 	case "elevenLabs":
-		if *serviceRegion == 2 {
+		if *serviceRegion == 1 {
 			log.Fatalln("ElevenLabs TTS is not supported in ChineseMainland service region")
 		}
 
 		s.RunWithElevenLabsTTS()
+	case "cartesia":
+		if *serviceRegion == 1 {
+			log.Fatalln("Cartesia TTS is not supported in ChineseMainland service region")
+		}
+
+		s.RunWithCartesiaTTS()
+	case "openai":
+		if *serviceRegion == 1 {
+			log.Fatalln("OpenAI TTS is not supported in ChineseMainland service region")
+		}
+
+		s.RunWithOpenAITTS()
 	default:
 		log.Fatalln("Invalid tts vendor")
 	}
