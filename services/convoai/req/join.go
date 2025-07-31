@@ -127,6 +127,9 @@ type TTSBytedanceVendorParams struct {
 func (TTSBytedanceVendorParams) VendorParam()             {}
 func (TTSBytedanceVendorParams) GetVendorType() TTSVendor { return BytedanceTTSVendor }
 
+// TTSMicrosoftVendorParams Defines the Microsoft vendor parameters for the Text-to-Speech (TTS) module when the agent joins the RTC channel
+//
+// @since v0.12.0
 type TTSMicrosoftVendorParams struct {
 	// The API key used for authentication.(Required)
 	Key string `json:"key"`
@@ -153,6 +156,9 @@ type TTSMicrosoftVendorParams struct {
 func (TTSMicrosoftVendorParams) VendorParam()             {}
 func (TTSMicrosoftVendorParams) GetVendorType() TTSVendor { return MicrosoftTTSVendor }
 
+// TTSElevenLabsVendorParams Defines the ElevenLabs vendor parameters for the Text-to-Speech (TTS) module when the agent joins the RTC channel
+//
+// @since v0.12.0
 type TTSElevenLabsVendorParams struct {
 	// The API key used for authentication.(Required)
 	Key string `json:"key"`
