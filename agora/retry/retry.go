@@ -2,6 +2,7 @@ package retry
 
 import (
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/AgoraIO-Community/agora-rest-client-go/agora"
@@ -21,6 +22,7 @@ func Do(retryFunc Func, stopFunc ShouldStopFunc, delayFunc DelayFunc, attemptFun
 		err        error
 	)
 
+	err = agora.NewRetryErr(false, fmt.Errorf("stopped before first try"))
 	stopRetry := stopFunc()
 	for !stopRetry {
 		err = retryFunc(retryCount)
